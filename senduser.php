@@ -44,7 +44,6 @@ if (is_null($id)) {
         die;
     }
 }
-echo '6';
 $headers = clearlesson_set_header($pluginconfig);
 $body = clearlesson_set_body($pluginconfig, $url);
 $jws = new Gamegos\JWS\JWS();

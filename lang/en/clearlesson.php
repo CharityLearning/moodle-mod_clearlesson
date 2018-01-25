@@ -22,8 +22,16 @@
  * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-$string['clicktoopen'] = 'Click {$a} link to open resource.';
+$string['clearlessonurl'] = 'Clear Lesson Platform URL';
+$string['clearlessonurldesc'] = 'Url for your Clear Lesson Platform with no trailing slash.';
+$string['apikey'] = 'API Key';
+$string['apikeydesc'] = 'Your API Key from the Clear Lesson Platform.';
+$string['secretkey'] = 'Secret Key';
+$string['secretkeydesc'] = 'Your Secret Key from the Clear Lesson Platform';
+$string['externalref'] = 'External Reference eg. ABC123';
+$string['type'] = 'Type';
+$string['invalidresponse'] = 'Invalid response from Clear Lesson Platform.';
+$string['clicktoopen'] = 'Click {$a} link to open video.';
 $string['configdisplayoptions'] = 'Select all options that should be available, existing settings are not modified. Hold CTRL key to select multiple fields.';
 $string['configframesize'] = 'When a web page or an uploaded file is displayed within a frame, this value is the height (in pixels) of the top frame (which contains the navigation).';
 $string['configrolesinparams'] = 'Enable if you want to include localized role names in list of available parameter variables.';

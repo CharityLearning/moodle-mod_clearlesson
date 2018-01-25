@@ -331,7 +331,7 @@ function clearlesson_dndupload_handle($uploadinfo) {
  * @since Moodle 3.0
  */
 function clearlesson_view($clearlessonref, $course, $cm, $context) {
-
+  global $DB, $USER;
     // Trigger course_module_viewed event.
     $params = array(
         'context' => $context,
@@ -343,6 +343,12 @@ function clearlesson_view($clearlessonref, $course, $cm, $context) {
     $event->add_record_snapshot('course', $course);
     $event->add_record_snapshot('clearlesson', $clearlessonref);
     $event->trigger();
+
+    $newview = new \stdClass();
+    $newview->userid = $USER->id;
+    $newview->clearlessonid = $clearlessonref->id;
+    $newview->timemodified = time();
+    $DB->insert_record('clearlesson_track', $newview);
 
     // Completion.
     $completion = new completion_info($course);
@@ -375,7 +381,6 @@ function clearlesson_redirect_post($data, array $headers = null) {
        curl_setopt($curl, CURLOPT_POST, 1);
        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
        curl_setopt($curl,CURLOPT_URL,$pluginconfig->clearlessonurl.'/api/v1/userlogin');
-       //curl_setopt($curl,CURLOPT_URL, 'https://requestb.in/1iylyq61');
        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
        $response = curl_exec($curl);
        $response = json_decode($response);
@@ -384,10 +389,7 @@ function clearlesson_redirect_post($data, array $headers = null) {
            $url = new \moodle_url($response->authUrl);
        redirect($url);
        }else{
-         //  echo $OUTPUT->header();
-           echo var_dump($response);
-           //->error;
-         //  echo $OUTPUT->footer();
+         throw new \moodle_exception(get_string('invalidresponse', 'clearlesson'));
        }
 
 }
@@ -458,20 +460,14 @@ class clearlesson_usersync {
             }
             $users[] = $processeduser;
         }
-
         $pluginconfig = get_config('clearlesson');
         $headers = clearlesson_set_header($pluginconfig);
         $body = array('origin' => $CFG->wwwroot,
                     'users' => $users,
                     'date' => gmdate("Y-m-d\TH:i:s\Z")
                     );
-
-                    var_dump($headers);
-                    var_dump($body);
-                    die();
         $jws = new Gamegos\JWS\JWS();
         $body = $jws->encode($headers, $body, $pluginconfig->secretkey);
-
         $curl = curl_init();
         $headertosend = array();
         foreach($headers as $key => $header){

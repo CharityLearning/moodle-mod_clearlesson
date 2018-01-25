@@ -51,8 +51,8 @@ class mod_clearlesson_mod_form extends moodleform_mod {
             'topics' => 'topics',
             'playlists' => 'playlists'
         );
-        $select = $mform->addElement('select', 'type', get_string('type'), $options);
-        $mform->addElement('text', 'externalref', get_string('externalref', 'externalref'), array('size'=>'10'), array('usefilepicker'=>false));
+        $select = $mform->addElement('select', 'type', get_string('type', 'clearlesson'), $options);
+        $mform->addElement('text', 'externalref', get_string('externalref', 'clearlesson'), array('size'=>'10'), array('usefilepicker'=>false));
         $mform->setType('externalref', PARAM_TEXT);
         $mform->addRule('externalref', null, 'required', null, 'client');
         $this->standard_intro_elements();
