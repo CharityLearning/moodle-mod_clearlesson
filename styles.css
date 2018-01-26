@@ -1,0 +1,15 @@
+#page-mod-clearlesson-view #resourceobject {
+  border: 0;
+  overflow: visible;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100% !important;
+}
+#page-mod-clearlesson-view .resourcecontent.resourcegeneral {
+  width: 100%;
+  padding-top: 56.25%;
+  position: relative;
+}
