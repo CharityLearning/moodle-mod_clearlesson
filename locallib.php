@@ -192,7 +192,6 @@ function clearlesson_print_intro($clearlesson, $cm, $course, $ignoresettings=fal
  */
 function clearlesson_display_frame($clearlesson, $cm, $course) {
     global $PAGE, $OUTPUT, $CFG;
-
     $frame = optional_param('frameset', 'main', PARAM_ALPHA);
 
     if ($frame === 'top') {

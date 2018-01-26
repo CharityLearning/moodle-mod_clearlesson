@@ -22,8 +22,16 @@
  * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-$string['clicktoopen'] = 'Click {$a} link to open resource.';
+$string['clearlessonurl'] = 'Clear Lesson Platform URL';
+$string['clearlessonurldesc'] = 'Url for your Clear Lesson Platform with no trailing slash.';
+$string['apikey'] = 'API Key';
+$string['apikeydesc'] = 'Your API Key from the Clear Lesson Platform.';
+$string['secretkey'] = 'Secret Key';
+$string['secretkeydesc'] = 'Your Secret Key from the Clear Lesson Platform';
+$string['externalref'] = 'External Reference eg. ABC123';
+$string['type'] = 'Type';
+$string['invalidresponse'] = 'Invalid response from Clear Lesson Platform.';
+$string['clicktoopen'] = 'Click {$a} link to open video.';
 $string['configdisplayoptions'] = 'Select all options that should be available, existing settings are not modified. Hold CTRL key to select multiple fields.';
 $string['configframesize'] = 'When a web page or an uploaded file is displayed within a frame, this value is the height (in pixels) of the top frame (which contains the navigation).';
 $string['configrolesinparams'] = 'Enable if you want to include localized role names in list of available parameter variables.';
@@ -47,16 +55,16 @@ $string['invalidstoredurl'] = 'Cannot display this resource, URL is invalid.';
 $string['chooseavariable'] = 'Choose a variable...';
 $string['invalidurl'] = 'Entered URL is invalid';
 $string['modulename'] = 'Clear Lesson Video';
-$string['modulename_help'] = 'The URL module enables a teacher to provide a web link as a course resource. Anything that is freely available online, such as documents or images, can be linked to; the URL doesn’t have to be the home page of a website. The URL of a particular web page may be copied and pasted or a teacher can use the file picker and choose a link from a repository such as Flickr, YouTube or Wikimedia (depending upon which repositories are enabled for the site).
+$string['modulename_help'] = 'The Clear Lesson module provides a Clear Lesson Video as a course resource.
 
-There are a number of display options for the URL, such as embedded or opening in a new window and advanced options for passing information, such as a student\'s name, to the URL if required.
+There are a number of display options for the video, such as embedded or opening in a new window and advanced options for passing information, such as a student\'s name, to the URL if required.
 
 Note that URLs can also be added to any other resource or activity type through the text editor.';
 $string['modulename_link'] = 'mod/clearlesson/view';
 $string['modulenameplural'] = 'Clear Lesson Videos';
 $string['page-mod-url-x'] = 'Any URL module page';
 $string['parameterinfo'] = '&amp;parameter=variable';
-$string['parametersheader'] = 'URL variables';
+$string['parametersheader'] = 'Clear Lesson variables';
 $string['parametersheader_help'] = 'Some internal Moodle variables may be automatically appended to the URL. Type your name for the parameter into each text box(es) and then select the required matching variable.';
 $string['pluginadministration'] = 'Clear Lesson Video module administration';
 $string['pluginname'] = 'Clear Lesson Video';
