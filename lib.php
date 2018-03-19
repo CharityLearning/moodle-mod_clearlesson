@@ -435,12 +435,13 @@ class clearlesson_usersync {
     require_once(dirname(__FILE__) . '/lib.php');
     require_once(dirname(__FILE__) . '/lib/php-jws/JWS.php');
     require_once(dirname(__FILE__) . '/lib/php-jws/Algorithm/HMACAlgorithm.php');
-    $all = true;
     GLOBAL $DB, $CFG;
     if ($all) {
       $rawusersinfo = $DB->get_records('user', array());
     } else {
-      $rawusersinfo = $DB->get_records_sql("SELECT * FROM {user} WHERE (timemodified  >= UNIX_TIMESTAMP(NOW() - INTERVAL 7 DAY))");
+      $week = new DateTime("-7 day", core_date::get_server_timezone_object());
+      $weekint = $week->getTimestamp();
+      $rawusersinfo = $DB->get_records_sql("SELECT * FROM {user} WHERE (timemodified  >= $weekint)");
     }
     $users = array();
     foreach ($rawusersinfo as $rawuserinfo) {
