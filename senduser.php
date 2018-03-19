@@ -32,7 +32,7 @@ require_once(dirname(__FILE__) . '/lib/php-jws/JWS.php');
 require_once(dirname(__FILE__) . '/lib/php-jws/Algorithm/HMACAlgorithm.php');
 require_once($CFG->libdir . '/filelib.php');
 require_login();
-$id = optional_param('id', NULL, PARAM_INT);
+$id = optional_param('id', null, PARAM_INT);
 global $DB, $USER;
 $pluginconfig = get_config('clearlesson');
 if (is_null($id)) {
@@ -42,7 +42,7 @@ if (is_null($id)) {
     if ($record) {
         $url = clearlesson_build_url($record, $pluginconfig);
     } else {
-        notice(get_string('invalidstoredurl', 'url'), new moodle_url('/course/view.php', array('id'=>$cm->course)));
+        notice(get_string('invalidstoredurl', 'url'), new moodle_url('/course/view.php', array('id' => $cm->course)));
         die;
     }
 }

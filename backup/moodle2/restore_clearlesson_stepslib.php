@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -36,7 +35,7 @@ class restore_clearlesson_activity_structure_step extends restore_activity_struc
         $paths = array();
         $paths[] = new restore_path_element('clearlesson', '/activity/clearlesson');
 
-        // Return the paths wrapped into standard activity structure
+        // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);
     }
 
@@ -47,14 +46,14 @@ class restore_clearlesson_activity_structure_step extends restore_activity_struc
         $oldid = $data->id;
         $data->course = $this->get_courseid();
 
-        // insert the clearlesson record
+        // Insert the clearlesson record.
         $newitemid = $DB->insert_record('clearlesson', $data);
-        // immediately after inserting "activity" record, call this
+        // Immediately after inserting "activity" record, call this.
         $this->apply_activity_instance($newitemid);
     }
 
     protected function after_execute() {
-        // Add clearlesson related files, no need to match by itemname (just internally handled context)
+        // Add clearlesson related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_clearlesson', 'intro', null);
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,8 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $logs = array(
-    array('module'=>'clearlesson', 'action'=>'view', 'mtable'=>'clearlesson', 'field'=>'name'),
-    array('module'=>'clearlesson', 'action'=>'view all', 'mtable'=>'clearlesson', 'field'=>'name'),
-    array('module'=>'clearlesson', 'action'=>'update', 'mtable'=>'clearlesson', 'field'=>'name'),
-    array('module'=>'clearlesson', 'action'=>'add', 'mtable'=>'clearlesson', 'field'=>'name'),
+    array('module' => 'clearlesson', 'action' => 'view', 'mtable' => 'clearlesson', 'field' => 'name'),
+    array('module' => 'clearlesson', 'action' => 'view all', 'mtable' => 'clearlesson', 'field' => 'name'),
+    array('module' => 'clearlesson', 'action' => 'update', 'mtable' => 'clearlesson', 'field' => 'name'),
+    array('module' => 'clearlesson', 'action' => 'add', 'mtable' => 'clearlesson', 'field' => 'name'),
 );

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -26,33 +25,32 @@
 defined('MOODLE_INTERNAL') || die;
 
  /**
- * Define the complete Clear Lesson structure for backup, with file and id annotations
- */
+  * Define the complete Clear Lesson structure for backup, with file and id annotations.
+  */
 class backup_clearlesson_activity_structure_step extends backup_activity_structure_step {
 
     protected function define_structure() {
 
-        //the Clear Lesson module stores no user info
+        // The Clear Lesson module stores no user info.
 
-        // Define each element separated
+        // Define each element separated.
         $clearlesson = new backup_nested_element('clearlesson', array('id'), array(
             'name', 'intro', 'introformat', 'externalref',
             'display', 'displayoptions', 'parameters', 'timemodified', 'type'));
 
+        // Build the tree.
+        // Nothing here for Clear Lessons.
 
-        // Build the tree
-        //nothing here for Clear Lessons
-
-        // Define sources
+        // Define sources.
         $clearlesson->set_source_table('clearlesson', array('id' => backup::VAR_ACTIVITYID));
 
-        // Define id annotations
-        //module has no id annotations
+        // Define id annotations.
+        // Module has no id annotations.
 
         // Define file annotations
-        $clearlesson->annotate_files('mod_clearlesson', 'intro', null); // This file area hasn't itemid
+        $clearlesson->annotate_files('mod_clearlesson', 'intro', null); // This file area hasn't itemid.
 
-        // Return the root element (ClearLesson), wrapped into standard activity structure
+        // Return the root element (ClearLesson), wrapped into standard activity structure.
         return $this->prepare_activity_structure($clearlesson);
 
     }

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -41,11 +40,16 @@ if ($ADMIN->fulltree) {
                                    RESOURCELIB_DISPLAY_POPUP,
                                   );
 
-    //--- general settings -----------------------------------------------------------------------------------
+    // General settings.
     $settings->add(new admin_setting_configtext('clearlesson/clearlessonurl',
-        get_string('clearlessonurl', 'clearlesson'), get_string('clearlessonurldesc', 'clearlesson'), 'https://clearlessons.com', PARAM_URL));
+        get_string('clearlessonurl', 'clearlesson'),
+        get_string('clearlessonurldesc', 'clearlesson'),
+        'https://clearlessons.com', PARAM_URL));
     $settings->add(new admin_setting_configtext('clearlesson/framesize',
-        get_string('framesize', 'clearlesson'), get_string('configframesize', 'clearlesson'), 130, PARAM_INT));
+        get_string('framesize', 'clearlesson'),
+        get_string('configframesize', 'clearlesson'),
+        130,
+        PARAM_INT));
     $settings->add(new admin_setting_configpasswordunmask('clearlesson/apikey', get_string('apikey', 'clearlesson'),
         get_string('apikeydesc', 'clearlesson'), ''));
     $settings->add(new admin_setting_configpasswordunmask('clearlesson/secretkey', get_string('secretkey', 'clearlesson'),
@@ -56,13 +60,17 @@ if ($ADMIN->fulltree) {
         get_string('displayoptions', 'clearlesson'), get_string('configdisplayoptions', 'clearlesson'),
         $defaultdisplayoptions, $displayoptions));
 
-    //--- modedit defaults -----------------------------------------------------------------------------------
-    $settings->add(new admin_setting_heading('clearlessonmodeditdefaults', get_string('modeditdefaults', 'admin'), get_string('condifmodeditdefaults', 'admin')));
-
+    // Modedit defaults.
+    $settings->add(new admin_setting_heading('clearlessonmodeditdefaults',
+    get_string('modeditdefaults', 'admin'),
+    get_string('condifmodeditdefaults', 'admin')));
     $settings->add(new admin_setting_configcheckbox('clearlesson/printintro',
         get_string('printintro', 'clearlesson'), get_string('printintroexplain', 'clearlesson'), 1));
     $settings->add(new admin_setting_configselect('clearlesson/display',
-        get_string('displayselect', 'clearlesson'), get_string('displayselectexplain', 'clearlesson'), RESOURCELIB_DISPLAY_AUTO, $displayoptions));
+        get_string('displayselect', 'clearlesson'),
+        get_string('displayselectexplain', 'clearlesson'),
+        RESOURCELIB_DISPLAY_AUTO,
+        $displayoptions));
     $settings->add(new admin_setting_configtext('clearlesson/popupwidth',
         get_string('popupwidth', 'clearlesson'), get_string('popupwidthexplain', 'clearlesson'), 620, PARAM_INT, 7));
     $settings->add(new admin_setting_configtext('clearlesson/popupheight',

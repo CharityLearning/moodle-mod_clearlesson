@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines backup_clearlesson_activity_task class
+ * Defines backup_clearlesson_activity_task class.
  *
  * @package     mod_clearlesson
  * @category    backup
@@ -29,25 +28,25 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot . '/mod/clearlesson/backup/moodle2/backup_clearlesson_stepslib.php');
 
 /**
- * Provides all the settings and steps to perform one complete backup of the activity
+ * Provides all the settings and steps to perform one complete backup of the activity.
  */
 class backup_clearlesson_activity_task extends backup_activity_task {
 
     /**
-     * No specific settings for this activity
+     * No specific settings for this activity.
      */
     protected function define_my_settings() {
     }
 
     /**
-     * Defines a backup step to store the instance data in the clearlesson.xml file
+     * Defines a backup step to store the instance data in the clearlesson.xml file.
      */
     protected function define_my_steps() {
         $this->add_step(new backup_clearlesson_activity_structure_step('clearlesson_structure', 'clearlesson.xml'));
     }
 
     /**
-     * Encodes Clear Lesson Values to the index.php and view.php scripts
+     * Encodes Clear Lesson Values to the index.php and view.php scripts.
      *
      * @param string $content some HTML text that eventually contains Clear Lessons to the activity instance scripts
      * @return string the content with the Clear Lessons encoded
@@ -55,19 +54,19 @@ class backup_clearlesson_activity_task extends backup_activity_task {
     static public function encode_content_links($content) {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot.'/mod/clearlesson','#');
+        $base = preg_quote($CFG->wwwroot.'/mod/clearlesson', '#');
 
-        //Access a list of all links in a course
+        // Access a list of all links in a course.
         $pattern = '#('.$base.'/index\.php\?id=)([0-9]+)#';
         $replacement = '$@CLEARLESSONINDEX*$2@$';
         $content = preg_replace($pattern, $replacement, $content);
 
-        //Access the link supplying a course module id
+        // Access the link supplying a course module id.
         $pattern = '#('.$base.'/view\.php\?id=)([0-9]+)#';
         $replacement = '$@CLEARLESSONVIEWBYID*$2@$';
         $content = preg_replace($pattern, $replacement, $content);
 
-        //Access the link supplying an instance id
+        // Access the link supplying an instance id.
         $pattern = '#('.$base.'/view\.php\?u=)([0-9]+)#';
         $replacement = '$@CLEARLESSONVIEWBYU*$2@$';
         $content = preg_replace($pattern, $replacement, $content);

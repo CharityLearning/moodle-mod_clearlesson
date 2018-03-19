@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,9 +24,9 @@
 
 require('../../config.php');
 
-$id = required_param('id', PARAM_INT); // course id
+$id = required_param('id', PARAM_INT); // Course id.
 
-$course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
 require_course_login($course, true);
 $PAGE->set_pagelayout('incourse');
@@ -93,11 +92,11 @@ foreach ($urls as $url) {
     $extra = empty($cm->extra) ? '' : $cm->extra;
     $icon = '';
     if (!empty($cm->icon)) {
-        // each url has an icon in 2.0
-        $icon = '<img src="'.$OUTPUT->pix_url($cm->icon).'" class="activityicon" alt="'.get_string('modulename', $cm->modname).'" /> ';
+        $attributes = array('class' => 'activityicon');
+        $icon = \html_writer::img($OUTPUT->pix_url($cm->icon), get_string('modulename', $cm->modname), $attributes);
     }
 
-    $class = $url->visible ? '' : 'class="dimmed"'; // hidden modules are dimmed
+    $class = $url->visible ? '' : 'class="dimmed"'; // Hidden modules are dimmed.
     $table->data[] = array (
         $printsection,
         "<a $class $extra href=\"view.php?id=$cm->id\">".$icon.format_string($url->name)."</a>",

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,28 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * URL configuration form
+ * Clear Lesson configuration form
  *
- * @package    mod_url
+ * @package    mod_clearlesson
  * @copyright  2009 Petr Skoda  {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
-
-require_once ($CFG->dirroot.'/course/moodleform_mod.php');
+require_once($CFG->dirroot.'/course/moodleform_mod.php');
 require_once($CFG->dirroot.'/mod/clearlesson/locallib.php');
 
 class mod_clearlesson_mod_form extends moodleform_mod {
-    function definition() {
+    public function definition() {
         global $CFG, $DB;
         $mform = $this->_form;
 
         $config = get_config('clearlesson');
 
-        //-------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));
-        $mform->addElement('text', 'name', get_string('name'), array('size'=>'48'));
+        $mform->addElement('text', 'name', get_string('name'), array('size' => '48'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -52,7 +49,10 @@ class mod_clearlesson_mod_form extends moodleform_mod {
             'playlists' => 'playlists'
         );
         $select = $mform->addElement('select', 'type', get_string('type', 'clearlesson'), $options);
-        $mform->addElement('text', 'externalref', get_string('externalref', 'clearlesson'), array('size'=>'10'), array('usefilepicker'=>false));
+        $mform->addElement('text', 'externalref',
+        get_string('externalref', 'clearlesson'),
+        array('size' => '10'),
+        array('usefilepicker' => false));
         $mform->setType('externalref', PARAM_TEXT);
         $mform->addRule('externalref', null, 'required', null, 'client');
         $this->standard_intro_elements();
@@ -60,7 +60,6 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         $attributes = $element->getAttributes();
         $attributes['rows'] = 5;
         $element->setAttributes($attributes);
-        //-------------------------------------------------------
         $mform->addElement('header', 'optionssection', get_string('appearance'));
 
         if ($this->current->instance) {
@@ -80,14 +79,14 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         }
 
         if (array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {
-            $mform->addElement('text', 'popupwidth', get_string('popupwidth', 'url'), array('size'=>3));
+            $mform->addElement('text', 'popupwidth', get_string('popupwidth', 'url'), array('size' => 3));
             if (count($options) > 1) {
                 $mform->disabledIf('popupwidth', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
             }
             $mform->setType('popupwidth', PARAM_INT);
             $mform->setDefault('popupwidth', $config->popupwidth);
 
-            $mform->addElement('text', 'popupheight', get_string('popupheight', 'url'), array('size'=>3));
+            $mform->addElement('text', 'popupheight', get_string('popupheight', 'url'), array('size' => 3));
             if (count($options) > 1) {
                 $mform->disabledIf('popupheight', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
             }
@@ -105,38 +104,35 @@ class mod_clearlesson_mod_form extends moodleform_mod {
             $mform->setDefault('printintro', $config->printintro);
         }
 
-        //-------------------------------------------------------
         $this->standard_coursemodule_elements();
-
-        //-------------------------------------------------------
         $this->add_action_buttons();
     }
 
-    function data_preprocessing(&$default_values) {
-        if (!empty($default_values['displayoptions'])) {
-            $displayoptions = unserialize($default_values['displayoptions']);
+    public function data_preprocessing(&$defaultvalues) {
+        if (!empty($defaultvalues['displayoptions'])) {
+            $displayoptions = unserialize($defaultvalues['displayoptions']);
             if (isset($displayoptions['printintro'])) {
-                $default_values['printintro'] = $displayoptions['printintro'];
+                $defaultvalues['printintro'] = $displayoptions['printintro'];
             }
             if (!empty($displayoptions['popupwidth'])) {
-                $default_values['popupwidth'] = $displayoptions['popupwidth'];
+                $defaultvalues['popupwidth'] = $displayoptions['popupwidth'];
             }
             if (!empty($displayoptions['popupheight'])) {
-                $default_values['popupheight'] = $displayoptions['popupheight'];
+                $defaultvalues['popupheight'] = $displayoptions['popupheight'];
             }
         }
-        if (!empty($default_values['parameters'])) {
-            $parameters = unserialize($default_values['parameters']);
+        if (!empty($defaultvalues['parameters'])) {
+            $parameters = unserialize($defaultvalues['parameters']);
             $i = 0;
-            foreach ($parameters as $parameter=>$variable) {
-                $default_values['parameter_'.$i] = $parameter;
-                $default_values['variable_'.$i]  = $variable;
+            foreach ($parameters as $parameter => $variable) {
+                $defaultvalues['parameter_'.$i] = $parameter;
+                $defaultvalues['variable_'.$i]  = $variable;
                 $i++;
             }
         }
     }
 
-    function validation($data, $files) {
+    public function validation($data, $files) {
         return array();
     }
 

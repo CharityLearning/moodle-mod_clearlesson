@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -24,7 +23,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
-
 require_once("$CFG->libdir/filelib.php");
 require_once("$CFG->libdir/resourcelib.php");
 require_once("$CFG->dirroot/mod/clearlesson/lib.php");
@@ -38,7 +36,7 @@ require_once("$CFG->dirroot/mod/clearlesson/lib.php");
  */
 function clearlesson_appears_valid_clearlesson($clearlesson) {
     if (preg_match('/^(\/|https?:|ftp:)/i', $clearlesson)) {
-        // note: this is not exact validation, we look for severely malformed clearlessons only
+        // Note: this is not exact validation, we look for severely malformed clearlessons only.
         return (bool)preg_match('/^[a-z]+:\/\/([^:@\s]+:[^@\s]+@)?[a-z0-9_\.\-]+(:[0-9]+)?(\/[^#]*)?(#.*)?$/i', $clearlesson);
     } else {
         return (bool)preg_match('/^[a-z]+:\/\/...*$/i', $clearlesson);
@@ -55,13 +53,10 @@ function clearlesson_appears_valid_clearlesson($clearlesson) {
  * @return string
  */
 function clearlesson_fix_submitted_ref($clearlesson) {
-    // note: empty clearlessons are prevented in form validation
+    // Note: empty clearlessons are prevented in form validation.
     $clearlesson = trim($clearlesson);
-
-    // remove encoded entities - we want the raw URI here
+    // Remove encoded entities - we want the raw URI here.
     $clearlesson = html_entity_decode($clearlesson, ENT_QUOTES, 'UTF-8');
-
-
     return $clearlesson;
 }
 
@@ -77,10 +72,9 @@ function clearlesson_fix_submitted_ref($clearlesson) {
  * @return string clearlesson with & encoded as &amp;
  */
 function clearlesson_get_full_clearlesson($clearlesson, $cm, $course, $config=null, $embed=null) {
-
     $parameters = empty($clearlesson->parameters) ? array() : unserialize($clearlesson->parameters);
 
-    // make sure there are no encoded entities, it is ok to do this twice
+    // Make sure there are no encoded entities, it is ok to do this twice.
     if ($embed) {
         $options = array('id' => $clearlesson->id, 'embed' => true);
     } else {
@@ -89,11 +83,11 @@ function clearlesson_get_full_clearlesson($clearlesson, $cm, $course, $config=nu
     $fullclearlesson = new moodle_url("/mod/clearlesson/senduser.php", $options);
 
     if (preg_match('/^(\/|https?:|ftp:)/i', $fullclearlesson) or preg_match('|^/|', $fullclearlesson)) {
-        // encode extra chars in clearlessons - this does not make it always valid, but it helps with some UTF-8 problems
+        // Encode extra chars in clearlessons - this does not make it always valid, but it helps with some UTF-8 problems.
         $allowed = "a-zA-Z0-9".preg_quote(';/?:@=&$_.+!*(),-#%', '/');
         $fullclearlesson = preg_replace_callback("/[^$allowed]/", 'clearlesson_filter_callback', $fullclearlesson);
     } else {
-        // encode special chars only
+        // Encode special chars only.
         $fullclearlesson = str_replace('"', '%22', $fullclearlesson);
         $fullclearlesson = str_replace('\'', '%27', $fullclearlesson);
         $fullclearlesson = str_replace(' ', '%20', $fullclearlesson);
@@ -101,14 +95,14 @@ function clearlesson_get_full_clearlesson($clearlesson, $cm, $course, $config=nu
         $fullclearlesson = str_replace('>', '%3E', $fullclearlesson);
     }
 
-    // add variable clearlesson parameters
+    // Add variable clearlesson parameters.
     if (!empty($parameters)) {
         if (!$config) {
             $config = get_config('clearlesson');
         }
         $paramvalues = clearlesson_get_variable_values($clearlesson, $cm, $course, $config);
 
-        foreach ($parameters as $parse=>$parameter) {
+        foreach ($parameters as $parse => $parameter) {
             if (isset($paramvalues[$parameter])) {
                 $parameters[$parse] = rawclearlessonencode($parse).'='.rawclearlessonencode($paramvalues[$parameter]);
             } else {
@@ -117,7 +111,7 @@ function clearlesson_get_full_clearlesson($clearlesson, $cm, $course, $config=nu
         }
     }
 
-    // encode all & to &amp; entity
+    // Encode all & to &amp; entity.
     $fullclearlesson = str_replace('&', '&amp;', $fullclearlesson);
     $fullclearlesson = $fullclearlesson;
     return $fullclearlesson;
@@ -211,7 +205,7 @@ function clearlesson_display_frame($clearlesson, $cm, $course) {
         $courseshortname = format_string($course->shortname, true, array('context' => $coursecontext));
         $title = strip_tags($courseshortname.': '.format_string($clearlesson->name));
         $framesize = $config->framesize;
-        $modulename = s(get_string('modulename','clearlesson'));
+        $modulename = (get_string('modulename', 'clearlesson'));
         $contentframetitle = s(format_string($clearlesson->name));
         $dir = get_string('thisdirection', 'langconfig');
 
@@ -254,9 +248,10 @@ function clearlesson_print_workaround($clearlesson, $cm, $course) {
     if ($display == RESOURCELIB_DISPLAY_POPUP) {
         $jsfullclearlesson = addslashes_js($fullclearlesson);
         $options = empty($clearlesson->displayoptions) ? array() : unserialize($clearlesson->displayoptions);
-        $width  = empty($options['popupwidth'])  ? 620 : $options['popupwidth'];
+        $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
         $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
-        $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes";
+        $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,
+        status=no,directories=no,scrollbars=yes,resizable=yes";
         $extra = "onclick=\"window.open('$jsfullclearlesson', '', '$wh'); return false;\"";
 
     } else if ($display == RESOURCELIB_DISPLAY_NEW) {
@@ -287,7 +282,7 @@ function clearlesson_display_embed($clearlesson, $cm, $course) {
     $fullclearlesson  = clearlesson_get_full_clearlesson($clearlesson, $cm, $course, null, true);
     $title    = $clearlesson->name;
 
-    $link = html_writer::tag('a', $fullclearlesson, array('href'=>str_replace('&amp;', '&', $fullclearlesson)));
+    $link = html_writer::tag('a', $fullclearlesson, array('href' => str_replace('&amp;', '&', $fullclearlesson)));
     $clicktoopen = get_string('clicktoopen', 'clearlesson', $link);
     $moodleclearlesson = new moodle_url(str_replace('&amp;', '&', $fullclearlesson));
     $extension = resourcelib_get_extension($moodleclearlesson);
@@ -298,11 +293,8 @@ function clearlesson_display_embed($clearlesson, $cm, $course) {
         core_media_manager::OPTION_BLOCK => true
     );
     $code = resourcelib_embed_general($fullclearlesson, $title, $clicktoopen, 'text/html');
-
-
     clearlesson_print_header($clearlesson, $cm, $course);
     clearlesson_print_heading($clearlesson, $cm, $course);
-
     echo $code;
 
     clearlesson_print_intro($clearlesson, $cm, $course);
@@ -322,8 +314,6 @@ function clearlesson_get_final_display_type($clearlesson) {
     if ($clearlesson->display != RESOURCELIB_DISPLAY_AUTO) {
         return $clearlesson->display;
     }
-
-
     return RESOURCELIB_DISPLAY_OPEN;
 }
 
@@ -446,15 +436,9 @@ function clearlesson_get_variable_values($clearlesson, $cm, $course, $config) {
         $values['usertimezone']    = $now->getOffset() / 3600.0; // Value in hours for BC.
         $values['userclearlesson']         = $USER->clearlesson;
     }
-
-    // weak imitation of Single-Sign-On, for backwards compatibility only
-    // NOTE: login hack is not included in 2.0 any more, new contrib auth plugin
-    //       needs to be createed if somebody needs the old functionality!
     if (!empty($config->secretphrase)) {
         $values['encryptedcode'] = clearlesson_get_encrypted_parameter($clearlesson, $config);
     }
-
-    //hmm, this is pretty fragile and slow, why do we need it here??
     if ($config->rolesinparams) {
         $coursecontext = context_course::instance($course->id);
         $roles = role_fix_names(get_all_roles($coursecontext), $coursecontext, ROLENAME_ALIAS);

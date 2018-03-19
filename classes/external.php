@@ -64,11 +64,7 @@ class mod_clearlesson_external extends external_api {
     public static function view_clearlesson($refid) {
         global $DB, $CFG;
         require_once($CFG->dirroot . "/mod/clearlesson/lib.php");
-
-        $params = self::validate_parameters(self::view_url_parameters(),
-                                            array(
-                                                'refid' => $refid
-                                            ));
+        $params = self::validate_parameters(self::view_url_parameters(), array('refid' => $refid));
         $warnings = array();
 
         // Request and permission validation.
