@@ -369,22 +369,15 @@ function clearlesson_check_updates_since(cm_info $cm, $from, $filter = array()) 
   return $updates;
 }
 function clearlesson_redirect_post($data, array $headers = null) {
-  GLOBAL $OUTPUT;
   $pluginconfig = get_config('clearlesson');
-  $curl = curl_init();
-  $headertosend = array();
-  foreach($headers as $key => $header){
-    $headertosend[] = $key.':'.$header;
+  $curl = new \curl;
+  if (!empty($headers)) {
+    foreach($headers as $key => $header){
+      $curl->setHeader("$key:$header");
+    }
   }
-  curl_setopt($curl,CURLOPT_SSL_VERIFYPEER,FALSE);
-  curl_setopt($curl, CURLOPT_HTTPHEADER, $headertosend);
-  curl_setopt($curl, CURLOPT_POST, 1);
-  curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-  curl_setopt($curl,CURLOPT_URL,$pluginconfig->clearlessonurl.'/api/v1/userlogin');
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-  $response = curl_exec($curl);
-  $response = json_decode($response);
-  curl_close($curl);
+  $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v1/userlogin');
+  $response = json_decode($curl->post($endpoint, $data));
   if (isset($response->success)) {
     $url = new \moodle_url($response->authUrl);
     redirect($url);
@@ -470,20 +463,14 @@ class clearlesson_usersync {
   );
   $jws = new Gamegos\JWS\JWS();
   $body = $jws->encode($headers, $body, $pluginconfig->secretkey);
-  $curl = curl_init();
-  $headertosend = array();
-  foreach($headers as $key => $header){
-    $headertosend[] = $key.':'.$header;
+  $curl = new \curl;
+  if (!empty($headers)) {
+    foreach($headers as $key => $header){
+      $curl->setHeader("$key:$header");
+    }
   }
-  curl_setopt($curl,CURLOPT_SSL_VERIFYPEER,FALSE);
-  curl_setopt($curl, CURLOPT_HTTPHEADER, $headertosend);
-  curl_setopt($curl, CURLOPT_POST, 1);
-  curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
-  curl_setopt($curl,CURLOPT_URL,$pluginconfig->clearlessonurl.'/api/v1/usersync');
-  //curl_setopt($curl,CURLOPT_URL, 'https://requestb.in/1gcyss11');
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-  $response = curl_exec($curl);
+  $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v1/usersync');
+  $response = json_decode($curl->post($endpoint, $body));
   var_dump($response = json_decode($response));
-  curl_close($curl);
 }
 }

@@ -30,6 +30,7 @@ require_once(dirname(__FILE__) . '/lib/php-jws/Algorithm/RSA_SSA_PKCSv15.php');
 require_once(dirname(__FILE__) . '/lib.php');
 require_once(dirname(__FILE__) . '/lib/php-jws/JWS.php');
 require_once(dirname(__FILE__) . '/lib/php-jws/Algorithm/HMACAlgorithm.php');
+require_once($CFG->libdir . '/filelib.php');
 $id = optional_param('id', NULL, PARAM_INT);
 global $DB, $USER;
 $pluginconfig = get_config('clearlesson');
