@@ -29,7 +29,58 @@ class clearlesson_task extends \core\task\scheduled_task {
         return 'Clear Lesson';
     }
     public function execute() {
-      $sync = new \clearlesson_usersync();
-      $sync->sync();
+      $this->sync();
     }
+    public function sync($all = false){
+      require_once(dirname(__FILE__) . '/../../config.php');
+      require_once(dirname(__FILE__) . '/lib/php-jws/Exception/JWSException.php');
+      require_once(dirname(__FILE__) . '/lib/php-jws/Util/Base64Url.php');
+      require_once(dirname(__FILE__) . '/lib/php-jws/Util/Json.php');
+      require_once(dirname(__FILE__) . '/lib/php-jws/Exception/UnspecifiedAlgorithmException.php');
+      require_once(dirname(__FILE__) . '/lib/php-jws/Algorithm/AlgorithmInterface.php');
+      require_once(dirname(__FILE__) . '/lib/php-jws/Algorithm/RSA_SSA_PKCSv15.php');
+      require_once(dirname(__FILE__) . '/lib.php');
+      require_once(dirname(__FILE__) . '/lib/php-jws/JWS.php');
+      require_once(dirname(__FILE__) . '/lib/php-jws/Algorithm/HMACAlgorithm.php');
+      require_once($CFG->libdir . '/filelib.php');
+      GLOBAL $DB, $CFG;
+      if ($all) {
+        $rawusersinfo = $DB->get_records('user', array());
+      } else {
+        $week = new DateTime("-7 day", core_date::get_server_timezone_object());
+        $weekint = $week->getTimestamp();
+        $rawusersinfo = $DB->get_records_sql("SELECT * FROM {user} WHERE (timemodified  >= $weekint)");
+      }
+      $users = array();
+      foreach ($rawusersinfo as $rawuserinfo) {
+        $processeduser = new stdClass();
+        $processeduser->email = $rawuserinfo->email;
+        $processeduser->firstName = $rawuserinfo->firstname;
+        $processeduser->lastName = $rawuserinfo->lastname;
+        $processeduser->deleted = false;
+        if ($rawuserinfo->deleted) {
+          $processeduser->email = substr($rawuserinfo->username, 0, -11);
+          $processeduser->deleted = true;
+        }
+        $users[] = $processeduser;
+      }
+      $pluginconfig = get_config('clearlesson');
+      $headers = clearlesson_set_header($pluginconfig);
+      $body = array('origin' => $CFG->wwwroot,
+      'users' => $users,
+      'date' => gmdate("Y-m-d\TH:i:s\Z")
+    );
+    $jws = new Gamegos\JWS\JWS();
+    $body = $jws->encode($headers, $body, $pluginconfig->secretkey);
+    $curl = new \curl;
+    if (!empty($headers)) {
+      foreach($headers as $key => $header){
+        $curl->setHeader("$key:$header");
+      }
+    }
+    $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v1/usersync');
+    $response = json_decode($curl->post($endpoint, $body));
+    var_dump($response = json_decode($response));
+  }
+
 }
