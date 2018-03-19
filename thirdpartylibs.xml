@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<libraries>
+  <library>
+    <location>lib/php-jws/JWS.php</location>
+    <name>JSON Web Signature - Gamegos</name>
+    <license>MIT</license>
+    <version>0.3.6</version>
+  </library>
+</libraries>
