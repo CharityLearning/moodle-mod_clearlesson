@@ -31,9 +31,12 @@
 class restore_clearlesson_activity_structure_step extends restore_activity_structure_step {
 
     protected function define_structure() {
-
+        $userinfo = $this->get_setting_value('userinfo');
         $paths = array();
         $paths[] = new restore_path_element('clearlesson', '/activity/clearlesson');
+        if ($userinfo) {
+            $paths[] = new restore_path_element('clearlesson_track', '/activity/clearlesson_track');
+        }
 
         // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);
@@ -51,7 +54,19 @@ class restore_clearlesson_activity_structure_step extends restore_activity_struc
         // Immediately after inserting "activity" record, call this.
         $this->apply_activity_instance($newitemid);
     }
+    protected function process_clearlesson_track($data) {
+        global $DB;
 
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->clearlessonid = $this->get_new_parentid('clearlesson');
+        $data->userid = $this->get_mappingid('user', $data->userid);
+
+        // Insert the entry record.
+        $newitemid = $DB->insert_record('clearlesson_track', $data);
+        $this->set_mapping('clearlesson_track', $oldid, $newitemid, true); // Childs and files by itemname.
+    }
     protected function after_execute() {
         // Add clearlesson related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_clearlesson', 'intro', null);

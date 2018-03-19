@@ -31,25 +31,33 @@ class backup_clearlesson_activity_structure_step extends backup_activity_structu
 
     protected function define_structure() {
 
-        // The Clear Lesson module stores no user info.
+        // Check if user records are required.
+        $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated.
         $clearlesson = new backup_nested_element('clearlesson', array('id'), array(
-            'name', 'intro', 'introformat', 'externalref',
+            'course', 'name', 'intro', 'introformat', 'externalref',
             'display', 'displayoptions', 'parameters', 'timemodified', 'type'));
 
         // Build the tree.
-        // Nothing here for Clear Lessons.
-
+        if ($userinfo) {
+            $clearlessontrack = new backup_nested_element('clearlesson_track', array('id'), array(
+            'userid', 'clearlessonid', 'timemodified'));
+            $clearlesson->add_child($clearlessontrack);
+        }
         // Define sources.
         $clearlesson->set_source_table('clearlesson', array('id' => backup::VAR_ACTIVITYID));
-
+        if ($userinfo) {
+            $clearlessontrack->set_source_table('clearlesson_track', array('id' => backup::VAR_PARENTID));
+        }
         // Define id annotations.
         // Module has no id annotations.
 
         // Define file annotations
         $clearlesson->annotate_files('mod_clearlesson', 'intro', null); // This file area hasn't itemid.
-
+        if ($userinfo) {
+            $clearlessontrack->annotate_ids('user', 'userid');
+        }
         // Return the root element (ClearLesson), wrapped into standard activity structure.
         return $this->prepare_activity_structure($clearlesson);
 
