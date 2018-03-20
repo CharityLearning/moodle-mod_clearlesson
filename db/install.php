@@ -30,6 +30,5 @@
 defined('MOODLE_INTERNAL') || die;
 
 function xmldb_clearlesson_install() {
-    global $CFG;
 
 }

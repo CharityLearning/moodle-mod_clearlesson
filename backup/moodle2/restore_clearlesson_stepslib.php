@@ -46,7 +46,6 @@ class restore_clearlesson_activity_structure_step extends restore_activity_struc
         global $DB;
 
         $data = (object)$data;
-        $oldid = $data->id;
         $data->course = $this->get_courseid();
 
         // Insert the clearlesson record.

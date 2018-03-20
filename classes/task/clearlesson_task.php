@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_clearlesson\task;
+defined('MOODLE_INTERNAL') || die();
 GLOBAL $CFG;
 require_once($CFG->dirroot.'/mod/clearlesson/lib.php');
 
@@ -31,7 +32,7 @@ class clearlesson_task extends \core\task\scheduled_task {
     public function execute() {
         $this->sync();
     }
-    public function sync($all = false) {
+    public function sync() {
         require_once(dirname(__FILE__) . '/../../config.php');
         require_once(dirname(__FILE__) . '/lib/php-jws/Exception/JWSException.php');
         require_once(dirname(__FILE__) . '/lib/php-jws/Util/Base64Url.php');
@@ -44,13 +45,11 @@ class clearlesson_task extends \core\task\scheduled_task {
         require_once(dirname(__FILE__) . '/lib/php-jws/Algorithm/HMACAlgorithm.php');
         require_once($CFG->libdir . '/filelib.php');
         GLOBAL $DB, $CFG;
-        if ($all) {
-            $rawusersinfo = $DB->get_records('user', array());
-        } else {
-            $week = new DateTime("-7 day", core_date::get_server_timezone_object());
-            $weekint = $week->getTimestamp();
-            $rawusersinfo = $DB->get_records_sql("SELECT * FROM {user} WHERE (timemodified  >= $weekint)");
-        }
+
+        $week = new DateTime("-7 day", core_date::get_server_timezone_object());
+        $weekint = $week->getTimestamp();
+        $rawusersinfo = $DB->get_records_sql("SELECT * FROM {user} WHERE (timemodified  >= $weekint)");
+
         $users = array();
         foreach ($rawusersinfo as $rawuserinfo) {
             $processeduser = new stdClass();

@@ -77,4 +77,6 @@ $string['rolesinparams'] = 'Include role names in parameters';
 $string['search:activity'] = 'URL';
 $string['serverurl'] = 'Server URL';
 $string['addinstance'] = 'Add a new Clear Lesson resource';
+$string['clearlesson:addinstance'] = 'Add a new Clear Lesson resource';
 $string['view'] = 'View Clear Lesson Video';
+$string['clearlesson:view'] = 'View Clear Lesson Video';
