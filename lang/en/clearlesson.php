@@ -76,5 +76,5 @@ $string['printintroexplain'] = 'Display URL description below content? Some disp
 $string['rolesinparams'] = 'Include role names in parameters';
 $string['search:activity'] = 'URL';
 $string['serverurl'] = 'Server URL';
-$string['url:addinstance'] = 'Add a new URL resource';
-$string['url:view'] = 'View URL';
+$string['addinstance'] = 'Add a new Clear Lesson resource';
+$string['view'] = 'View Clear Lesson Video';
