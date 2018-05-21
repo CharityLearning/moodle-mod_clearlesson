@@ -33,16 +33,16 @@ class clearlesson_task extends \core\task\scheduled_task {
         $this->sync();
     }
     public function sync() {
-        require_once(dirname(__FILE__) . '/../../config.php');
-        require_once(dirname(__FILE__) . '/lib/php-jws/Exception/JWSException.php');
-        require_once(dirname(__FILE__) . '/lib/php-jws/Util/Base64Url.php');
-        require_once(dirname(__FILE__) . '/lib/php-jws/Util/Json.php');
-        require_once(dirname(__FILE__) . '/lib/php-jws/Exception/UnspecifiedAlgorithmException.php');
-        require_once(dirname(__FILE__) . '/lib/php-jws/Algorithm/AlgorithmInterface.php');
-        require_once(dirname(__FILE__) . '/lib/php-jws/Algorithm/RSA_SSA_PKCSv15.php');
-        require_once(dirname(__FILE__) . '/lib.php');
-        require_once(dirname(__FILE__) . '/lib/php-jws/JWS.php');
-        require_once(dirname(__FILE__) . '/lib/php-jws/Algorithm/HMACAlgorithm.php');
+        require_once(dirname(__FILE__) . '../../../../../config.php');
+        require_once(dirname(__FILE__) . '../../../lib/php-jws/Exception/JWSException.php');
+        require_once(dirname(__FILE__) . '../../../lib/php-jws/Util/Base64Url.php');
+        require_once(dirname(__FILE__) . '../../../lib/php-jws/Util/Json.php');
+        require_once(dirname(__FILE__) . '../../../lib/php-jws/Exception/UnspecifiedAlgorithmException.php');
+        require_once(dirname(__FILE__) . '../../../lib/php-jws/Algorithm/AlgorithmInterface.php');
+        require_once(dirname(__FILE__) . '../../../lib/php-jws/Algorithm/RSA_SSA_PKCSv15.php');
+        require_once(dirname(__FILE__) . '../../../lib.php');
+        require_once(dirname(__FILE__) . '../../../lib/php-jws/JWS.php');
+        require_once(dirname(__FILE__) . '../../../lib/php-jws/Algorithm/HMACAlgorithm.php');
         require_once($CFG->libdir . '/filelib.php');
         GLOBAL $DB, $CFG;
 
