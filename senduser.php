@@ -33,10 +33,21 @@ require_once(dirname(__FILE__) . '/lib/php-jws/Algorithm/HMACAlgorithm.php');
 require_once($CFG->libdir . '/filelib.php');
 require_login();
 $id = optional_param('id', null, PARAM_INT);
+$redirect = optional_param('redirect', '', PARAM_URL);
+$emailtoken = optional_param('emailtoken', '', PARAM_TEXT);
 global $DB, $USER;
 $pluginconfig = get_config('clearlesson');
 if (is_null($id)) {
-    $url = $pluginconfig->clearlessonurl;
+    if (!is_null($redirect)) {
+        if (substr($redirect, 0, 1 ) !== "/") {
+            $redirect = '/'.$redirect;
+        }
+        $url = new \moodle_url($pluginconfig->clearlessonurl.$redirect, array('emailtoken' => $emailtoken));
+        $url->set_anchor('emailtoken='.$emailtoken);
+        $url = $url->__toString();
+    } else {
+        $url = $pluginconfig->clearlessonurl;
+    }
 } else {
     $record = $DB->get_record('clearlesson', array('id' => $id));
     if ($record) {
