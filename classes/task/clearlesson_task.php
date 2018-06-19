@@ -45,9 +45,8 @@ class clearlesson_task extends \core\task\scheduled_task {
         require_once(dirname(__FILE__) . '../../../lib/php-jws/Algorithm/HMACAlgorithm.php');
         GLOBAL $DB, $CFG;
         require_once($CFG->libdir . '/filelib.php');
-
-        $week = new DateTime("-7 day", core_date::get_server_timezone_object());
-        $weekint = $week->getTimestamp();
+        $cltask = $DB->get_record('task_scheduled', array('classname' => '\mod_clearlesson\task\clearlesson_task'));
+        $weekint = $cltask->lastruntime;
         $rawusersinfo = $DB->get_records_sql("SELECT * FROM {user} WHERE (timemodified  >= $weekint)");
 
         $users = array();
