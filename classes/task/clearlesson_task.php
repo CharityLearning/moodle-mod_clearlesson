@@ -78,7 +78,7 @@ class clearlesson_task extends \core\task\scheduled_task {
         }
         $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v1/usersync');
         $response = json_decode($curl->post($endpoint, $body));
-        var_dump($response = json_decode($response));
+        var_dump($response);
     }
 
 }
