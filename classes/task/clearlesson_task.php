@@ -51,7 +51,7 @@ class clearlesson_task extends \core\task\scheduled_task {
 
         $users = array();
         foreach ($rawusersinfo as $rawuserinfo) {
-            $processeduser = new stdClass();
+            $processeduser = new \stdClass();
             $processeduser->email = $rawuserinfo->email;
             $processeduser->firstName = $rawuserinfo->firstname;
             $processeduser->lastName = $rawuserinfo->lastname;
