@@ -34,7 +34,7 @@ require_once($CFG->libdir . '/filelib.php');
 require_login();
 $id = optional_param('id', null, PARAM_INT);
 $redirect = optional_param('redirect', '', PARAM_URL);
-$emailtoken = optional_param('emailtoken', '', PARAM_TEXT);
+$emailtoken = optional_param('email_token', '', PARAM_TEXT);
 global $DB, $USER;
 $pluginconfig = get_config('clearlesson');
 if (is_null($id)) {
@@ -42,8 +42,8 @@ if (is_null($id)) {
         if (substr($redirect, 0, 1 ) !== "/") {
             $redirect = '/'.$redirect;
         }
-        $url = new \moodle_url($pluginconfig->clearlessonurl.$redirect, array('emailtoken' => $emailtoken));
-        $url->set_anchor('emailtoken='.$emailtoken);
+        $url = new \moodle_url($pluginconfig->clearlessonurl.$redirect, array('email_token' => $emailtoken));
+        $url->set_anchor('email_token='.$emailtoken);
         $url = $url->__toString();
     } else {
         $url = $pluginconfig->clearlessonurl;

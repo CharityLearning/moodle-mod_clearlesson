@@ -43,8 +43,8 @@ class clearlesson_task extends \core\task\scheduled_task {
         require_once(dirname(__FILE__) . '../../../lib.php');
         require_once(dirname(__FILE__) . '../../../lib/php-jws/JWS.php');
         require_once(dirname(__FILE__) . '../../../lib/php-jws/Algorithm/HMACAlgorithm.php');
-        require_once($CFG->libdir . '/filelib.php');
         GLOBAL $DB, $CFG;
+        require_once($CFG->libdir . '/filelib.php');
 
         $week = new DateTime("-7 day", core_date::get_server_timezone_object());
         $weekint = $week->getTimestamp();
