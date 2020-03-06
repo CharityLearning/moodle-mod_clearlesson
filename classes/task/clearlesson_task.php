@@ -68,7 +68,7 @@ class clearlesson_task extends \core\task\scheduled_task {
         'users' => $users,
         'date' => gmdate("Y-m-d\TH:i:s\Z")
         );
-        $jws = new Gamegos\JWS\JWS();
+        $jws = new \Gamegos\JWS\JWS();
         $body = $jws->encode($headers, $body, $pluginconfig->secretkey);
         $curl = new \curl;
         if (!empty($headers)) {
@@ -78,7 +78,7 @@ class clearlesson_task extends \core\task\scheduled_task {
         }
         $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v1/usersync');
         $response = json_decode($curl->post($endpoint, $body));
-        var_dump($response = json_decode($response));
+        var_dump($response);
     }
 
 }
