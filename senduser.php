@@ -43,7 +43,11 @@ if (is_null($id)) {
             $redirect = '/'.$redirect;
         }
         $url = new \moodle_url($pluginconfig->clearlessonurl.$redirect, array('email_token' => $emailtoken));
-        $url->set_anchor('email_token='.$emailtoken);
+        // TODO: Set Anchor on for legacy
+        // Temporary - Remove set anchor when HomepageMedia sites are gone.
+        if (!isset($CFG->clearlessonsversion) OR $CFG->clearlessonsversion <> 'PHP') {
+            $url->set_anchor('email_token='.$emailtoken);            
+        }
         $url = $url->__toString();
     } else {
         $url = $pluginconfig->clearlessonurl;
