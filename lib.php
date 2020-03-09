@@ -359,7 +359,7 @@ function clearlesson_redirect_post($data, array $headers = null) {
             $curl->setHeader("$key:$header");
         }
     }
-    $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v1/userlogin');
+    $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v1/userlogin/');
     $response = json_decode($curl->post($endpoint, $data));
     if (isset($response->success)) {
         $url = new \moodle_url($response->authUrl);
@@ -390,6 +390,7 @@ function clearlesson_set_header($pluginconfig) {
 function clearlesson_set_body($pluginconfig, $url) {
     GLOBAL $CFG, $USER;
     $userinfofields = array();
+    $userinfofields['referrer'] = str_replace('https://', '', $CFG->wwwroot);
     foreach ($USER as $key => $value) {
         if (!empty($value)) {
             if (substr($key, 0, 14) == 'profile_field_') {

@@ -48,17 +48,19 @@ class clearlesson_task extends \core\task\scheduled_task {
         $cltask = $DB->get_record('task_scheduled', array('classname' => '\mod_clearlesson\task\clearlesson_task'));
         $weekint = $cltask->lastruntime;
         $rawusersinfo = $DB->get_records_sql("SELECT * FROM {user} WHERE (timemodified  >= $weekint)");
-
         $users = array();
         foreach ($rawusersinfo as $rawuserinfo) {
             $processeduser = new \stdClass();
             $processeduser->email = $rawuserinfo->email;
             $processeduser->firstName = $rawuserinfo->firstname;
             $processeduser->lastName = $rawuserinfo->lastname;
-            $processeduser->deleted = false;
             if ($rawuserinfo->deleted) {
                 $processeduser->email = substr($rawuserinfo->username, 0, -11);
                 $processeduser->deleted = true;
+            } else {
+                $processeduser->deleted = false;
+                $processeduser->user_info_fields = profile_user_record($rawuserinfo->id);
+                $processeduser->user_info_fields->referrer = str_replace('https://', '', $CFG->wwwroot);
             }
             $users[] = $processeduser;
         }
@@ -68,6 +70,7 @@ class clearlesson_task extends \core\task\scheduled_task {
         'users' => $users,
         'date' => gmdate("Y-m-d\TH:i:s\Z")
         );
+    
         $jws = new \Gamegos\JWS\JWS();
         $body = $jws->encode($headers, $body, $pluginconfig->secretkey);
         $curl = new \curl;
@@ -76,9 +79,7 @@ class clearlesson_task extends \core\task\scheduled_task {
                 $curl->setHeader("$key:$header");
             }
         }
-        $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v1/usersync');
+        $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v1/usersync/');
+        var_dump($curl->post($endpoint, $body));
         $response = json_decode($curl->post($endpoint, $body));
         var_dump($response);
-    }
-
-}
