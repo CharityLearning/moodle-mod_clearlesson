@@ -83,3 +83,4 @@ class clearlesson_task extends \core\task\scheduled_task {
         var_dump($curl->post($endpoint, $body));
         $response = json_decode($curl->post($endpoint, $body));
         var_dump($response);
+    }
