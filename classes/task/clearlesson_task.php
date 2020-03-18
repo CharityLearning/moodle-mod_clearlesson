@@ -24,6 +24,7 @@ namespace mod_clearlesson\task;
 defined('MOODLE_INTERNAL') || die();
 GLOBAL $CFG;
 require_once($CFG->dirroot.'/mod/clearlesson/lib.php');
+require_once($CFG->dirroot.'/user/profile/lib.php');
 
 class clearlesson_task extends \core\task\scheduled_task {
     public function get_name() {
@@ -59,7 +60,7 @@ class clearlesson_task extends \core\task\scheduled_task {
                 $processeduser->deleted = true;
             } else {
                 $processeduser->deleted = false;
-                $processeduser->user_info_fields = profile_user_record($rawuserinfo->id);
+                $processeduser->user_info_fields = \profile_user_record($rawuserinfo->id);
                 $processeduser->user_info_fields->referrer = str_replace('https://', '', $CFG->wwwroot);
             }
             $users[] = $processeduser;
