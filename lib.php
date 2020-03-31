@@ -352,6 +352,7 @@ function clearlesson_check_updates_since(cm_info $cm, $from, $filter = array()) 
     return $updates;
 }
 function clearlesson_redirect_post($data, array $headers = null) {
+    global $CFG;
     $pluginconfig = get_config('clearlesson');
     $curl = new \curl;
     if (!empty($headers)) {
