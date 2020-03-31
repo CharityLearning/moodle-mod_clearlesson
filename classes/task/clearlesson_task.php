@@ -80,7 +80,11 @@ class clearlesson_task extends \core\task\scheduled_task {
                 $curl->setHeader("$key:$header");
             }
         }
-        $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v1/usersync/');
+        if (!isset($CFG->clearlessonsversion) OR $CFG->clearlessonsversion <> 'PHP') {
+            $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v1/usersync/');
+        } else {
+            $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v1/usersync.php');
+        }
         var_dump($curl->post($endpoint, $body));
         $response = json_decode($curl->post($endpoint, $body));
         var_dump($response);
