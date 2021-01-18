@@ -383,6 +383,9 @@ function clearlesson_build_url($url, $pluginconfig) {
     if ($url->display == 1 AND $url->type == 'play') {
         $url->type = 'soloplay';
     }
+    if ($url->type == 'playlist') {
+        $url->type = 'collections/playlist';
+    }
     $url = $pluginconfig->clearlessonurl.$url->type.'/'.$url->externalref;
     return $url;
 }
