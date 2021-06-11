@@ -46,7 +46,9 @@ class mod_clearlesson_mod_form extends moodleform_mod {
             'play' => 'play',
             'speakers' => 'speakers',
             'topics' => 'topics',
-            'playlists' => 'playlists'
+            'playlists' => 'playlists',
+            'collections' => 'collections',
+            'series' => 'series'
         );
         $select = $mform->addElement('select', 'type', get_string('type', 'clearlesson'), $options);
         $mform->addElement('text', 'externalref',
