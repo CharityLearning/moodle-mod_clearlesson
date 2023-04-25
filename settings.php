@@ -44,16 +44,16 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('clearlesson/clearlessonurl',
         get_string('clearlessonurl', 'clearlesson'),
         get_string('clearlessonurldesc', 'clearlesson'),
-        $CFG->clearlessons['address'], PARAM_URL));
+        '', PARAM_URL));
     $settings->add(new admin_setting_configtext('clearlesson/framesize',
         get_string('framesize', 'clearlesson'),
         get_string('configframesize', 'clearlesson'),
         130,
         PARAM_INT));
     $settings->add(new admin_setting_configpasswordunmask('clearlesson/apikey', get_string('apikey', 'clearlesson'),
-        get_string('apikeydesc', 'clearlesson'), $CFG->clearlessons['apikey']));
+        get_string('apikeydesc', 'clearlesson'), ''));
     $settings->add(new admin_setting_configpasswordunmask('clearlesson/secretkey', get_string('secretkey', 'clearlesson'),
-        get_string('secretkeydesc', 'clearlesson'), $CFG->clearlessons['secretkey']));
+        get_string('secretkeydesc', 'clearlesson'), ''));
     $settings->add(new admin_setting_configcheckbox('clearlesson/rolesinparams',
         get_string('rolesinparams', 'clearlesson'), get_string('configrolesinparams', 'clearlesson'), false));
     $settings->add(new admin_setting_configmultiselect('clearlesson/displayoptions',

@@ -16,13 +16,12 @@ cache:
     - $HOME/.npm
 
 php:
- - 7.0
- - 7.1
- - 7.2
+ - 8.0
+ - 8.1
 
 env:
  global:
-  - MOODLE_BRANCH=MOODLE_32_STABLE IGNORE_PATHS=lib/php-jws
+  - MOODLE_BRANCH=MOODLE_40_STABLE IGNORE_PATHS=lib/php-jws
   - MOODLE_BRANCH=master IGNORE_PATHS=lib/php-jws
  matrix:
   - DB=pgsql
