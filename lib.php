@@ -212,8 +212,7 @@ function clearlesson_get_coursemodule_info($coursemodule) {
         $options = empty($clearlessonref->displayoptions) ? array() : unserialize($clearlessonref->displayoptions);
         $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
         $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
-        $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,
-        directories=no,scrollbars=yes,resizable=yes";
+        $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes";
         $info->onclick = "window.open('$fullurl', '', '$wh'); return false;";
     } else if ($display == RESOURCELIB_DISPLAY_NEW) {
         $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;redirect=1";
