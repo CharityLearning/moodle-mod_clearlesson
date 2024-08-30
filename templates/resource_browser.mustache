@@ -1,0 +1,54 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_clearlesson/resource_browser
+
+    Moodle template for the list of valid options in an autocomplate form element.
+}}
+<div class="d-flex">
+    {{> mod_clearlesson/elements/browser_sidebar}}
+    <div class="row w-100 ml-1" id="resource-container">
+        <div class="browser-filters d-flex flex-wrap container-fluid w-100
+        align-content-start">
+            {{#filters}}
+                {{> mod_clearlesson/elements/browser_filter}}
+            {{/filters}}
+            {{> mod_clearlesson/elements/searchbar}}
+        </div>
+            {{#resourcecard}}
+                {{#resources}}
+                    {{> mod_clearlesson/elements/resource_card}}
+                {{/resources}}
+            {{/resourcecard}}
+            {{#collectioncard}}
+                {{#resources}}
+                    {{> mod_clearlesson/elements/collection_card}}
+                {{/resources}}
+            {{/collectioncard}}
+            {{#videocard}}
+                {{#resources}}
+                    {{> mod_clearlesson/elements/video_card}}
+                {{/resources}}
+            {{/videocard}}
+            {{#topiccard}}
+                {{#resources}}
+                    {{> mod_clearlesson/elements/topic_card}}
+                {{/resources}}
+            {{/topiccard}}
+        </div>
+    </div>
+</div>

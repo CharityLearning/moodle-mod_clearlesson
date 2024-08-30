@@ -15,16 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Folder module version information
+ * The User Sync tasks.
  *
  * @package    mod_clearlesson
- * @copyright  2017 Josh Willcock  {@link http://josh.cloud}
+ * @copyright  2014 Josh Willcock http://joh.cloud
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2023091207;       // The current module version (Date: YYYYMMDDXX)
-$plugin->requires  = 2016091200;    // Requires this Moodle version
-$plugin->component = 'mod_clearlesson';        // Full name of the plugin (used for diagnostics).
-$plugin->maturity = 'MATURITY_STABLE';
+$tasks = array(
+    array(
+        'classname' => 'mod_clearlesson\task\clearlesson_task',
+        'blocking' => 0,
+        'minute' => '01',
+        'hour' => '01',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+);

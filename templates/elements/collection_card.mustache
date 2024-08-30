@@ -1,0 +1,52 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_clearlesson/elements/collection_card
+
+    Moodle template for the list of valid options in an autocomplate form element.
+}}
+<div class="d-flex flex-nowrap justify-content-between w-100 video-card-wrapper mb-4 mx-3 {{#hidden}}d-none{{/hidden}}" 
+ data-animation="{{animation}}" data-hiddenby="{{hiddenby}}" id="resource-{{id}}" {{#hidden}}aria-hidden="true{{/hidden}}">
+    <div class="video-card w-100">
+        <div class="video-card-image">
+            <a href="javascript:void(0)" class="view-icon" title="View collection" data-externalref="{{externalref}}">
+                <i class="fa fa-eye"></i>
+            </a>
+            {{#panelshtml}}
+                <a href="javascript:void(0)">
+                    {{{panelshtml}}}
+                </a>
+            {{/panelshtml}}
+            {{#thumbnail}}
+                <a href="javascript:void(0)">
+                    <img class="img-fluid" src="{{thumbnail}}" alt="{{name}}">
+                </a>
+            {{/thumbnail}}
+        </div>
+        <div class="video-card-body">
+            <div class="video-title">
+                <div class="video-details d-flex">
+                    <a class="video-details-view" data-view="{{externalref}}"><i class="fas fa-video"></i>{{countstring}}</a>
+                </div>
+                <span class="searchable card-title">{{name}}</span>
+            </div>
+        </div>
+        {{#showselectbutton}}
+            {{> mod_clearlesson/elements/select_resource_button }}
+        {{/showselectbutton}}
+    </div>
+</div>

@@ -1,0 +1,51 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_clearlesson/elements/video_card
+
+    Moodle template for the list of valid options in an autocomplate form element.
+}}
+<div class="col-xl-3 col-sm-6 mb-3 video-card-wrapper {{#hidden}}d-none{{/hidden}}" id="resource-{{id}}" 
+data-speakers="{{speakers}}" data-topics="{{topics}}" data-animation="{{animation}}"
+data-hiddenby="{{hiddenby}}" data-playlists="{{playlists}}" data-series="{{series}}" 
+data-collections="{{collections}}" {{#hidden}}aria-hidden="true"{{/hidden}}>
+    <div class="video-card">
+        <div class="video-card-image">
+            <a href="javascript:void(0)" class="play-icon" title="Play video"
+            data-externalref="{{externalref}}" data-src="{{src}}" data-name="{{name}}">
+                <i class="fas fa-play-circle"></i>
+            </a>
+            <a href="javascript:void(0)">
+                <img class="img-fluid" {{#lazyload}} loading="lazy"{{/lazyload}} src="{{thumbnail}}" alt="{{name}}">
+            </a>
+        </div>
+        <div class="video-card-body">
+            <div class="video-title">
+                <div class="video-details d-flex">
+                    <span class="video-details-view"></span>
+                    <span class="video-details-time ml-auto" ><i class="far fa-clock"></i>{{duration}}</span>
+                </div>
+                <span class="searchable mr-1 card-title" style="line-height: 1.3!important; display:block;font-size:15px;">{{name}}</span>
+            </div>
+        </div>
+        <div class="video-details-speaker"><a class="vid-speaker-link searchable  ml-3">{{speakername}}</a></div>
+        <br>
+        {{#showselectbutton}}
+            {{> mod_clearlesson/elements/select_resource_button }}
+        {{/showselectbutton}}
+    </div>
+</div>
