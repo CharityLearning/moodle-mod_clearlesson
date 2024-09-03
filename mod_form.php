@@ -42,7 +42,6 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $options = clearlessons_get_resource_type_options();
-        $options['customplaylist'] = 'custom playlist';
         $select = $mform->addElement('select', 'type', get_string('type', 'clearlesson'), $options);
 
         $browseresourcesstring = get_string('browseresources', 'clearlesson');
@@ -70,55 +69,59 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         $mform->setType('externalref', PARAM_TEXT);
         $refselectgroup[] =& $mform->createElement('html', $buttonhtml);
         $mform->addGroup($refselectgroup, 'ref_select_group', get_string('selectaresource', 'clearlesson'), array(''), false);
-        // $mform->hideIf('ref_select_group', 'type', 'eq', 'customplaylist');
         $this->standard_intro_elements();
         $element = $mform->getElement('introeditor');
         $attributes = $element->getAttributes();
         $attributes['rows'] = 5;
         $element->setAttributes($attributes);
-        $mform->addElement('header', 'optionssection', get_string('appearance'));
 
-        if ($this->current->instance) {
-            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
-        } else {
-            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
-        }
-        if (count($options) == 1) {
-            $mform->addElement('hidden', 'display');
-            $mform->setType('display', PARAM_INT);
-            reset($options);
-            $mform->setDefault('display', key($options));
-        } else {
-            $mform->addElement('select', 'display', get_string('displayselect', 'url'), $options);
-            $mform->setDefault('display', $config->display);
-            $mform->addHelpButton('display', 'displayselect', 'url');
-        }
+        // Modal window every time for now.
+        // TODO consider allowin the option of embeding the player directly into the course page.
 
-        if (array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {
-            $mform->addElement('text', 'popupwidth', get_string('popupwidth', 'url'), array('size' => 3));
-            if (count($options) > 1) {
-                $mform->disabledIf('popupwidth', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
-            }
-            $mform->setType('popupwidth', PARAM_INT);
-            $mform->setDefault('popupwidth', $config->popupwidth);
+        // $mform->addElement('header', 'optionssection', get_string('appearance'));
+        // if ($this->current->instance) {
+        //     $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
+        // } else {
+        //     $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
+        // }
+        // if (count($options) == 1) {
+        //     $mform->addElement('hidden', 'display');
+        //     $mform->setType('display', PARAM_INT);
+        //     reset($options);
+        //     $mform->setDefault('display', key($options));
+        // } else {
+        //     $mform->addElement('select', 'display', get_string('displayselect', 'url'), $options);
+        //     $mform->setDefault('display', $config->display);
+        //     $mform->addHelpButton('display', 'displayselect', 'url');
+        // }
 
-            $mform->addElement('text', 'popupheight', get_string('popupheight', 'url'), array('size' => 3));
-            if (count($options) > 1) {
-                $mform->disabledIf('popupheight', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
-            }
-            $mform->setType('popupheight', PARAM_INT);
-            $mform->setDefault('popupheight', $config->popupheight);
-        }
+        // if (array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {
+        //     $mform->addElement('text', 'popupwidth', get_string('popupwidth', 'url'), array('size' => 3));
+        //     if (count($options) > 1) {
+        //         $mform->disabledIf('popupwidth', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
+        //     }
+        //     $mform->setType('popupwidth', PARAM_INT);
+        //     $mform->setDefault('popupwidth', $config->popupwidth);
 
-        if (array_key_exists(RESOURCELIB_DISPLAY_AUTO, $options) or
-          array_key_exists(RESOURCELIB_DISPLAY_EMBED, $options) or
-          array_key_exists(RESOURCELIB_DISPLAY_FRAME, $options)) {
-            $mform->addElement('checkbox', 'printintro', get_string('printintro', 'url'));
-            $mform->disabledIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_POPUP);
-            $mform->disabledIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_OPEN);
-            $mform->disabledIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_NEW);
-            $mform->setDefault('printintro', $config->printintro);
-        }
+        //     $mform->addElement('text', 'popupheight', get_string('popupheight', 'url'), array('size' => 3));
+        //     if (count($options) > 1) {
+        //         $mform->disabledIf('popupheight', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
+        //     }
+        //     $mform->setType('popupheight', PARAM_INT);
+        //     $mform->setDefault('popupheight', $config->popupheight);
+        // }
+
+        // if (array_key_exists(RESOURCELIB_DISPLAY_AUTO, $options) or
+        //   array_key_exists(RESOURCELIB_DISPLAY_EMBED, $options) or
+        //   array_key_exists(RESOURCELIB_DISPLAY_FRAME, $options)) {
+        //     $mform->addElement('checkbox', 'printintro', get_string('printintro', 'url'));
+        //     $mform->disabledIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_POPUP);
+        //     $mform->disabledIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_OPEN);
+        //     $mform->disabledIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_NEW);
+        //     $mform->setDefault('printintro', $config->printintro);
+        // }
+
+        // var_dump();
 
         $PAGE->requires->js_call_amd('mod_clearlesson/modal-resource-browser', 'init');
         $PAGE->requires->js_call_amd('mod_clearlesson/modal-resource-menu', 'init');

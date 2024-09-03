@@ -30,37 +30,42 @@ require_once("$CFG->libdir/formslib.php");
 /**
  * The resource player form.
  */
-class resource_player_form extends \core_form\dynamic_form {
+class incourse_player_form extends \core_form\dynamic_form {
 
     /**
      * The course module id.
      * @var int
      */
     protected $cmid;
-    
     /**
      * Define the form.
      */
     public function definition() {
         global $CFG, $DB, $PAGE, $OUTPUT;
         $dform = $this->_form;
-        if (!isset($this->_ajaxformdata['type']) || !isset($this->_ajaxformdata['externalref'])) {
+        if (!isset($this->_ajaxformdata['cmid'])) {
             throw new \moodle_exception('Missing form param/s');
         }
-        $renderable = new \mod_clearlesson\output\resource_player($this->_ajaxformdata['type'],
-                                                                $this->_ajaxformdata['externalref'],
-                                                                $this->_ajaxformdata['position']);
-
-        // switch ($this->_ajaxformdata['type']) {
-        //     case 'play':
-        //         $typestring = get_string('video', 'mod_clearlesson');
-        //         break;
-        //     case 'playlists':
-        //         $typestring = get_string('playlist', 'mod_clearlesson');
-        //         break;
-        // }
+        if (isset($this->_ajaxformdata['position'])) {
+            $position = $this->_ajaxformdata['position'];
+        } else {
+            $position = 1;
+        }
+        $sql = "SELECT cl.id, cl.externalref, cl.type
+                    FROM {course_modules} cm
+                    JOIN {clearlesson} cl ON cl.id = cm.instance
+                    WHERE cm.id = {$this->cmid}";
+        if ($resource = $DB->get_record_sql($sql)) {
+            $type = $resource->type;
+            $externalref = $resource->externalref;
+        } else {
+            throw new \moodle_exception('Resource not found');
+        }
+        $renderable = new \mod_clearlesson\output\incourse_player($type,
+                                                                $externalref,
+                                                                $position);
         $output = $PAGE->get_renderer('mod_clearlesson');
-        $dform->addElement('html', $output->render_resource_player($renderable));
+        $dform->addElement('html', $output->render_incourse_player($renderable));
     }
 
     /**
