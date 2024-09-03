@@ -28,9 +28,8 @@ require_once($CFG->dirroot.'/mod/clearlesson/locallib.php');
 
 class mod_clearlesson_mod_form extends moodleform_mod {
     public function definition() {
-        global $CFG, $DB;
+        global $CFG, $DB, $OUTPUT, $PAGE;
         $mform = $this->_form;
-
         $config = get_config('clearlesson');
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -42,21 +41,36 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $options = array(
-            'play' => 'play',
-            'speakers' => 'speakers',
-            'topics' => 'topics',
-            'playlists' => 'playlists',
-            'collections' => 'collections',
-            'series' => 'series'
-        );
+        $options = clearlessons_get_resource_type_options();
+        $options['customplaylist'] = 'custom playlist';
         $select = $mform->addElement('select', 'type', get_string('type', 'clearlesson'), $options);
-        $mform->addElement('text', 'externalref',
-        get_string('externalref', 'clearlesson'),
-        array('size' => '10'),
-        array('usefilepicker' => false));
+
+        $browseresourcesstring = get_string('browseresources', 'clearlesson');
+        $buttonhtml = '<button type="button" id="resource-select-button" class="btn btn-primary">' . $browseresourcesstring . '</button>';
+        $refselectgroup = [];
+        $autocompleteoptions = [
+            'multiple' => false,
+            'noselectionstring' => get_string('noresourceselected', 'mod_clearlesson') . '...',
+            'ajax' => 'mod_clearlesson/form-potential-resource-selector',
+            'valuehtmlcallback' => function($value) {
+                global $OUTPUT, $DB;
+                if ($resource = $DB->get_record('clearlesson', ['id' => $this->current->instance])) {
+                    $details = mod_clearlesson\call::get_potential_resources($resource->type, $resource->externalref, true);
+                    // Now get any additional details we need to display using the clearlessons api.
+                    return $OUTPUT->render_from_template('mod_clearlesson/autocomplete_results/form_resource_selector_suggestion', $details);
+                } else {
+                    return 'No selection';
+                }
+            }
+        ];
+        $refselectgroup[] =& $mform->createElement('autocomplete', 'externalref',
+                    // get_string('externalref', 'clearlesson'),
+                    get_string('selectaresource', 'clearlesson'),
+                    [], $autocompleteoptions);
         $mform->setType('externalref', PARAM_TEXT);
-        $mform->addRule('externalref', null, 'required', null, 'client');
+        $refselectgroup[] =& $mform->createElement('html', $buttonhtml);
+        $mform->addGroup($refselectgroup, 'ref_select_group', get_string('selectaresource', 'clearlesson'), array(''), false);
+        // $mform->hideIf('ref_select_group', 'type', 'eq', 'customplaylist');
         $this->standard_intro_elements();
         $element = $mform->getElement('introeditor');
         $attributes = $element->getAttributes();
@@ -106,6 +120,9 @@ class mod_clearlesson_mod_form extends moodleform_mod {
             $mform->setDefault('printintro', $config->printintro);
         }
 
+        $PAGE->requires->js_call_amd('mod_clearlesson/modal-resource-browser', 'init');
+        $PAGE->requires->js_call_amd('mod_clearlesson/modal-resource-menu', 'init');
+        $PAGE->requires->js_call_amd('mod_clearlesson/modal-video-player', 'init');
         $this->standard_coursemodule_elements();
         $this->add_action_buttons();
     }
@@ -135,6 +152,7 @@ class mod_clearlesson_mod_form extends moodleform_mod {
     }
 
     public function validation($data, $files) {
+        // TODO this.
         return array();
     }
 

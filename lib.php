@@ -24,6 +24,13 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+define('CLEARLESSON_LAZYLOAD_LIMIT', 15);
+
+// Define privacy constants.
+define('CLEARLESSON_PRIVACY_NONE', 0);
+define('CLEARLESSON_PRIVACY_MYAUDIENCE', 1);
+define('CLEARLESSON_PRIVACY_PUBLIC', 2);
+
 /**
  * List of features supported in Clear Lesson module.
  * @param string $feature FEATURE_xx constant for requested feature
@@ -409,4 +416,13 @@ function clearlesson_set_body($pluginconfig, $url) {
     'date' => gmdate("Y-m-d\TH:i:s\Z"),
     'redirectUrl' => $url,
     'userInfoFields' => $userinfofields);
+}
+
+function clearlessons_get_resource_type_options() {
+    return ['play' => 'video',
+            'speakers' => 'speakers',
+            'topics' => 'topics',
+            'playlists' => 'playlists',
+            'series' => 'series',
+            'collections' => 'collections'];
 }
