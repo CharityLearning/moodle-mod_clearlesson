@@ -56,6 +56,8 @@ function clearlesson_supports($feature) {
             return true;
         case FEATURE_SHOW_DESCRIPTION:
             return true;
+        case FEATURE_COMPLETION_HAS_RULES:
+            return true;
         default:
             return null;
     }
@@ -205,44 +207,46 @@ function clearlesson_delete_instance($id) {
  * @param object $coursemodule
  * @return cached_cm_info info
  */
-function clearlesson_get_coursemodule_info($coursemodule) { // TODO this could be where the work needs to be done
+function clearlesson_get_coursemodule_info($coursemodule) {
     global $CFG, $DB;
     require_once("$CFG->dirroot/mod/clearlesson/locallib.php");
     if (!$clearlessonref = $DB->get_record('clearlesson', array('id' => $coursemodule->instance),
-    'id, name, display, displayoptions, externalref, parameters, intro, introformat')) {
+    'id, name, display, displayoptions, externalref, parameters, intro, introformat ,type, completionwatchedall')) {
         return null;
     }
     $info = new cached_cm_info();
     $info->name = $clearlessonref->name;
-    // var_dump($info);
-    // die();
     // Note: there should be a way to differentiate links from normal resources.
     $info->icon = clearlesson_guess_icon($clearlessonref->externalref, 24);
     $display = clearlesson_get_final_display_type($clearlessonref);
+
     if ($display == RESOURCELIB_DISPLAY_POPUP) {
         $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;redirect=1";
         $options = empty($clearlessonref->displayoptions) ? array() : unserialize($clearlessonref->displayoptions);
         $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
         $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
-        // $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes";
-        // $info->onclick = "window.open('$fullurl', '', '$wh'); return false;";
         $onclickjs = "event.preventDefault(); 
                     if (typeof window.openPlayer === 'undefined') {
                         require(['mod_clearlesson/course-page'], function (coursePage) {
                             coursePage.init();
-                            window.openPlayer(event);
+                            window.openPlayer(event, '$clearlessonref->type');
                         });
                     } else {
-                        window.openPlayer(event);
+                        window.openPlayer(event, '$clearlessonref->type');
                     }";
-        // strip any new lines from the js
+        // Strip any new lines from the js.
         $info->onclick = trim(preg_replace('/\s\s+/', ' ', $onclickjs));
-        // $info->onclick = $onclickjs;
-        // $info->href = "javascript:void(0);";
     } else if ($display == RESOURCELIB_DISPLAY_NEW) {
         $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;redirect=1";
         $info->onclick = "window.open('$fullurl'); return false;";
     }
+
+    // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        // This rules asks that all videos in the resource be watched until the end.
+        $info->customdata['customcompletionrules']['completionwatchedall'] = $clearlessonref->completionwatchedall;
+    }
+
     if ($coursemodule->showdescription) {
         // Convert intro to html. Do not filter cached version, filters run at display time.
         $info->content = format_module_intro('url', $clearlessonref, $coursemodule->id, false);
@@ -436,7 +440,7 @@ function clearlesson_set_body($pluginconfig, $url) {
     'userInfoFields' => $userinfofields);
 }
 
-function clearlessons_get_resource_type_options() {
+function clearlesson_get_resource_type_options() {
     return ['play' => 'video',
             'speakers' => 'speakers',
             'topics' => 'topics',

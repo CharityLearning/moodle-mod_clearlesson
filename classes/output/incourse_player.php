@@ -67,18 +67,26 @@ class incourse_player implements \renderable, \templatable {
      * Construct this renderable.
      *
      * @param string $type
+     * @param string $externalref
+     * @param int $position
+     * @param array $response
+     * @param int $watchedall
      *
      * @return void
      */
-    public function __construct(string $type, string $externalref, int $position = 1, array $response = []) {
+    public function __construct(string $type, string $externalref, int $position = 1, array $response = [], int $watchedall = 0) {
         $this->type = $type;
         $this->externalref = $externalref;
         $this->position = $position;
         if (!empty($response)) {
             $this->response = $response;
         } else {
-            $this->response = \mod_clearlesson\call::get_playerform_data($this->type, $this->externalref, $this->position);
+            $this->response = \mod_clearlesson\call::get_playerform_data($this->type, $this->externalref, $this->position, $watchedall);
         }
+        // Add the resourceref to the response.
+        // The response externalref is the externalref of the first video in the resource.
+        $this->response['resourceref'] = $this->externalref;
+        $this->response['type'] = $this->type;
     }
 
     /**

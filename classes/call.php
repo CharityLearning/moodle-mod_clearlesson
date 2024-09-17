@@ -121,14 +121,19 @@ class call {
      * @param string $type The type of resource.
      * @param string $externalref The externalref of the resource.
      * @param int $position The position of the resource.
+     * @param bool $watchedall Whether all videos have been watched.
      */
-    public static function get_playerform_data(string $type, string $externalref, int $position = 1): array {
+    public static function get_playerform_data(string $type, string $externalref, int $position = 1, int $watchedall = 0): array {
         $response = self::initate_call('/api/v1/get_playerform_data.php', ['type' => $type,
                                                                     'externalref' => $externalref,
-                                                                    'position' => $position]);
+                                                                    'position' => $position,
+                                                                    'watchedall' => $watchedall]);
         // debugging 
         // var_dump($response);
         $decodedresponse = json_decode($response, true);
+        // var_dump($decodedresponse);
+        $decodedresponse['records']['videowatchedstring'] = get_string('videowatched', 'clearlesson');
+        $decodedresponse['records']['watchedall'] = $watchedall;
         return $decodedresponse['records'];
     }
 
@@ -141,6 +146,49 @@ class call {
     public static function get_menuform_data(string $type, string $externalref): array {
         $response = self::initate_call('/api/v1/get_menuform_data.php', ['type' => $type,
                                                                     'externalref' => $externalref]);
+        // debugging 
+        // var_dump($response);
+        $decodedresponse = json_decode($response, true);
+        // var_dump($decodedresponse);
+        return $decodedresponse['records'];
+    }
+
+    /**
+     * Updates the progress of a video.
+     * 
+     * @param string $externalref The externalref of the video.
+     * @param int $duration The duration of the video.
+     * @param string $status The status of the video.
+     * @param string $resourceref The resourceref of the video.
+     * @param string $type The type of resource.
+     */
+    public static function update_progress(string $externalref,
+                                            int $duration,
+                                            string $status,
+                                            string $resourceref,
+                                            string $type): array {
+        // var_dump($resourceref);
+        $response = self::initate_call('/api/v1/update_progress.php', ['externalref' => $externalref,
+                                                                    'duration' => $duration,
+                                                                    'status' => $status,
+                                                                    'resourceref' => $resourceref,
+                                                                    'type' => $type]);
+        // debugging 
+        // var_dump($response);
+        $decodedresponse = json_decode($response, true);
+        // var_dump($decodedresponse);
+        return $decodedresponse;
+    }
+
+    /**
+     * Gets the video count.
+     * 
+     * @param string $externalref The externalref of the video.
+     * @param string $type The type of resource.
+     */
+    public static function get_video_count(string $externalref, string $type) {
+        $response = self::initate_call('/api/v1/get_video_count.php', ['externalref' => $externalref,
+                                                                    'type' => $type]);
         // debugging 
         // var_dump($response);
         $decodedresponse = json_decode($response, true);

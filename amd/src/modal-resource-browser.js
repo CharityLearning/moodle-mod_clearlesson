@@ -47,9 +47,11 @@ export const init = () => {
             e.preventDefault();
             openResourceBrowser();
         }
-        if (element.classList?.contains('select-resource-button')) { // In the modal browser.
+
+        if (element.classList?.contains('select-resource-button')) { // In the modal browser & menu.
             e.preventDefault();
-            selectResource(e.target.id, e.target.getAttribute('data-type'));
+            const externalref = element.getAttribute('data-externalref');
+            selectResource(externalref, e.target.getAttribute('data-type'));
         }
         if (element.classList?.contains('close')
             || element.getAttribute('data-action') === 'cancel'
@@ -174,6 +176,10 @@ function openResourceBrowser() {
                 const type = e.target.getAttribute('data-type');
                 viewResourceType(type, cmid, courseid, url, browserForm);
             }
+        });
+
+        Utils.waitForElement('.modal-footer button.btn-primary', modalRootInner, function() {
+            modalRootInner.querySelector('.modal-footer button.btn-primary').classList.add('d-none');
         });
     });
 

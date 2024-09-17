@@ -19,36 +19,38 @@
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="d-flex">
-    {{> mod_clearlesson/elements/browser_sidebar}}
-    <div class="row w-100 ml-1" id="resource-container">
-        <div class="browser-filters d-flex flex-wrap container-fluid w-100
-        align-content-start">
-            {{#filters}}
-                {{> mod_clearlesson/elements/browser_filter}}
-            {{/filters}}
-            {{> mod_clearlesson/elements/searchbar}}
-        </div>
-            {{#resourcecard}}
-                {{#resources}}
-                    {{> mod_clearlesson/elements/resource_card}}
-                {{/resources}}
-            {{/resourcecard}}
-            {{#collectioncard}}
-                {{#resources}}
-                    {{> mod_clearlesson/elements/collection_card}}
-                {{/resources}}
-            {{/collectioncard}}
-            {{#videocard}}
-                {{#resources}}
-                    {{> mod_clearlesson/elements/video_card}}
-                {{/resources}}
-            {{/videocard}}
-            {{#topiccard}}
-                {{#resources}}
-                    {{> mod_clearlesson/elements/topic_card}}
-                {{/resources}}
-            {{/topiccard}}
+<div class="mod-clearlesson">
+    <div class="d-flex">
+        {{> mod_clearlesson/elements/browser_sidebar}}
+        <div class="row w-100 ml-1" id="resource-container">
+            <div class="browser-filters d-flex flex-wrap container-fluid w-100
+            align-content-start">
+                {{#filters}}
+                    {{> mod_clearlesson/elements/browser_filter}}
+                {{/filters}}
+                {{> mod_clearlesson/elements/searchbar}}
+            </div>
+                {{#resourcecard}}
+                    {{#resources}}
+                        {{> mod_clearlesson/elements/resource_card}}
+                    {{/resources}}
+                {{/resourcecard}}
+                {{#collectioncard}}
+                    {{#resources}}
+                        {{> mod_clearlesson/elements/collection_card}}
+                    {{/resources}}
+                {{/collectioncard}}
+                {{#videocard}}
+                    {{#resources}}
+                        {{> mod_clearlesson/elements/video_card}}
+                    {{/resources}}
+                {{/videocard}}
+                {{#topiccard}}
+                    {{#resources}}
+                        {{> mod_clearlesson/elements/topic_card}}
+                    {{/resources}}
+                {{/topiccard}}
+            </div>
         </div>
     </div>
 </div>

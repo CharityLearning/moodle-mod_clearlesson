@@ -22,20 +22,24 @@ use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
 use core_external\external_warnings;
+use core_courseformat\output\local\content\cm\completion;
 
 defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot . '/mod/clearlesson/lib.php');
+require_once("{$CFG->libdir}/completionlib.php");
+require_once($CFG->dirroot . '/course/format/lib.php');
 
 /**
-* Trigger the course module viewed event and update the module completion status.
+ * Even if the play button has not been pressed the course module is considered viewed.
+ * Marking a course module as viewed is the only purpose of this file.
  *
  * @package    mod_clearlesson
  * @category   external
- * @copyright  2017 Josh Willcock
+ * @copyright  2024 Dan Watkins
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.1
  */
-class get_potential_resources extends \core_external\external_api {
+class course_module_viewed extends \core_external\external_api {
     
         /**
         * Returns description of method parameters
@@ -46,37 +50,42 @@ class get_potential_resources extends \core_external\external_api {
         public static function execute_parameters(): external_function_parameters {
             return new external_function_parameters(
                 array(
-                    'type' => new external_value(PARAM_TEXT, 'play, playlist, topics, speakers, collections, series'),
-                    'query' => new external_value(PARAM_TEXT, 'Search query')
+                    'courseid' => new external_value(PARAM_INT, 'Course id'),
+                    'cmid' => new external_value(PARAM_INT, 'Course module id')
                 )
             );
         }
     
         /**
-        * Use the clearlessons API to get a list of potential resources for an autocomplete search.
+        * Mark the course module as viewed.
         *
-        * @param string $type the type of resource to search for
-        * @param string $query the search query
+        * @param int $courseid the course id
+        * @param int $cmid the course module id
         * @return array of warnings and status result
         * @since Moodle 3.0
         * @throws moodle_exception
         */
-        public static function execute(string $type, string $query): array {
-            global $DB, $USER, $OUTPUT, $PAGE;
-            require_login();
-            $PAGE->set_context(\context_system::instance()); // Use module context?
+        public static function execute(int $courseid,
+                                        int $cmid): array {
 
+            global $PAGE, $USER, $DB;
+            require_login();
             $params = self::validate_parameters(
                         self::execute_parameters(),
-                            ['type' => $type,
-                            'query' => $query]);
+                            ['courseid' => $courseid,
+                            'cmid' => $cmid]);
 
-            $results = \mod_clearlesson\call::get_potential_resources($type, $query);
-            foreach ($results as $key => $result) {
-                $results[$key]['label'] = $OUTPUT->render_from_template('mod_clearlesson/autocomplete_results/form_resource_selector_suggestion', $result);
-            }
-
-            return $results;
+            $PAGE->set_context(\context_course::instance($courseid)); 
+            $course = $DB->get_record('course', array('id' => $courseid));
+            $completion = new \completion_info($course);
+            $format = \course_get_format($course);
+            $modinfo = $format->get_modinfo();
+            $cm = $modinfo->get_cm($cmid);
+            $completion->set_module_viewed($cm);
+            $section = $modinfo->get_section_info($cm->sectionnum);
+            $renderer = $format->get_renderer($PAGE);
+            $updatedhtml = $renderer->course_section_updated_cm_item($format, $section, $cm);
+            return ['activitymodulehtml' => $updatedhtml];
         }
 
         /**
@@ -85,15 +94,9 @@ class get_potential_resources extends \core_external\external_api {
          * @return external_multiple_structure
          * @since Moodle 3.0
          */
-        public static function execute_returns(): external_multiple_structure {
-            return new external_multiple_structure(
-                new external_single_structure(
-                    array(
-                        'id' => new external_value(PARAM_TEXT, 'Clear Lesson External Reference'),
-                        'externalref' => new external_value(PARAM_TEXT, 'External ref'),
-                        'label' => new external_value(PARAM_RAW, 'HTML label')
-                    )
-                )
+        public static function execute_returns(): external_single_structure {
+            return new external_single_structure(
+                ['activitymodulehtml' => new external_value(PARAM_RAW, 'HTML to update the course page Todo button with')]
             );
         }
 }

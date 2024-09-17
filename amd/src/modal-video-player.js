@@ -28,7 +28,6 @@ import Templates from 'core/templates';
 import {get_string as getString} from 'core/str';
 import * as Utils from './utils';
 
-// eslint-disable-next-line no-unused-vars
 var modalVideoPlayer;
 
 export const init = () => {
@@ -67,6 +66,7 @@ async function openVideoPlayer(externalref, name, src) {
         externalref: externalref,
         src: src,
         name: name,
+        editform: true
     });
 
     const videoPlayer = await ModalSaveCancel.create({

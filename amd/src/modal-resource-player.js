@@ -118,12 +118,6 @@ export const init = () => {
  */
 const openResourcePlayer = (externalref) => {
     const resourceType = document.getElementsByClassName('disabled-looking')[0].getAttribute('data-type');
-    if (resourceType !== 'play') {
-        // The resource player is currently only available for videos in the mod_form.
-        // We will enble this again for students in the course page.
-        alert('Resource player is only available for videos in the mod form. Resource selected: ' + resourceType);
-        return;
-    }
     const cmid = document.querySelector('input[name="coursemodule"]').value;
     const courseid = document.querySelector('input[name="course"]').value;
     const url = window.location.href;
