@@ -51,14 +51,6 @@ class resource_player_form extends \core_form\dynamic_form {
                                                                 $this->_ajaxformdata['externalref'],
                                                                 $this->_ajaxformdata['position']);
 
-        // switch ($this->_ajaxformdata['type']) {
-        //     case 'play':
-        //         $typestring = get_string('video', 'mod_clearlesson');
-        //         break;
-        //     case 'playlists':
-        //         $typestring = get_string('playlist', 'mod_clearlesson');
-        //         break;
-        // }
         $output = $PAGE->get_renderer('mod_clearlesson');
         $dform->addElement('html', $output->render_resource_player($renderable));
     }

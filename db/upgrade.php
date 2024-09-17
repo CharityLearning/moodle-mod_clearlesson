@@ -45,11 +45,29 @@
 defined('MOODLE_INTERNAL') || die;
 
 function xmldb_clearlesson_upgrade($oldversion) {
-    global $CFG;
+    global $CFG, $DB;
 
     if ($oldversion < 2017091202) {
         echo("Pre-release version detected. The plugin should be completely removed first.\n");
         exit(1);
+    }
+
+    if ($oldverion < 2023091217) {
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('clearlesson');
+        $field = new xmldb_field('completionwatchedall', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL , null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('clearlesson_track');
+        // Define field watchedall to be added to clearlesson_track.
+        $field = new xmldb_field('watchedall', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL , null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2023091217, 'mod', 'clearlesson');
     }
 
     return true;

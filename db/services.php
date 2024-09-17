@@ -41,6 +41,22 @@ $functions = array(
         'capabilities'  => 'mod/clearlesson:view',
         'ajax' => true,
         'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
+    ),
+    'mod_clearlesson_update_progress' => array(
+        'classname' => 'mod_clearlesson\external\update_progress',
+        'description'   => 'Update the viewed progress of a video in the Clear Lesson Platform.',
+        'type'          => 'write',
+        'capabilities'  => 'mod/clearlesson:view',
+        'ajax' => true,
+        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
+    ),
+    'mod_clearlesson_course_module_viewed' => array(
+        'classname' => 'mod_clearlesson\external\course_module_viewed',
+        'description'   => 'Mark the course module as viewed.',
+        'type'          => 'write',
+        'capabilities'  => 'mod/clearlesson:view',
+        'ajax' => true,
+        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
     )
 
 );

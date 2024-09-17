@@ -124,3 +124,5 @@ $string['playlistviewer'] = 'Playlist Viewer';
 $string['playlistvideos'] = 'Playlist videos';
 $string['playlistmenu'] = 'playlist videos';
 $string['videoplayer'] = 'Video Player';
+$string['videowatched'] = 'Video watched';
+$string['watchedallrule'] = 'All videos in the resource must be watched past the 90% mark.';

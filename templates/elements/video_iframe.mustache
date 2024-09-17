@@ -19,10 +19,22 @@
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<!-- allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" -->
-<div class="video-container">
-    <iframe class="videoframe" src="{{src}}" title="{{name}}" frameborder="0" allowfullscreen></iframe>
-</div>
-<div class="p-2">
-    <h4 class="video-title">{{name}}</h4>
+<div class="mod-clearlesson">
+    <div class="video-container" data-externalref="{{externalref}}">
+        <iframe class="videoframe" src="{{src}}" title="{{name}}" frameborder="0" allowfullscreen></iframe>
+            <script>
+                require([{{#firstload}}'../../../mod/clearlesson/vimeo/vimeo-sdk', {{/firstload}}'mod_clearlesson/progress-tracker'],
+                function({{#firstload}}VimeoPlayerConstructor, {{/firstload}}progressTracker) {
+                    {{#firstload}}
+                        window.VimeoPlayerConstructor = VimeoPlayerConstructor;
+                    {{/firstload}}
+                    // Here we initialise a new player for each video after destroying any previous instances.
+                    {{^editform}}progressTracker.init();{{/editform}}
+                });
+            </script>
+    </div>
+    <div class="p-2 video-title-wrapper" style="position: relative">
+        <h4 class="video-title">{{name}}</h4>
+        {{> mod_clearlesson/elements/icons/watched_check}}
+    </div>
 </div>

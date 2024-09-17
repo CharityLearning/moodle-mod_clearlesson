@@ -200,6 +200,7 @@ async function setSaveButton(saveString, type, externalref) {
         saveButton.setAttribute('data-action', 'select');
         saveButton.setAttribute('data-type', type);
         saveButton.setAttribute('data-externalref', externalref);
+        saveButton.classList.add('select-resource-button');
         saveButton.classList.add('d-block');
     });
 }

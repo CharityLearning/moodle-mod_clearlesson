@@ -41,7 +41,7 @@ class incourse_player_form extends \core_form\dynamic_form {
      * Define the form.
      */
     public function definition() {
-        global $CFG, $DB, $PAGE, $OUTPUT;
+        global $DB, $PAGE, $USER;
         $dform = $this->_form;
         if (!isset($this->_ajaxformdata['cmid'])) {
             throw new \moodle_exception('Missing form param/s');
@@ -51,6 +51,12 @@ class incourse_player_form extends \core_form\dynamic_form {
         } else {
             $position = 1;
         }
+        if (isset($this->_ajaxformdata['firstload'])) {
+            $firstload = $this->_ajaxformdata['firstload'];
+        } else {
+            throw new \moodle_exception('Missing form param/s');
+        }
+
         $sql = "SELECT cl.id, cl.externalref, cl.type
                     FROM {course_modules} cm
                     JOIN {clearlesson} cl ON cl.id = cm.instance
@@ -61,11 +67,59 @@ class incourse_player_form extends \core_form\dynamic_form {
         } else {
             throw new \moodle_exception('Resource not found');
         }
+
+        $sql = "SELECT clt.clearlessonid,
+                    MAX(clt.watchedall) as watchedall
+                FROM {course_modules} cm
+                JOIN {clearlesson} cl ON cl.id = cm.instance
+                JOIN {clearlesson_track} clt ON clt.clearlessonid = cl.id
+                WHERE cm.id = {$this->cmid}
+                    AND clt.userid = {$USER->id}
+                    AND clt.watchedall = 1
+                GROUP BY clt.clearlessonid";
+        if ($clearlesson = $DB->get_record_sql($sql)) {
+            $watchedall = 1;
+        } else {
+            // Double check the clearlesson track is up to date and update if necessary.
+            // A user may have watched some videos on the clearlessons platform already.
+            $counts = \mod_clearlesson\call::get_video_count($externalref, $type);
+            if ($counts['watchedcount'] === $counts['videocount']) {
+                $watchedall = 1;
+                // Get the latest track record
+                $sql = "SELECT clt.*
+                        FROM {course_modules} cm
+                        JOIN {clearlesson} cl ON cl.id = cm.instance
+                        JOIN {clearlesson_track} clt ON clt.clearlessonid = cl.id
+                        WHERE cm.id = {$this->cmid}
+                            AND clt.userid = {$USER->id}
+                        ORDER BY clt.id DESC
+                        LIMIT 1";
+                
+                if ($clearlesson = $DB->get_record_sql($sql)) {
+                    $clearlesson->watchedall = 1;
+                    $DB->update_record('clearlesson_track', $clearlesson);
+                } else {
+                    $newrecord = new \stdClass();
+                    $newrecord->clearlessonid = $resource->id;
+                    $newrecord->userid = $USER->id;
+                    $newrecord->watchedall = 1;
+                    $newrecord->timemodified = time();
+                    $DB->insert_record('clearlesson_track', $newrecord);
+                }
+            } else {
+                $watchedall = 0;
+            }
+        }
         $renderable = new \mod_clearlesson\output\incourse_player($type,
                                                                 $externalref,
-                                                                $position);
+                                                                $position,
+                                                                [],
+                                                                $watchedall);
+        $renderable->response['firstload'] = $firstload;
         $output = $PAGE->get_renderer('mod_clearlesson');
         $dform->addElement('html', $output->render_incourse_player($renderable));
+        $dform->addElement('hidden', 'type', $type);
+        $dform->setType('type', PARAM_TEXT);
     }
 
     /**

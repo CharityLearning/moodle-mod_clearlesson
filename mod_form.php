@@ -41,7 +41,7 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $options = clearlessons_get_resource_type_options();
+        $options = clearlesson_get_resource_type_options();
         $select = $mform->addElement('select', 'type', get_string('type', 'clearlesson'), $options);
 
         $browseresourcesstring = get_string('browseresources', 'clearlesson');
@@ -120,14 +120,50 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         //     $mform->disabledIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_NEW);
         //     $mform->setDefault('printintro', $config->printintro);
         // }
-
+        // $this->$this->standard_coursemodule_elements();
         // var_dump();
 
+        // $this->add_completion_rules();
+        $this->standard_coursemodule_elements();
         $PAGE->requires->js_call_amd('mod_clearlesson/modal-resource-browser', 'init');
         $PAGE->requires->js_call_amd('mod_clearlesson/modal-resource-menu', 'init');
         $PAGE->requires->js_call_amd('mod_clearlesson/modal-video-player', 'init');
-        $this->standard_coursemodule_elements();
         $this->add_action_buttons();
+    }
+
+    /**
+     * Add elements for setting the custom completion rules.
+     *
+     * @category completion
+     * @return array List of added element names, or names of wrapping group elements.
+     */
+    public function add_completion_rules() {
+
+        $mform = $this->_form;
+
+        $mform->addElement(
+            'checkbox',
+            $this->get_suffixed_name('completionwatchedall'),
+            ' ',
+            get_string('watchedallrule', 'clearlesson')
+        );
+        $mform->setType('completionwatchedall', PARAM_INT);
+
+        return [$this->get_suffixed_name('completionwatchedall')];
+    }
+
+    protected function get_suffixed_name(string $fieldname): string {
+        return $fieldname . $this->get_suffix();
+    }
+
+    /**
+     * Called during validation to see whether some activity-specific completion rules are selected.
+     *
+     * @param array $data Input data not yet validated.
+     * @return bool True if one or more rules is enabled, false if none are.
+     */
+    public function completion_rule_enabled($data) {
+        return (!empty($data[$this->get_suffixed_name('completionwatchedall')]));
     }
 
     public function data_preprocessing(&$defaultvalues) {
@@ -152,10 +188,13 @@ class mod_clearlesson_mod_form extends moodleform_mod {
                 $i++;
             }
         }
+        // $defaultvalues['completionwatchedall'] = !empty($defaultvalues['completion']) ? 1 : 0;
     }
 
     public function validation($data, $files) {
         // TODO this.
+        // var_dump($data);
+        // die();
         return array();
     }
 

@@ -15,22 +15,12 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_clearlesson/resource_browser
+    @template mod_clearlesson/elements/icons/check_circle
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="mod-clearlesson">
-    <div id="menu-container" class="row mod-clearlesson" data-type="{{type}}" data-itemtype="{{itemtype}}">
-        {{#editor}}
-            <div class="w-100 d-flex {{^playlistsexist}}h-100 justify-content-center align-items-center{{/playlistsexist}}">
-                {{#playlistsexist}}<div class="spacer" style="flex-grow: 10"></div>{{/playlistsexist}}
-                <button class="btn btn-primary playlist-edit" id="create-playlist" data-playlistid="0">
-                    {{#str}}createplaylist, mod_clearlesson{{/str}}
-                </button>
-            </div>
-        {{/editor}}
-        {{#resources}}
-            {{> mod_clearlesson/elements/menu_item}}
-        {{/resources}}
-    </div>
+
+<div class="watched-check{{#position}} othervideo{{/position}}{{^watched}} notwatched{{/watched}}"
+style="position: absolute; {{^position}}top: 1em; right: 0.5em; font-size: 3em;{{/position}}{{#position}}bottom: 0.3em; right: 0.2em; font-size: 1.3em;{{/position}} overflow: visible;">
+    <i class="fas fa-check-circle" style="color: var(--success);" title="{{videowatchedstring}}" alt="{{videowatchedstring}}"></i>
 </div>

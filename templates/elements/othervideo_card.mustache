@@ -30,16 +30,28 @@
         <a href="javascript:void(0)" class="play-icon" data-externalref="{{vimeoref}}">
             <i class="fas fa-play-circle"></i>
         </a>
-    <div class="time">{{convertedduration}}</div>
+        <div class="time">{{convertedduration}}</div>
         <a class="video-player-link" href="javascript:void(0)" data-externalref="{{vimeoref}}">
-            <img class="img-fluid" src="{{smallthumbnail}}" alt="{{name}}">
+            <img class="img-fluid" src="{{smallthumbnail}}" alt="{{name}}"
+            {{^playlistref}} style="display: inline-block; max-height: calc(100% - 6px);"{{/playlistref}}>
         </a>
+        {{^progress}}
+            <div class="progress-none"></div>
+        {{/progress}}
+        {{#progress}}
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: {{progresspercent}}%;"
+                    aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="{{duration}}">
+                </div>
+            </div>
+        {{/progress}}
     </div>
     <div class="video-card-body">
-        <div class="play-{{#playlists}}playlist-{{/playlists}}video-card-body">
+        <div class="play-{{#playlists}}playlist-{{/playlists}}video-card-body" style="position: relative;">
             <div class="video-title">
                 <a href="javascript:void(0)" class="v video-player-link" data-externalref="{{vimeoref}}" style="font-size: 13px;">{{name}}</a>
             </div>
+            {{> mod_clearlesson/elements/icons/watched_check}}
         </div>
     </div>
 </div>

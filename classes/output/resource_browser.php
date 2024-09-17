@@ -81,7 +81,11 @@ class resource_browser implements \renderable, \templatable {
      *
      * @return void
      */
-    public function __construct(string $type, string $destinationtype = '', string $filtervalue = '', bool $lazyload = false, array $response = []) {
+    public function __construct(string $type,
+                                string $destinationtype = '',
+                                string $filtervalue = '',
+                                bool $lazyload = false,
+                                array $response = []) {
         $this->originaltype = $type;
         $this->loadtype = $destinationtype ? $destinationtype : $type;
         if (!empty($response)) {
@@ -101,7 +105,7 @@ class resource_browser implements \renderable, \templatable {
      * @return stdClass
      */
     public function export_array_for_template(renderer_base $output): array {
-        $resourcetypes = clearlessons_get_resource_type_options();
+        $resourcetypes = clearlesson_get_resource_type_options();
         $this->response['types'] = [];
         foreach ($resourcetypes as $key => $value) {
             $type = ['key' => $key,
@@ -208,6 +212,5 @@ class resource_browser implements \renderable, \templatable {
     */
    public function export_for_template(renderer_base $output): stdClass {
        return (object) $this->export_array_for_template($output);
-   } 
-
+   }
 }
