@@ -57,4 +57,15 @@ class renderer extends \plugin_renderer_base {
         $data = $output->export_array_for_template($this);
         return parent::render_from_template('mod_clearlesson/resource_menu', $data);
     }
+
+    /**
+     * Render the in-course player.
+     * 
+     * @param object $output
+     * @return string
+     */
+    public function render_incourse_player($output): string {
+        $data = $output->export_array_for_template($this);
+        return parent::render_from_template('mod_clearlesson/incourse_player', $data);
+    }
 }

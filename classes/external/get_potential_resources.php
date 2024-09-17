@@ -70,19 +70,9 @@ class get_potential_resources extends \core_external\external_api {
                             ['type' => $type,
                             'query' => $query]);
 
-            if ($type !== 'customplaylist') {
-                $results = \mod_clearlesson\call::get_potential_resources($type, $query);
-                foreach ($results as $key => $result) {
-                    $results[$key]['label'] = $OUTPUT->render_from_template('mod_clearlesson/autocomplete_results/form_resource_selector_suggestion', $result);
-                }
-            }
-
-            if ($type === 'customplaylist') {
-                $sql = "SELECT * FROM {clearlesson_playlist}
-                        WHERE name LIKE :query
-                            AND (visibility = " . CLEARLESSON_PRIVACY_PUBLIC . " OR createdby = :userid)";
-                // TODO: my-audience visibility.
-                $results = $DB->get_records_sql($sql, ['query' => "%$query%", 'userid' => $USER->id]);
+            $results = \mod_clearlesson\call::get_potential_resources($type, $query);
+            foreach ($results as $key => $result) {
+                $results[$key]['label'] = $OUTPUT->render_from_template('mod_clearlesson/autocomplete_results/form_resource_selector_suggestion', $result);
             }
 
             return $results;

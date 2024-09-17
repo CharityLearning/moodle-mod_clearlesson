@@ -125,15 +125,17 @@ function clearlesson_add_instance($data, $mform) {
     }
     $data->parameters = serialize($parameters);
 
-    $displayoptions = array();
-    if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
-        $displayoptions['popupwidth']  = $data->popupwidth;
-        $displayoptions['popupheight'] = $data->popupheight;
-    }
-    if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME))) {
-        $displayoptions['printintro']   = (int)!empty($data->printintro);
-    }
-    $data->displayoptions = serialize($displayoptions);
+    $data->display = RESOURCELIB_DISPLAY_POPUP; // ALWAYS POPUP.
+    // No longer used. TODO check for other unsused fields.
+    // $displayoptions = array();
+    // if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
+    //     $displayoptions['popupwidth']  = $data->popupwidth;
+    //     $displayoptions['popupheight'] = $data->popupheight;
+    // }
+    // if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME))) {
+    //     $displayoptions['printintro']   = (int)!empty($data->printintro);
+    // }
+    // $data->displayoptions = serialize($displayoptions);
 
     $data->timemodified = time();
     $data->id = $DB->insert_record('clearlesson', $data);
@@ -160,15 +162,17 @@ function clearlesson_update_instance($data, $mform) {
         $parameters[$data->$parameter] = $data->$variable;
     }
     $data->parameters = serialize($parameters);
-    $displayoptions = array();
-    if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
-        $displayoptions['popupwidth']  = $data->popupwidth;
-        $displayoptions['popupheight'] = $data->popupheight;
-    }
-    if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME))) {
-        $displayoptions['printintro']   = (int)!empty($data->printintro);
-    }
-    $data->displayoptions = serialize($displayoptions);
+    $data->display = RESOURCELIB_DISPLAY_POPUP; // ALWAYS POPUP.
+    // No longer used. TODO check for other unsused fields.
+    // $displayoptions = array();
+    // if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
+    //     $displayoptions['popupwidth']  = $data->popupwidth;
+    //     $displayoptions['popupheight'] = $data->popupheight;
+    // }
+    // if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME))) {
+    //     $displayoptions['printintro']   = (int)!empty($data->printintro);
+    // }
+    // $data->displayoptions = serialize($displayoptions);
     $data->externalref = clearlesson_fix_submitted_ref($data->externalref);
     $data->timemodified = time();
     $data->id           = $data->instance;
@@ -201,7 +205,7 @@ function clearlesson_delete_instance($id) {
  * @param object $coursemodule
  * @return cached_cm_info info
  */
-function clearlesson_get_coursemodule_info($coursemodule) {
+function clearlesson_get_coursemodule_info($coursemodule) { // TODO this could be where the work needs to be done
     global $CFG, $DB;
     require_once("$CFG->dirroot/mod/clearlesson/locallib.php");
     if (!$clearlessonref = $DB->get_record('clearlesson', array('id' => $coursemodule->instance),
@@ -210,7 +214,8 @@ function clearlesson_get_coursemodule_info($coursemodule) {
     }
     $info = new cached_cm_info();
     $info->name = $clearlessonref->name;
-
+    // var_dump($info);
+    // die();
     // Note: there should be a way to differentiate links from normal resources.
     $info->icon = clearlesson_guess_icon($clearlessonref->externalref, 24);
     $display = clearlesson_get_final_display_type($clearlessonref);
@@ -219,8 +224,21 @@ function clearlesson_get_coursemodule_info($coursemodule) {
         $options = empty($clearlessonref->displayoptions) ? array() : unserialize($clearlessonref->displayoptions);
         $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
         $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
-        $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes";
-        $info->onclick = "window.open('$fullurl', '', '$wh'); return false;";
+        // $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes";
+        // $info->onclick = "window.open('$fullurl', '', '$wh'); return false;";
+        $onclickjs = "event.preventDefault(); 
+                    if (typeof window.openPlayer === 'undefined') {
+                        require(['mod_clearlesson/course-page'], function (coursePage) {
+                            coursePage.init();
+                            window.openPlayer(event);
+                        });
+                    } else {
+                        window.openPlayer(event);
+                    }";
+        // strip any new lines from the js
+        $info->onclick = trim(preg_replace('/\s\s+/', ' ', $onclickjs));
+        // $info->onclick = $onclickjs;
+        // $info->href = "javascript:void(0);";
     } else if ($display == RESOURCELIB_DISPLAY_NEW) {
         $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;redirect=1";
         $info->onclick = "window.open('$fullurl'); return false;";

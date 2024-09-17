@@ -129,10 +129,6 @@ class call {
         // debugging 
         // var_dump($response);
         $decodedresponse = json_decode($response, true);
-                // var_dump($decodedresponse);
-        if ($type == 'play') {
-            $decodedresponse['records']['isvideo'] = true;
-        }
         return $decodedresponse['records'];
     }
 

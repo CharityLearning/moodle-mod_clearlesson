@@ -42,10 +42,8 @@ var modalForm;
 export const init = () => {
     document.addEventListener('click', function(e) {
         const element = e.target;
-        const typeSelect = document.getElementById('id_type');
-        // var externalref = '';
-        if (element.getAttribute('id') === 'resource-select-button'
-            && typeSelect.value !== 'customplaylist') { // In the page form.
+        // const typeSelect = document.getElementById('id_type');
+        if (element.getAttribute('id') === 'resource-select-button') { // In the page form.
             e.preventDefault();
             openResourceBrowser();
         }
@@ -517,21 +515,21 @@ async function clearOrdering() {
     });
 }
 
-/**
- * Focus the filter animation.
- * @param {String} type
- */
-function focusFilterAnimation(type) {
-    const filter = modalForm.modal.getRoot()[0].querySelector('#' + type + '-filter');
-    scrollToTop();
-    const filterContainer = filter.closest('.filter-parent');
-    setTimeout(function() {
-        filterContainer.classList.add('filter-animation');
-        setTimeout(function() {
-            filterContainer.classList.remove('filter-animation');
-        }, 600);
-    }, 200);
-}
+// /**
+//  * Focus the filter animation.
+//  * @param {String} type
+//  */
+// function focusFilterAnimation(type) {
+//     const filter = modalForm.modal.getRoot()[0].querySelector('#' + type + '-filter');
+//     scrollToTop();
+//     const filterContainer = filter.closest('.filter-parent');
+//     setTimeout(function() {
+//         filterContainer.classList.add('filter-animation');
+//         setTimeout(function() {
+//             filterContainer.classList.remove('filter-animation');
+//         }, 600);
+//     }, 200);
+// }
 
 /**
  * Scroll to the top of the browser filters.
