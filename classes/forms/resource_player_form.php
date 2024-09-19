@@ -30,14 +30,7 @@ require_once("$CFG->libdir/formslib.php");
 /**
  * The resource player form.
  */
-class resource_player_form extends \core_form\dynamic_form {
-
-    /**
-     * The course module id.
-     * @var int
-     */
-    protected $cmid;
-    
+class resource_player_form extends base_dynamic_form {
     /**
      * Define the form.
      */
@@ -53,58 +46,5 @@ class resource_player_form extends \core_form\dynamic_form {
 
         $output = $PAGE->get_renderer('mod_clearlesson');
         $dform->addElement('html', $output->render_resource_player($renderable));
-    }
-
-    /**
-     * Get the context for the form submission
-     */
-    protected function get_context_for_dynamic_submission(): \context {
-        $this->cmid = ($this->_ajaxformdata['cmid']) ?? 0;
-        if ($this->cmid) {
-            return \context_module::instance($this->cmid);
-        } else {
-            return \context_course::instance($this->_ajaxformdata['course']);
-        }
-    }
-
-    /**
-     * Check access for the form submission.
-     */
-    protected function check_access_for_dynamic_submission(): void {
-        // reu
-    }
-
-    /**
-     * Process the form submission.
-     */
-    public function process_dynamic_submission() {
-        // global $DB;
-    }
-
-    /**
-     * Set the form data
-     */
-    public function set_data_for_dynamic_submission(): void {
-    }
-
-    /**
-     * Get the page url for the form submission.
-     */
-    protected function get_page_url_for_dynamic_submission(): \moodle_url {
-        $url = parse_url($this->_ajaxformdata['url']);
-        parse_str($url['query'], $queryarray);
-        return new \moodle_url($url['path'], $queryarray);
-    }
-
-    /**
-     * Validate the form submission.
-     *
-     * @param array $data The form data.
-     * @param array $files The form files.
-     */
-    public function validation($data, $files) {
-        global $DB;
-        $errors = parent::validation($data, $files);
-        return $errors;
     }
 }

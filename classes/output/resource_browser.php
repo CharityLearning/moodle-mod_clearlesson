@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * ftfclassroom renderable.
+ * clearlesson resource browser renderable.
  *
  * @package    mod_clearlesson
  * @subpackage clearlesson
@@ -38,41 +38,6 @@ use templatable;
  * @package    mod_clearlesson
  */
 class resource_browser implements \renderable, \templatable {
-    /**
-     * The original resource type.
-     * @var string
-     */
-    public $originaltype;
-
-    /**
-     * The resource type to load.
-     * @var string
-     */
-    public $loadtype;
-
-    /**
-     * The filter name
-     * @var string
-     */
-    public $destinationtype;
-
-    /**
-     * The filter value
-     * @var string
-     */
-    public $filtervalue;
-
-    /**
-     * The browserdata response, if provided.
-     * @var array
-     */
-    public $response;
-
-    /**
-     * Is the browser being used in Safari?
-     * @var bool
-     */
-    public $lazyload;
 
     /**
      * Construct this renderable.

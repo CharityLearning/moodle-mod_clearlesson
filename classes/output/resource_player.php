@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * ftfclassroom renderable.
+ * clearlesson resource player renderable.
  *
  * @package    mod_clearlesson
  * @subpackage clearlesson
