@@ -27,14 +27,13 @@ import ModalForm from 'core_form/modalform';
 import * as Utils from './utils';
 import {updateProgressAndActivity} from './progress-tracker';
 import Ajax from 'core/ajax';
+import {get_string as getString} from 'core/str';
 
-var player;
+var url, playerModal, formClass, backString, modalType, moodleCompleted;
 var firstLoad = 1;
 
 export const init = () => {
     var position = 1;
-    var url;
-
     window.openPlayer = (e, type) => {
         if (e.target.href.includes('clearlesson')) {
             e.preventDefault();
@@ -43,6 +42,7 @@ export const init = () => {
             window.cmid = elementAncestor.querySelector('.activityname a')
                                                 .getAttribute('href').split('id=')[1];
 
+            window.type = type;
             const searchParams = new URLSearchParams(window.location.search);
             url = e.target.href;
             window.courseid = searchParams.get('id'); // Used in the progress tracker as well as on this page.
@@ -54,16 +54,22 @@ export const init = () => {
             }
             const instanceName = instanceNameElement.innerText;
 
-            const playerModal = new ModalForm({
-                formClass: 'mod_clearlesson\\forms\\incourse_player_form',
+            if (type === 'series' || type === 'collections') {
+                formClass = 'mod_clearlesson\\forms\\incourse_menu_form';
+                modalType = 'menu';
+            } else {
+                formClass = 'mod_clearlesson\\forms\\incourse_player_form';
+                modalType = 'player';
+            }
+
+            playerModal = new ModalForm({
+                formClass: formClass,
                 args: {cmid: window.cmid,
                         course: window.courseid,
                         url: url,
                         firstload: firstLoad},
                 modalConfig: {title: instanceName},
             });
-
-            player = playerModal;
 
             playerModal.addEventListener(playerModal.events.LOADED, function() {
                 const modalRootInner = playerModal.modal.getRoot()[0].children[0];
@@ -80,12 +86,47 @@ export const init = () => {
                     );
                 }
 
-                Utils.waitForElement('.incourse-player', modalRootInner, async function() {
-                    // Store the resource reference for the progress tracker.
-                    await updateProgressAndActivity();
-                    window.resourceRef = document.querySelector('.incourse-player').getAttribute('data-resourceref');
-                    window.type = document.querySelector('.incourse-player').getAttribute('data-type');
-                    setWindowWatched();
+                if (modalType === 'player') {
+                    Utils.waitForElement('.incourse-player', modalRootInner, async function() {
+                        // Store the resource reference for the progress tracker.
+                        await updateProgressAndActivity();
+                        window.resourceRef = document.querySelector('.incourse-player').getAttribute('data-resourceref');
+                        window.type = document.querySelector('.incourse-player').getAttribute('data-type');
+                        setWindowWatched();
+                    });
+                }
+
+                const completionDropdown = elementAncestor.querySelector('.completion-dropdown');
+                if (completionDropdown.classList.contains('btn-success')) {
+                    moodleCompleted = true;
+                } else {
+                    moodleCompleted = false;
+                }
+
+                Utils.waitForElement('.incourse', modalRootInner, async function() {
+                    if (modalRootInner.querySelector('.incourse').getAttribute('data-watchedall') == '1') {
+                        window.viewedStatus = 'watched';
+                        window.watched = true;
+                        if (!moodleCompleted) {
+                            // All the videos have been watched but the activity has not been marked as complete.
+                            // If the completionwatchedall rule is enabled, we can mark the activity as complete.
+                            const watchdAllRuleString = await getString('watchedallrule', 'mod_clearlesson');
+                            if (completionDropdown.outerHTML.includes(watchdAllRuleString)) {
+                                window.currentTime = 0;
+                                window.resourceRef = modalRootInner.querySelector('.incourse').getAttribute('data-resourceref');
+                                window.extref = '';
+                                await updateProgressAndActivity();
+                            }
+                        }
+                    }
+                });
+
+                Utils.waitForElement('.modal-footer button.btn-primary', modalRootInner, async function() {
+                    backString = await getString('back');
+                    const saveButton = modalRootInner.querySelector('.modal-footer button.btn-primary');
+                    saveButton.classList.add('d-none');
+                    const cancelButton = modalRootInner.querySelector('.modal-footer button.btn-secondary');
+                    cancelButton.innerHTML = backString;
                 });
 
                 Ajax.call([{
@@ -125,8 +166,8 @@ export const init = () => {
 async function reRenderPlayerModal(position, url) {
     const formParams = {cmid: window.cmid, course: window.courseid, url: url, position: position, firstload: false};
     const serialFormParams = Utils.serialize(formParams);
-    const bodyContent = player.getBody(serialFormParams);
-    await player.modal.setBodyContent(bodyContent);
+    const bodyContent = playerModal.getBody(serialFormParams);
+    await playerModal.modal.setBodyContent(bodyContent);
     setWindowWatched();
 }
 

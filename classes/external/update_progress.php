@@ -106,7 +106,8 @@ class update_progress extends \core_external\external_api {
                 }
             }
 
-            $activitysql = "SELECT cl.*, cm.completion FROM {course_modules} cm
+            $activitysql = "SELECT cl.*, cm.completion
+                                FROM {course_modules} cm
                                 JOIN {clearlesson} cl ON cm.instance = cl.id
                                 WHERE cm.id = ?";
             if ($activity = $DB->get_record_sql($activitysql, [$cmid])) {
@@ -119,7 +120,7 @@ class update_progress extends \core_external\external_api {
 
             // If a '$resourceref' is set, then we need to check if all videos in the resource have been watched.
             // If they have, then we can update the completion status of the module.
-            if ($response = \mod_clearlesson\call::update_progress($externalref, $duration, $status, $resourceref, $type)) {
+            if ($externalref && $response = \mod_clearlesson\call::update_progress($externalref, $duration, $status, $resourceref, $type)) {
                 // Update completion of activity module.
                 $newtrackrecord = new \stdClass();
                 $newtrackrecord->clearlessonid = $activity->id;
@@ -128,20 +129,20 @@ class update_progress extends \core_external\external_api {
                 if ($response['result']['completionstatus']) {
                     $newtrackrecord->watchedall = 1;
                     // Update completion of course module.
-                    $clearlesson = $DB->get_record('clearlesson', array('id' => $activity->id), '*', MUST_EXIST);
-                    list($course, $cm) = \get_course_and_cm_from_instance($clearlesson, 'clearlesson');
-                    $completion = new completion_info($course);
-                    $completion->update_state($cm, COMPLETION_COMPLETE);
-                    $format = \course_get_format($course);
-                    $modinfo = $format->get_modinfo();
-                    $section = $modinfo->get_section_info($cm->sectionnum);
-                    $renderer = $format->get_renderer($PAGE);
-                    $updatedhtml = $renderer->course_section_updated_cm_item($format, $section, $cm);
+                    $updatedhtml = self::mark_module_complete_and_get_updatedhtml($activity, $course, $cm);
                 } else {
                     $newtrackrecord->watchedall = 0;
                     $updatedhtml = '';
                 }
                 $DB->insert_record('clearlesson_track', $newtrackrecord);
+                return ['success' => true,
+                        'activitymodulehtml' => $updatedhtml];
+            } else if (!$externalref && $resourceref) { 
+                // All the videos in the resource have already been watched, but the module has not been marked as complete.
+                // The videos may have been watched in other resources or on the Clear Lessons platform.
+                // Alternatively the completion conditions may have changed.
+                // Mark completed in moodle.
+                $updatedhtml = self::mark_module_complete_and_get_updatedhtml($activity, $course, $cm);
                 return ['success' => true,
                         'activitymodulehtml' => $updatedhtml];
             } else {
@@ -163,5 +164,42 @@ class update_progress extends \core_external\external_api {
                 ['success' => new external_value(PARAM_BOOL, 'Success of the update'),
                 'activitymodulehtml' => new external_value(PARAM_RAW, 'HTML to update the course page Todo button with')]
             );
+        }
+
+        public static function mark_module_complete_and_get_updatedhtml($activity, $course, $cm) {
+            global $PAGE, $DB, $USER;
+
+            // Check the clearlesson track and set watchedall to 1 if all videos have been watched.
+            $sql = "SELECT ct.userid, MAX(ct.watchedall) AS watchedall, MAX(ct.id) AS id
+            FROM {clearlesson_track} ct
+            WHERE ct.clearlessonid = {$activity->id}
+                AND ct.userid = {$USER->id}
+                GROUP BY ct.userid";
+            if ($result = $DB->get_record_sql($sql)) {
+                if (!$result->watchedall) {
+                    $latestrecord = $DB->get_record('clearlesson_track', array('id' => $result->id), '*', MUST_EXIST);
+                    $latestrecord->watchedall = 1;
+                    $DB->update_record('clearlesson_track', $latestrecord);
+                }
+            } else {
+                $newrecord = new \stdClass();
+                $newrecord->clearlessonid = $activity->id;
+                $newrecord->userid = $USER->id;
+                $newrecord->watchedall = 1;
+                $newrecord->timemodified = time();
+                $DB->insert_record('clearlesson_track', $newrecord);
+            } 
+
+            // Course module completion.
+            $clearlesson = $DB->get_record('clearlesson', array('id' => $activity->id), '*', MUST_EXIST);
+            list($course, $cm) = \get_course_and_cm_from_instance($clearlesson, 'clearlesson');
+            $completion = new completion_info($course);
+            $completion->update_state($cm, COMPLETION_COMPLETE);
+            $format = \course_get_format($course);
+            $modinfo = $format->get_modinfo();
+            $section = $modinfo->get_section_info($cm->sectionnum);
+            $renderer = $format->get_renderer($PAGE);
+
+            return $renderer->course_section_updated_cm_item($format, $section, $cm);
         }
 }

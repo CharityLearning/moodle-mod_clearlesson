@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * ftfclassroom renderable.
+ * clearlesson incourse menu renderable.
  *
  * @package    mod_clearlesson
  * @subpackage clearlesson
@@ -74,14 +74,14 @@ class incourse_player implements \renderable, \templatable {
      *
      * @return void
      */
-    public function __construct(string $type, string $externalref, int $position = 1, array $response = [], int $watchedall = 0) {
+    public function __construct(string $type, string $externalref, int $position = 1, array $response = []) {
         $this->type = $type;
         $this->externalref = $externalref;
         $this->position = $position;
         if (!empty($response)) {
             $this->response = $response;
         } else {
-            $this->response = \mod_clearlesson\call::get_playerform_data($this->type, $this->externalref, $this->position, $watchedall);
+            $this->response = \mod_clearlesson\call::get_playerform_data($this->type, $this->externalref, $this->position);
         }
         // Add the resourceref to the response.
         // The response externalref is the externalref of the first video in the resource.

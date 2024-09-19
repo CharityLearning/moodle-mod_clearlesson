@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * ftfclassroom renderable.
+ * clearlesson resource menu renderable.
  *
  * @package    mod_clearlesson
  * @subpackage clearlesson
@@ -100,7 +100,7 @@ class resource_menu implements \renderable, \templatable {
      * @return stdClass
      */
     public function export_array_for_template(renderer_base $output): array {
-        $response['resources'] = $this->response;
+        $response['resources'] = $this->response['resources'];
         switch ($this->type) {
             case 'collections':
                 $response['countstring'] = get_string('playlists', 'mod_clearlesson');

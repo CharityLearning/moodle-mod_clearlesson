@@ -134,7 +134,7 @@ function searchIfSearchbutton(e) {
 /**
  * Open the resoure browser modal form.
  */
-function openResourceBrowser() {
+async function openResourceBrowser() {
     const resourceType = document.getElementById('id_type').value;
     const cmid = document.querySelector('input[name="coursemodule"]').value;
     const courseid = document.querySelector('input[name="course"]').value;
@@ -144,7 +144,7 @@ function openResourceBrowser() {
         lazyLoad = true;
     }
 
-    const browserForm = new ModalForm({
+    const browserForm = await new ModalForm({
         formClass: 'mod_clearlesson\\forms\\resource_browser_form',
         args: {type: resourceType, cmid: cmid, course: courseid, url: url, lazyload: lazyLoad},
         modalConfig: {title: getString('resourcebrowser', 'mod_clearlesson')},

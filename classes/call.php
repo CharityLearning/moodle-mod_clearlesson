@@ -123,17 +123,15 @@ class call {
      * @param int $position The position of the resource.
      * @param bool $watchedall Whether all videos have been watched.
      */
-    public static function get_playerform_data(string $type, string $externalref, int $position = 1, int $watchedall = 0): array {
+    public static function get_playerform_data(string $type, string $externalref, int $position = 1): array {
         $response = self::initate_call('/api/v1/get_playerform_data.php', ['type' => $type,
                                                                     'externalref' => $externalref,
-                                                                    'position' => $position,
-                                                                    'watchedall' => $watchedall]);
+                                                                    'position' => $position]);
         // debugging 
         // var_dump($response);
         $decodedresponse = json_decode($response, true);
-        // var_dump($decodedresponse);
+        // var_dump($decodedresponse['records']['watchedall']);
         $decodedresponse['records']['videowatchedstring'] = get_string('videowatched', 'clearlesson');
-        $decodedresponse['records']['watchedall'] = $watchedall;
         return $decodedresponse['records'];
     }
 
