@@ -64,12 +64,13 @@ class update_progress extends \core_external\external_api {
         /**
         * Update the viewed progress of a video in the Clear Lesson Platform.
         *
-        * @param string $externalref the external reference of the video
+        * @param string $externalref the external reference of the video.
+        * It's presence indicates progress should be updated in the Clear Lesson Platform.
         * @param int $duration the time watched in seconds
         * @param string $status the view status of the video for this session
         * @param int $courseid the course id
         * @param int $cmid the course module id
-        * @param string $resourceref the external reference of the resource
+        * @param string $resourceref the external reference of the parent resource
         * @param string $type the type of resource
         * @return array of warnings and status result
         * @since Moodle 3.0
@@ -146,8 +147,7 @@ class update_progress extends \core_external\external_api {
                 return ['success' => true,
                         'activitymodulehtml' => $updatedhtml];
             } else {
-                // This only happens when the user does not have a clearlessons account with a matching email.
-                // Which should neveer happen.
+                // No action taken.
                 return ['success' => false,
                         'activitymodulehtml' => ''];
             }

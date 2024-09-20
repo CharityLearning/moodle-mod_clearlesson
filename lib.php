@@ -221,10 +221,10 @@ function clearlesson_get_coursemodule_info($coursemodule) {
     $display = clearlesson_get_final_display_type($clearlessonref);
 
     if ($display == RESOURCELIB_DISPLAY_POPUP) {
-        $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;redirect=1";
-        $options = empty($clearlessonref->displayoptions) ? array() : unserialize($clearlessonref->displayoptions);
-        $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
-        $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
+        // $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;$clearlessonref->type";
+        // $options = empty($clearlessonref->displayoptions) ? array() : unserialize($clearlessonref->displayoptions);
+        // $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
+        // $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
         $onclickjs = "event.preventDefault(); 
                     if (typeof window.openPlayer === 'undefined') {
                         require(['mod_clearlesson/course-page'], function (coursePage) {
@@ -236,10 +236,11 @@ function clearlesson_get_coursemodule_info($coursemodule) {
                     }";
         // Strip any new lines from the js.
         $info->onclick = trim(preg_replace('/\s\s+/', ' ', $onclickjs));
-    } else if ($display == RESOURCELIB_DISPLAY_NEW) {
-        $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;redirect=1";
-        $info->onclick = "window.open('$fullurl'); return false;";
     }
+    // else if ($display == RESOURCELIB_DISPLAY_NEW) {
+    //     $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;redirect=1";
+    //     $info->onclick = "window.open('$fullurl'); return false;";
+    // }
 
     // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
     if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {

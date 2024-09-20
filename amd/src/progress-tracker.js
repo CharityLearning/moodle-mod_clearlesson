@@ -47,7 +47,7 @@ export const init = async() => {
     });
 
     window.player.on('ended', async function() {
-        if (!window.watched) {
+        if (window.updateProgress) {
             videoWatched();
             await updateProgressAndActivity();
         }
@@ -58,7 +58,7 @@ export const init = async() => {
         window.player.getDuration().then(async function(duration) {
             // If 90% of the video has been watched, we update the status to 'watched'.
             if (data.seconds / duration >= 0.9) {
-                if (!window.watched) {
+                if (window.updateProgress) {
                     videoWatched();
                     updateProgressAndActivity();
                 }
@@ -71,14 +71,14 @@ export const init = async() => {
 
     // Before the user leaves the page, we update the progress.
     window.addEventListener('beforeunload', async function() {
-        if (!window.watched) {
+        if (window.updateProgress) {
             await updateProgressAndActivity();
         }
     }, true);
 
     // Every 30 minutes we update the progress.
     setInterval(async function() {
-        if (!window.watched) {
+        if (window.updateProgress) {
             await updateProgressAndActivity();
         }
     }, 1800000);
@@ -118,7 +118,7 @@ const updateProgress = async() => {
  */
 function videoWatched() {
     window.viewedStatus = 'watched';
-    window.watched = true;
+    window.updateProgress = false;
     document.querySelector('.video-title-wrapper .watched-check').classList.remove('notwatched');
     const playlistVideoLink = document.querySelector('.video-card-side a[data-externalref="' + window.extref + '"]');
     if (playlistVideoLink) {

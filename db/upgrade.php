@@ -52,7 +52,7 @@ function xmldb_clearlesson_upgrade($oldversion) {
         exit(1);
     }
 
-    if ($oldverion < 2023091217) {
+    if ($oldverion < 2023091223) {
         $dbman = $DB->get_manager();
         $table = new xmldb_table('clearlesson');
         $field = new xmldb_field('completionwatchedall', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL , null, '0');
@@ -67,7 +67,7 @@ function xmldb_clearlesson_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_plugin_savepoint(true, 2023091217, 'mod', 'clearlesson');
+        upgrade_plugin_savepoint(true, 2023091223, 'mod', 'clearlesson');
     }
 
     return true;

@@ -29,14 +29,16 @@ import {updateProgressAndActivity} from './progress-tracker';
 import Ajax from 'core/ajax';
 import {get_string as getString} from 'core/str';
 
-var url, playerModal, formClass, backString, modalType, moodleCompleted;
+var url, playerModal, formClass, backString, modalType, moodleCompleted, playerModalFromMenu, newMenuModal, completionDropdown;
 var firstLoad = 1;
+
 
 export const init = () => {
     var position = 1;
-    window.openPlayer = (e, type) => {
+    window.openPlayer = async(e, type) => {
         if (e.target.href.includes('clearlesson')) {
             e.preventDefault();
+            backString = await getString('back');
             const elementAncestor = e.target.closest('.activity');
             // Used in the progress tracker as well as on this page.
             window.cmid = elementAncestor.querySelector('.activityname a')
@@ -46,8 +48,7 @@ export const init = () => {
             const searchParams = new URLSearchParams(window.location.search);
             url = e.target.href;
             window.courseid = searchParams.get('id'); // Used in the progress tracker as well as on this page.
-
-            var instanceNameElement = elementAncestor.querySelector('.activityname .instancename');
+            const instanceNameElement = elementAncestor.querySelector('.activityname .instancename');
             const span = instanceNameElement.querySelector('span');
             if (span) {
                 instanceNameElement.removeChild(span);
@@ -74,60 +75,37 @@ export const init = () => {
             playerModal.addEventListener(playerModal.events.LOADED, function() {
                 const modalRootInner = playerModal.modal.getRoot()[0].children[0];
                 if (type !== 'play') {
-                    // Set the modal to nearly fullscreen size.
-                    let modalHeight = Math.ceil(window.innerHeight * 0.94);
-                    let modalWidth = Math.ceil(window.innerWidth * 0.94);
-                    modalWidth = modalWidth > 1800 ? 1800 : modalWidth;
-                    modalRootInner.setAttribute('style',
-                        'width: ' + modalWidth +
-                        'px;max-width: ' + modalWidth +
-                        'px;height: ' + modalHeight +
-                        'px;max-height: ' + modalHeight + 'px;'
-                    );
+                    setModalFullscreen(modalRootInner);
                 }
 
                 if (modalType === 'player') {
                     Utils.waitForElement('.incourse-player', modalRootInner, async function() {
+                        if (window.updateProgress) {
+                            await updateProgressAndActivity(); // Record any progress from the last player.
+                        }
                         // Store the resource reference for the progress tracker.
-                        await updateProgressAndActivity();
                         window.resourceRef = document.querySelector('.incourse-player').getAttribute('data-resourceref');
                         window.type = document.querySelector('.incourse-player').getAttribute('data-type');
                         setWindowWatched();
                     });
                 }
 
-                const completionDropdown = elementAncestor.querySelector('.completion-dropdown');
-                if (completionDropdown.classList.contains('btn-success')) {
-                    moodleCompleted = true;
-                } else {
-                    moodleCompleted = false;
+                if (modalType === 'menu') {
+                    Utils.waitForElement('.incourse-player', modalRootInner, async function() {
+                        if (window.updateProgress) {
+                            await updateProgressAndActivity(); // Record any progress from the last player.
+                        }
+                        window.updateProgress = false;
+                    });
+                    // TODO Check if the completion is enabled. and if the activity is marked as complete.
+                    // If the completion is enabled, and all videos are watched and the activity is not marked as complete,
+                    // mark the activity as complete.
                 }
 
-                Utils.waitForElement('.incourse', modalRootInner, async function() {
-                    if (modalRootInner.querySelector('.incourse').getAttribute('data-watchedall') == '1') {
-                        window.viewedStatus = 'watched';
-                        window.watched = true;
-                        if (!moodleCompleted) {
-                            // All the videos have been watched but the activity has not been marked as complete.
-                            // If the completionwatchedall rule is enabled, we can mark the activity as complete.
-                            const watchdAllRuleString = await getString('watchedallrule', 'mod_clearlesson');
-                            if (completionDropdown.outerHTML.includes(watchdAllRuleString)) {
-                                window.currentTime = 0;
-                                window.resourceRef = modalRootInner.querySelector('.incourse').getAttribute('data-resourceref');
-                                window.extref = '';
-                                await updateProgressAndActivity();
-                            }
-                        }
-                    }
-                });
+                completionDropdown = elementAncestor.querySelector('.completion-dropdown');
+                updateCompletionStatusIfIncorrect(completionDropdown, modalRootInner);
 
-                Utils.waitForElement('.modal-footer button.btn-primary', modalRootInner, async function() {
-                    backString = await getString('back');
-                    const saveButton = modalRootInner.querySelector('.modal-footer button.btn-primary');
-                    saveButton.classList.add('d-none');
-                    const cancelButton = modalRootInner.querySelector('.modal-footer button.btn-secondary');
-                    cancelButton.innerHTML = backString;
-                });
+                setModalButtons(modalRootInner);
 
                 Ajax.call([{
                     methodname: 'mod_clearlesson_course_module_viewed',
@@ -150,9 +128,20 @@ export const init = () => {
         || element.classList?.contains('video-player-link')
         || element.parentElement.classList?.contains('video-player-link')) {
             e.preventDefault();
-            await updateProgressAndActivity();
-            position = parseInt(element.closest('.has-position').getAttribute('data-position'));
-            reRenderPlayerModal(position, url);
+            if (element.classList.contains('incourse-player-link')
+            || element.parentElement.classList.contains('incourse-player-link')) {
+                if (element.getAttribute('data-type') === 'playlists'
+                || element.parentElement.getAttribute('data-type') === 'playlists') {
+                    // 2nd level modals.
+                    openPlayerFromMenu(e);
+                } else {
+                    // For collections we'll open the series menu.
+                    openNewMenuModal(e);
+                }
+            } else {
+                position = parseInt(element.closest('.has-position').getAttribute('data-position'));
+                reRenderPlayerModal(position, url);
+            }
         }
     });
 };
@@ -176,5 +165,143 @@ async function reRenderPlayerModal(position, url) {
  */
 function setWindowWatched() {
     const watchedCheck = document.querySelector('.incourse-player .player-column .watched-check');
-    window.watched = !watchedCheck?.classList.contains('notwatched');
+    // If the video has been watched already dont update the progress.
+    window.updateProgress = watchedCheck?.classList.contains('notwatched');
+}
+
+/**
+ * Open the player modal from the menu item.
+ * @param {Event} e The event object.
+ */
+function openPlayerFromMenu(e) {
+    const elementAncestor = e.target.closest('.menu-item');
+    const instanceName = elementAncestor.querySelector('.menu-item-title > .searchable').innerHTML;
+    const externalRef = elementAncestor.getAttribute('data-externalref');
+    window.type = 'playlists';
+    playerModalFromMenu = new ModalForm({
+        formClass: 'mod_clearlesson\\forms\\incourse_player_form',
+        args: {cmid: window.cmid,
+                course: window.courseid,
+                url: url,
+                firstload: firstLoad,
+                externalref: externalRef},
+        modalConfig: {title: instanceName},
+    });
+
+    playerModalFromMenu.addEventListener(playerModalFromMenu.events.LOADED, function() {
+        const modalRootInner = playerModalFromMenu.modal.getRoot()[0].children[0];
+        setModalFullscreen(modalRootInner);
+
+        Utils.waitForElement('.incourse-player', modalRootInner, async function() {
+            if (window.updateProgress) {
+                await updateProgressAndActivity(); // Record any progress from the last player.
+            }
+            // Store the resource reference for the progress tracker.
+            window.resourceRef = document.querySelector('.incourse-player').getAttribute('data-resourceref');
+            window.type = document.querySelector('.incourse-player').getAttribute('data-type');
+            setWindowWatched();
+        });
+
+        updateCompletionStatusIfIncorrect(completionDropdown, modalRootInner);
+
+        setModalButtons(modalRootInner);
+    });
+
+    playerModalFromMenu.show();
+}
+
+/**
+ * Open a new menu modal. This will be a menu of series for a collection.
+ * @param {Event} e The event object.
+ */
+function openNewMenuModal(e) {
+    const menuItem = e.target.closest('.menu-item');
+    const externalRef = menuItem.getAttribute('data-externalref');
+    const instanceName = menuItem.querySelector('.menu-item-title > .searchable').innerHTML;
+
+    window.type = 'series';
+    newMenuModal = new ModalForm({
+        formClass: 'mod_clearlesson\\forms\\incourse_menu_form',
+        args: {cmid: window.cmid,
+                course: window.courseid,
+                url: url,
+                firstload: firstLoad,
+                externalref: externalRef},
+        modalConfig: {title: instanceName},
+    });
+
+    newMenuModal.addEventListener(newMenuModal.events.LOADED, function() {
+        const modalRootInner = newMenuModal.modal.getRoot()[0].children[0];
+        setModalFullscreen(modalRootInner);
+        Utils.waitForElement('.incourse-menu', modalRootInner, async function() {
+            if (window.updateProgress) {
+                await updateProgressAndActivity(); // Record any progress from the last player.
+            }
+            window.updateProgress = false;
+        });
+        updateCompletionStatusIfIncorrect(completionDropdown, modalRootInner);
+    });
+
+    newMenuModal.show();
+}
+
+/**
+ * Set the modal to nearly fullscreen size.
+ * @param {HTMLelement} modalRootInner The root of the modal.
+ */
+function setModalFullscreen(modalRootInner) {
+    let modalHeight = Math.ceil(window.innerHeight * 0.94);
+    let modalWidth = Math.ceil(window.innerWidth * 0.94);
+    modalWidth = modalWidth > 1800 ? 1800 : modalWidth;
+    modalRootInner.setAttribute('style',
+        'width: ' + modalWidth +
+        'px;max-width: ' + modalWidth +
+        'px;height: ' + modalHeight +
+        'px;max-height: ' + modalHeight + 'px;'
+    );
+}
+
+/**
+ * Set the modal buttons.
+ * @param {HMTLelement} modalRootInner The root of the modal.
+ */
+function setModalButtons(modalRootInner) {
+    Utils.waitForElement('.modal-footer button.btn-primary', modalRootInner, async function() {
+        const saveButton = modalRootInner.querySelector('.modal-footer button.btn-primary');
+        saveButton.classList.add('d-none');
+        const cancelButton = modalRootInner.querySelector('.modal-footer button.btn-secondary');
+        cancelButton.innerHTML = backString;
+    });
+}
+
+/**
+ * Update the completion status if it is incorrect.
+ * @param {HTMLelement} completionDropdown The completion dropdown/button (may not be present).
+ * @param {HTMLelement} modalRootInner The root of the modal.
+ */
+function updateCompletionStatusIfIncorrect(completionDropdown, modalRootInner) {
+    if (completionDropdown) {
+        if (completionDropdown.classList.contains('btn-success')) {
+            moodleCompleted = true;
+        } else {
+            moodleCompleted = false;
+        }
+        Utils.waitForElement('.incourse', modalRootInner, async function() {
+            if (modalRootInner.querySelector('.incourse').getAttribute('data-watchedall') == '1') {
+                window.viewedStatus = 'watched';
+                window.updateProgress = false;
+                if (!moodleCompleted) {
+                    // All the videos have been watched but the activity has not been marked as complete.
+                    // If the completionwatchedall rule is enabled, we can mark the activity as complete.
+                    const watchdAllRuleString = await getString('watchedallrule', 'mod_clearlesson');
+                    if (completionDropdown.outerHTML.includes(watchdAllRuleString)) {
+                        window.currentTime = 0;
+                        window.resourceRef = modalRootInner.querySelector('.incourse').getAttribute('data-resourceref');
+                        window.extref = '';
+                        await updateProgressAndActivity(); // We ignore window.updateProgress here.
+                    }
+                }
+            }
+        });
+    }
 }
