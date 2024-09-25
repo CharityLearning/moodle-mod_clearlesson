@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The in-course player form. Used for topic, speaker, playlist and video resources.
+ * The in-course menu form. Used as a starting point for series and collection resources.
  *
  * @package mod_clearlesson
  * @copyright Dan Watkins <dwatkins@charitylearning.org>
@@ -30,7 +30,7 @@ require_once("$CFG->libdir/formslib.php");
 /**
  * The resource player form.
  */
-class incourse_player_form extends \mod_clearlesson\forms\base_dynamic_form {
+class incourse_menu_form extends \mod_clearlesson\forms\base_dynamic_form {
     /**
      * Define the form.
      */
@@ -40,33 +40,20 @@ class incourse_player_form extends \mod_clearlesson\forms\base_dynamic_form {
         if (!isset($this->_ajaxformdata['cmid'])) {
             throw new \moodle_exception('Missing form param/s');
         }
-        if (isset($this->_ajaxformdata['position'])) {
-            $position = $this->_ajaxformdata['position'];
-        } else {
-            $position = 1;
-        }
-        if (isset($this->_ajaxformdata['firstload'])) {
-            $firstload = $this->_ajaxformdata['firstload'];
-        } else {
-            throw new \moodle_exception('Missing form param/s');
-        }
 
-        // If an externalref is provided we use it to open that playlist.
-        // For all other circumstances get the externalref and type from the database using the cmid.
-        if (isset($this->_ajaxformdata['externalref']) && $this->_ajaxformdata['externalref']) {
+        if (isset($this->_ajaxformdata['externalref'])) {
+            // If an externalref is passed, this is a series.
+            // It will be the 2nd level of the menu, opened when a collection menu item is clicked.
             $this->externalref = $this->_ajaxformdata['externalref'];
-            $this->type = 'playlists';
+            $this->type = 'series';
         } else {
-            $this->get_resource_properties();
+            $this->get_resource_properties(); // Get the externalref and type from the database using the cmid.
         }
 
-        $renderable = new \mod_clearlesson\output\incourse_player($this->type,
-                                                                $this->externalref,
-                                                                $position,
-                                                                [],
-                                                                $firstload);                                       
+        $renderable = new \mod_clearlesson\output\incourse_menu($this->type,
+                                                                $this->externalref);
         $output = $PAGE->get_renderer('mod_clearlesson');
-        $dform->addElement('html', $output->render_incourse_player($renderable));
+        $dform->addElement('html', $output->render_incourse_menu($renderable));
         $dform->addElement('hidden', 'type', $this->type);
         $dform->setType('type', PARAM_TEXT);
     }

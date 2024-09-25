@@ -691,27 +691,27 @@
  }
  
  /* Card */
-  .mod-clearlesson div.page-title {
-     font-size: 1rem;
-     font-weight: 600;
- 
-     overflow: hidden;
- 
-     max-width: 99%;
-     padding: 20px 24px 20px 0;
- 
-     cursor: pointer;
-     white-space: nowrap;
-     text-overflow: ellipsis;
- 
-     color: #121212;
+.mod-clearlesson div.page-title {
+    font-size: 1rem;
+    font-weight: 600;
+
+    overflow: hidden;
+
+    max-width: 99%;
+    padding: 20px 24px 20px 0;
+
+    cursor: pointer;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: #121212;
  }
  
-  .mod-clearlesson h1.card-title {
+.mod-clearlesson h1.card-title {
      margin-bottom: 0px;
  }
  
-  .mod-clearlesson .card {
+.mod-clearlesson .card {
      border: 1px solid #e4e8eb;
      border-radius: 6px;
      box-shadow: 0 1px 6px rgba(0, 0, 0, .07);
@@ -1146,22 +1146,16 @@
  }
  
  @media only screen and (max-width: 585px) {
+    .mod-clearlesson .playlist-content-card {
+        height: 150px;
+    }
+}
  
-     .mod-clearlesson .playlist-content-card {
-         height: 150px;
- 
-     }
- 
- 
- }
- 
- @media only screen and (max-width: 505px) {
- 
-     .mod-clearlesson .playlist-content-card .video-duration {
-         display: none !important;
-     }
-
- }
+@media only screen and (max-width: 505px) {
+    .mod-clearlesson .playlist-content-card .video-duration {
+        display: none !important;
+    }
+}
 
 /*
 * Styles taken from the clearlessons platform END
@@ -1169,20 +1163,20 @@
 
 /** addiditonal for mod_clearlesson */
 
- .mod-clearlesson .form-autocomplete-suggestions li[role="option"]::before {
+.mod-clearlesson .form-autocomplete-suggestions li[role="option"]::before {
     content: none;
 }
 
- .mod-clearlesson .modal-backdrop {
+.mod-clearlesson .modal-backdrop {
     z-index: -1;
 }
  
- .mod-clearlesson a.video-details-view,
- .mod-clearlesson a.video-details-view * {
+.mod-clearlesson a.video-details-view,
+.mod-clearlesson a.video-details-view * {
     color: var(--info)!important;
 }
 
- .mod-clearlesson .select-resource-button {
+.mod-clearlesson .select-resource-button {
     border-top-right-radius: 0!important;
     border-bottom-left-radius: 0!important;
     position: relative;
@@ -1192,7 +1186,7 @@
     border-color: mix(var(--primary), black, 25%);
 }
 
- .mod-clearlesson .cl-search-append {
+.mod-clearlesson .cl-search-append {
     font-size: 16px;
 
     height: 35px;
@@ -1213,12 +1207,12 @@
     background: #f9f9f9;
 }
 
- .mod-clearlesson .cl-search-append,
- .mod-clearlesson .filter-label {
+.mod-clearlesson .cl-search-append,
+.mod-clearlesson .filter-label {
     border: 1px solid rgb(143,149,158)!important;
 }
 
- .mod-clearlesson .filter-label {
+.mod-clearlesson .filter-label {
     background-color: var(--secondary);
     margin-right: -10px;
     border-top-left-radius: 8px;
@@ -1229,16 +1223,16 @@
     padding-left: 15px;
 }
 
- .mod-clearlesson .disabled-looking {
+.mod-clearlesson .disabled-looking {
     opacity: 0.7;
 }
 
- .mod-clearlesson .filter-animation {
+.mod-clearlesson .filter-animation {
     outline-width: 9px!important;
     transition: outline-width 0.5s ease-in-out;
 }
 
- .mod-clearlesson .filter-parent {
+.mod-clearlesson .filter-parent {
     outline-width: 0px;
     outline-style: solid;
     outline-color: var(--secondary)!important;
@@ -1246,39 +1240,39 @@
     transition: outline-width 0.5s ease-in-out;
 }
 
- .mod-clearlesson .filter-child {
+.mod-clearlesson .filter-child {
     position: relative;
     top: 1px;
 }
 
- .mod-clearlesson .view-icon.topic-play {
+.mod-clearlesson .view-icon.topic-play {
     color: var(--secondary);
     opacity: 1;
     position: relative;
 }
 
- .mod-clearlesson .view-icon.topic-play * {
+.mod-clearlesson .view-icon.topic-play * {
     position: relative!important;
     width: unset;
     height: unset;
     padding-top: 3px;
 }
 
- .mod-clearlesson .view-icon.topic-play > *:before {
+.mod-clearlesson .view-icon.topic-play > *:before {
     font-size: 18px;
 }
 
- .mod-clearlesson .topic-title-and-play-icon .card-title {
+.mod-clearlesson .topic-title-and-play-icon .card-title {
     max-width: 170px;
 }
 
- .mod-clearlesson .menu-item-card .play-video-card-image {
+.mod-clearlesson .menu-item-card .play-video-card-image {
     height: unset!important;
     /* width: 127.5px;
     height: 72px; */
 }
 
- .mod-clearlesson .menu-item-card-image:hover .play-icon {
+.mod-clearlesson .menu-item-card-image:hover .play-icon {
     font-size: 35px;
  
     position: absolute;
@@ -1297,28 +1291,16 @@
     background: #000 none repeat scroll 0 0;
 }
 
- .mod-clearlesson .video-title .video-details-time {
+.mod-clearlesson .video-title .video-details-time {
     position: relative;
     bottom: 2px;
 }
- .mod-clearlesson .settings-icon {
+.mod-clearlesson .settings-icon {
     position: relative;
     top: 4px;
 }
 
-/*   .mod-clearlesson .othervideo i.fa-check-circle {
-    height: 1.3em;
-    width: 1.3em;
-} */
-
-
-/*  .mod-clearlesson .othervideo i.fa-check-circle:before {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-} */
-
- .mod-clearlesson .watched-check {
+.mod-clearlesson .watched-check {
     position: absolute;
     bottom: 2px;
     right: 2px;
@@ -1328,25 +1310,46 @@
     transition: 0.5s ease-in-out, font-size 0.5s ease-in-out;
 }
 
-/*  .mod-clearlesson .watched-check.notwatched i {
-    display: block;
-    width: 0px;
-} */
-
- .mod-clearlesson .watched-check.notwatched i:before,
- .mod-clearlesson .watched-check.notwatched i {
-    /* display: inline-block;
-    width: 0px; */
+.mod-clearlesson .watched-check.notwatched i:before,
+.mod-clearlesson .watched-check.notwatched i {
     opacity: 0;
     font-size: 0px;
     transition: opacity 0.5s ease-in-out, font-size 0.5s ease-in-out;
 }
 
- .mod-clearlesson .watched-check i:before,
- .mod-clearlesson .watched-check i {
-    /* display: inline-block;
-    width: 0px; */
+.mod-clearlesson .watched-check i:before,
+.mod-clearlesson .watched-check i {
     opacity: 1;
     font-size: inherit;
     transition: opacity 0.5s ease-in-out, font-size 0.5s ease-in-out;
+}
+
+.mod-clearlesson .video-card-side .video-title {
+    display: -webkit-box;
+    line-clamp: 3;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 12px!important;
+}
+
+body.mod-clearlesson-bodyrestricted .main-inner {
+    max-width: 1200px!important;
+    margin: 0 auto!important;
+    min-height: calc(100vh - 380px);
+}
+
+.mod-clearlesson .playlistimageholder {
+    display: block!important;
+}
+
+
+#clearlesson-page-container,
+.mod-clearlesson-body .modal-body,
+.mod-clearlesson-bodyrestricted .modal-body {
+    background-color: rgb(249, 249, 249)!important;
+}
+
+.mod-clearlesson-backgrounddgrey {
+    background-color: rgb(249, 249, 249)!important;
 }

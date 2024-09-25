@@ -60,62 +60,62 @@ function clearlesson_fix_submitted_ref($clearlesson) {
     return $clearlesson;
 }
 
-/**
- * Return full clearlesson with all extra parameters
- *
- * This function does not include any XSS protection.
- *
- * @param string $clearlesson
- * @param object $cm
- * @param object $course
- * @param object $config
- * @return string clearlesson with & encoded as &amp;
- */
-function clearlesson_get_full_clearlesson($clearlesson, $cm, $course, $config=null, $embed=null) {
-    $parameters = empty($clearlesson->parameters) ? array() : unserialize($clearlesson->parameters);
+// /**
+//  * Return full clearlesson with all extra parameters
+//  *
+//  * This function does not include any XSS protection.
+//  *
+//  * @param string $clearlesson
+//  * @param object $cm
+//  * @param object $course
+//  * @param object $config
+//  * @return string clearlesson with & encoded as &amp;
+//  */
+// function clearlesson_get_full_clearlesson($clearlesson, $cm, $course, $config=null, $embed=null) {
+//     $parameters = empty($clearlesson->parameters) ? array() : unserialize($clearlesson->parameters);
 
-    // Make sure there are no encoded entities, it is ok to do this twice.
-    if ($embed) {
-        $options = array('id' => $clearlesson->id, 'embed' => true);
-    } else {
-        $options = array('id' => $clearlesson->id);
-    }
-    $fullclearlesson = new moodle_url("/mod/clearlesson/senduser.php", $options);
+//     // Make sure there are no encoded entities, it is ok to do this twice.
+//     if ($embed) {
+//         $options = array('id' => $clearlesson->id, 'embed' => true);
+//     } else {
+//         $options = array('id' => $clearlesson->id);
+//     }
+//     $fullclearlesson = new moodle_url("/mod/clearlesson/senduser.php", $options);
 
-    if (preg_match('/^(\/|https?:|ftp:)/i', $fullclearlesson) or preg_match('|^/|', $fullclearlesson)) {
-        // Encode extra chars in clearlessons - this does not make it always valid, but it helps with some UTF-8 problems.
-        $allowed = "a-zA-Z0-9".preg_quote(';/?:@=&$_.+!*(),-#%', '/');
-        $fullclearlesson = preg_replace_callback("/[^$allowed]/", 'clearlesson_filter_callback', $fullclearlesson);
-    } else {
-        // Encode special chars only.
-        $fullclearlesson = str_replace('"', '%22', $fullclearlesson);
-        $fullclearlesson = str_replace('\'', '%27', $fullclearlesson);
-        $fullclearlesson = str_replace(' ', '%20', $fullclearlesson);
-        $fullclearlesson = str_replace('<', '%3C', $fullclearlesson);
-        $fullclearlesson = str_replace('>', '%3E', $fullclearlesson);
-    }
+//     if (preg_match('/^(\/|https?:|ftp:)/i', $fullclearlesson) or preg_match('|^/|', $fullclearlesson)) {
+//         // Encode extra chars in clearlessons - this does not make it always valid, but it helps with some UTF-8 problems.
+//         $allowed = "a-zA-Z0-9".preg_quote(';/?:@=&$_.+!*(),-#%', '/');
+//         $fullclearlesson = preg_replace_callback("/[^$allowed]/", 'clearlesson_filter_callback', $fullclearlesson);
+//     } else {
+//         // Encode special chars only.
+//         $fullclearlesson = str_replace('"', '%22', $fullclearlesson);
+//         $fullclearlesson = str_replace('\'', '%27', $fullclearlesson);
+//         $fullclearlesson = str_replace(' ', '%20', $fullclearlesson);
+//         $fullclearlesson = str_replace('<', '%3C', $fullclearlesson);
+//         $fullclearlesson = str_replace('>', '%3E', $fullclearlesson);
+//     }
 
-    // Add variable clearlesson parameters.
-    if (!empty($parameters)) {
-        if (!$config) {
-            $config = get_config('clearlesson');
-        }
-        $paramvalues = clearlesson_get_variable_values($clearlesson, $cm, $course, $config);
+//     // Add variable clearlesson parameters.
+//     if (!empty($parameters)) {
+//         if (!$config) {
+//             $config = get_config('clearlesson');
+//         }
+//         $paramvalues = clearlesson_get_variable_values($clearlesson, $cm, $course, $config);
 
-        foreach ($parameters as $parse => $parameter) {
-            if (isset($paramvalues[$parameter])) {
-                $parameters[$parse] = rawclearlessonencode($parse).'='.rawclearlessonencode($paramvalues[$parameter]);
-            } else {
-                unset($parameters[$parse]);
-            }
-        }
-    }
+//         foreach ($parameters as $parse => $parameter) {
+//             if (isset($paramvalues[$parameter])) {
+//                 $parameters[$parse] = rawclearlessonencode($parse).'='.rawclearlessonencode($paramvalues[$parameter]);
+//             } else {
+//                 unset($parameters[$parse]);
+//             }
+//         }
+//     }
 
-    // Encode all & to &amp; entity.
-    $fullclearlesson = str_replace('&', '&amp;', $fullclearlesson);
-    $fullclearlesson = $fullclearlesson;
-    return $fullclearlesson;
-}
+//     // Encode all & to &amp; entity.
+//     $fullclearlesson = str_replace('&', '&amp;', $fullclearlesson);
+//     $fullclearlesson = $fullclearlesson;
+//     return $fullclearlesson;
+// }
 
 /**
  * Unicode encoding helper callback
@@ -175,147 +175,150 @@ function clearlesson_print_intro($clearlesson, $cm, $course, $ignoresettings=fal
             echo $OUTPUT->box_end();
         }
     }
+    // Echo the course id in a hidden data attribute.
+    echo html_writer::empty_tag('div', array('id' => 'clearlesson-courseid', 'data-courseid' => $course->id));
+    echo html_writer::end_tag('div');
 }
 
-/**
- * Display clearlesson frames.
- * @param object $clearlesson
- * @param object $cm
- * @param object $course
- * @return does not return
- */
-function clearlesson_display_frame($clearlesson, $cm, $course) {
-    global $PAGE, $OUTPUT, $CFG;
-    $frame = optional_param('frameset', 'main', PARAM_ALPHA);
+// /**
+//  * Display clearlesson frames.
+//  * @param object $clearlesson
+//  * @param object $cm
+//  * @param object $course
+//  * @return does not return
+//  */
+// function clearlesson_display_frame($clearlesson, $cm, $course) {
+//     global $PAGE, $OUTPUT, $CFG;
+//     $frame = optional_param('frameset', 'main', PARAM_ALPHA);
 
-    if ($frame === 'top') {
-        $PAGE->set_pagelayout('frametop');
-        clearlesson_print_header($clearlesson, $cm, $course);
-        clearlesson_print_heading($clearlesson, $cm, $course);
-        clearlesson_print_intro($clearlesson, $cm, $course);
-        echo $OUTPUT->footer();
-        die;
+//     if ($frame === 'top') {
+//         $PAGE->set_pagelayout('frametop');
+//         clearlesson_print_header($clearlesson, $cm, $course);
+//         clearlesson_print_heading($clearlesson, $cm, $course);
+//         clearlesson_print_intro($clearlesson, $cm, $course);
+//         echo $OUTPUT->footer();
+//         die;
 
-    } else {
-        $config = get_config('clearlesson');
-        $context = context_module::instance($cm->id);
-        $exteclearlesson = clearlesson_get_full_clearlesson($clearlesson, $cm, $course, $config);
-        $navclearlesson = "$CFG->wwwroot/mod/clearlesson/view.php?id=$cm->id&frameset=top";
-        $coursecontext = context_course::instance($course->id);
-        $courseshortname = format_string($course->shortname, true, array('context' => $coursecontext));
-        $title = strip_tags($courseshortname.': '.format_string($clearlesson->name));
-        $framesize = $config->framesize;
-        $modulename = (get_string('modulename', 'clearlesson'));
-        $contentframetitle = s(format_string($clearlesson->name));
-        $dir = get_string('thisdirection', 'langconfig');
+//     } else {
+//         $config = get_config('clearlesson');
+//         $context = context_module::instance($cm->id);
+//         $exteclearlesson = clearlesson_get_full_clearlesson($clearlesson, $cm, $course, $config);
+//         $navclearlesson = "$CFG->wwwroot/mod/clearlesson/view.php?id=$cm->id&frameset=top";
+//         $coursecontext = context_course::instance($course->id);
+//         $courseshortname = format_string($course->shortname, true, array('context' => $coursecontext));
+//         $title = strip_tags($courseshortname.': '.format_string($clearlesson->name));
+//         $framesize = $config->framesize;
+//         $modulename = (get_string('modulename', 'clearlesson'));
+//         $contentframetitle = s(format_string($clearlesson->name));
+//         $dir = get_string('thisdirection', 'langconfig');
 
-        $extframe = <<<EOF
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
-<html dir="$dir">
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>$title</title>
-  </head>
-  <frameset rows="$framesize,*">
-    <frame src="$navclearlesson" title="$modulename"/>
-    <frame src="$exteclearlesson" title="$contentframetitle"/>
-  </frameset>
-</html>
-EOF;
+//         $extframe = <<<EOF
+// <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+// <html dir="$dir">
+//   <head>
+//     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+//     <title>$title</title>
+//   </head>
+//   <frameset rows="$framesize,*">
+//     <frame src="$navclearlesson" title="$modulename"/>
+//     <frame src="$exteclearlesson" title="$contentframetitle"/>
+//   </frameset>
+// </html>
+// EOF;
 
-        @header('Content-Type: text/html; charset=utf-8');
-        echo $extframe;
-        die;
-    }
-}
+//         @header('Content-Type: text/html; charset=utf-8');
+//         echo $extframe;
+//         die;
+//     }
+// }
 
-/**
- * Print clearlesson info and link.
- * @param object $clearlesson
- * @param object $cm
- * @param object $course
- * @return does not return
- */
-function clearlesson_print_workaround($clearlesson, $cm, $course) {
-    global $OUTPUT;
+// /**
+//  * Print clearlesson info and link.
+//  * @param object $clearlesson
+//  * @param object $cm
+//  * @param object $course
+//  * @return does not return
+//  */
+// function clearlesson_print_workaround($clearlesson, $cm, $course) {
+//     global $OUTPUT;
 
-    clearlesson_print_header($clearlesson, $cm, $course);
-    clearlesson_print_heading($clearlesson, $cm, $course, true);
-    clearlesson_print_intro($clearlesson, $cm, $course, true);
+//     clearlesson_print_header($clearlesson, $cm, $course);
+//     clearlesson_print_heading($clearlesson, $cm, $course, true);
+//     clearlesson_print_intro($clearlesson, $cm, $course, true);
 
-    $fullclearlesson = clearlesson_get_full_clearlesson($clearlesson, $cm, $course);
-    $display = clearlesson_get_final_display_type($clearlesson);
-    if ($display == RESOURCELIB_DISPLAY_POPUP) {
-        $jsfullclearlesson = addslashes_js($fullclearlesson);
-        $options = empty($clearlesson->displayoptions) ? array() : unserialize($clearlesson->displayoptions);
-        $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
-        $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
-        $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,
-        status=no,directories=no,scrollbars=yes,resizable=yes";
-        $extra = "onclick=\"window.open('$jsfullclearlesson', '', '$wh'); return false;\"";
+//     $fullclearlesson = clearlesson_get_full_clearlesson($clearlesson, $cm, $course);
+//     // $display = clearlesson_get_final_display_type($clearlesson);
+//     if ($clearlesson->display == RESOURCELIB_DISPLAY_POPUP) {
+//         $jsfullclearlesson = addslashes_js($fullclearlesson);
+//         $options = empty($clearlesson->displayoptions) ? array() : unserialize($clearlesson->displayoptions);
+//         $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
+//         $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
+//         $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,
+//         status=no,directories=no,scrollbars=yes,resizable=yes";
+//         $extra = "onclick=\"window.open('$jsfullclearlesson', '', '$wh'); return false;\"";
 
-    } else if ($display == RESOURCELIB_DISPLAY_NEW) {
-        $extra = "onclick=\"this.target='_blank';\"";
+//     } else if ($display == RESOURCELIB_DISPLAY_NEW) {
+//         $extra = "onclick=\"this.target='_blank';\"";
 
-    } else {
-        $extra = '';
-    }
+//     } else {
+//         $extra = '';
+//     }
 
-    echo '<div class="clearlessonworkaround">';
-    print_string('clicktoopen', 'clearlesson', "<a href=\"$fullclearlesson\" $extra>$fullclearlesson</a>");
-    echo '</div>';
+//     echo '<div class="clearlessonworkaround">';
+//     print_string('clicktoopen', 'clearlesson', "<a href=\"$fullclearlesson\" $extra>$fullclearlesson</a>");
+//     echo '</div>';
 
-    echo $OUTPUT->footer();
-    die;
-}
+//     echo $OUTPUT->footer();
+//     die;
+// }
 
-/**
- * Display embedded clearlesson file.
- * @param object $clearlesson
- * @param object $cm
- * @param object $course
- * @return does not return
- */
-function clearlesson_display_embed($clearlesson, $cm, $course) {
-    global $CFG, $PAGE, $OUTPUT;
+// /**
+//  * Display embedded clearlesson file.
+//  * @param object $clearlesson
+//  * @param object $cm
+//  * @param object $course
+//  * @return does not return
+//  */
+// function clearlesson_display_embed($clearlesson, $cm, $course) {
+//     global $CFG, $PAGE, $OUTPUT;
 
-    $fullclearlesson  = clearlesson_get_full_clearlesson($clearlesson, $cm, $course, null, true);
-    $title    = $clearlesson->name;
+//     $fullclearlesson  = clearlesson_get_full_clearlesson($clearlesson, $cm, $course, null, true);
+//     $title    = $clearlesson->name;
 
-    $link = html_writer::tag('a', $fullclearlesson, array('href' => str_replace('&amp;', '&', $fullclearlesson)));
-    $clicktoopen = get_string('clicktoopen', 'clearlesson', $link);
-    $moodleclearlesson = new moodle_url(str_replace('&amp;', '&', $fullclearlesson));
-    $extension = resourcelib_get_extension($moodleclearlesson);
+//     $link = html_writer::tag('a', $fullclearlesson, array('href' => str_replace('&amp;', '&', $fullclearlesson)));
+//     $clicktoopen = get_string('clicktoopen', 'clearlesson', $link);
+//     $moodleclearlesson = new moodle_url(str_replace('&amp;', '&', $fullclearlesson));
+//     $extension = resourcelib_get_extension($moodleclearlesson);
 
-    $mediamanager = core_media_manager::instance($PAGE);
-    $embedoptions = array(
-        core_media_manager::OPTION_TRUSTED => true,
-        core_media_manager::OPTION_BLOCK => true
-    );
-    $code = resourcelib_embed_general($fullclearlesson, $title, $clicktoopen, 'text/html');
-    clearlesson_print_header($clearlesson, $cm, $course);
-    clearlesson_print_heading($clearlesson, $cm, $course);
-    echo $code;
+//     $mediamanager = core_media_manager::instance($PAGE);
+//     $embedoptions = array(
+//         core_media_manager::OPTION_TRUSTED => true,
+//         core_media_manager::OPTION_BLOCK => true
+//     );
+//     $code = resourcelib_embed_general($fullclearlesson, $title, $clicktoopen, 'text/html');
+//     clearlesson_print_header($clearlesson, $cm, $course);
+//     clearlesson_print_heading($clearlesson, $cm, $course);
+//     echo $code;
 
-    clearlesson_print_intro($clearlesson, $cm, $course);
+//     clearlesson_print_intro($clearlesson, $cm, $course);
 
-    echo $OUTPUT->footer();
-    die;
-}
+//     echo $OUTPUT->footer();
+//     die;
+// }
 
-/**
- * Decide the best display format.
- * @param object $clearlesson
- * @return int display type constant
- */
-function clearlesson_get_final_display_type($clearlesson) {
-    global $CFG;
+// /**
+//  * Decide the best display format.
+//  * @param object $clearlesson
+//  * @return int display type constant
+//  */
+// function clearlesson_get_final_display_type($clearlesson) {
+//     global $CFG;
 
-    if ($clearlesson->display != RESOURCELIB_DISPLAY_AUTO) {
-        return $clearlesson->display;
-    }
-    return RESOURCELIB_DISPLAY_OPEN;
-}
+//     if ($clearlesson->display != RESOURCELIB_DISPLAY_AUTO) {
+//         return $clearlesson->display;
+//     }
+//     return RESOURCELIB_DISPLAY_OPEN;
+// }
 
 /**
  * Get the parameters that may be appended to clearlesson

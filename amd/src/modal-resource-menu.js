@@ -27,9 +27,9 @@ import ModalForm from 'core_form/modalform';
 import {get_string as getString} from 'core/str';
 import * as Utils from './utils';
 
-// eslint-disable-next-line no-unused-vars
-var currentMenuForm;
-export const init = () => {
+var currentMenuForm, backString;
+export const init = async() => {
+    backString = await getString('back');
     document.addEventListener('click', function(e) {
         var element = e.target;
         var speakerLink = false;
@@ -120,8 +120,7 @@ async function openResourceMenu(externalref, name, speaker = false) {
             'px;height: ' + modalHeight +
             'px;max-height: ' + modalHeight + 'px;'
         );
-
-        setSaveButton(await selectString, resourceType, externalref);
+        setButtons(await selectString, resourceType, externalref, backString);
     });
 
     menuForm.show();
@@ -145,7 +144,7 @@ async function reRenderResourceMenu(externalref, name, type) {
     // Set the title
     await currentMenuForm.modal.setTitle(titleString);
     await currentMenuForm.modal.setBodyContent(bodyContent);
-    setSaveButton(await selectString, type, externalref);
+    setButtons(await selectString, type, externalref, backString);
 }
 
 /**
@@ -191,8 +190,9 @@ async function getStringsFromResourceType(resourceType, name) {
  * @param {String} saveString
  * @param {String} type
  * @param {String} externalref
+ * @param {String} backString
  */
-async function setSaveButton(saveString, type, externalref) {
+async function setButtons(saveString, type, externalref, backString) {
     const modalRootInner = currentMenuForm.modal.getRoot()[0].children[0];
     Utils.waitForElement('.modal-footer button.btn-primary', modalRootInner, function() {
         const saveButton = modalRootInner.querySelector('.modal-footer button.btn-primary');
@@ -202,5 +202,7 @@ async function setSaveButton(saveString, type, externalref) {
         saveButton.setAttribute('data-externalref', externalref);
         saveButton.classList.add('select-resource-button');
         saveButton.classList.add('d-block');
+        const cancelButton = modalRootInner.querySelector('.modal-footer button.btn-secondary');
+        cancelButton.innerHTML = backString;
     });
 }

@@ -22,6 +22,7 @@
 <div class="mod-clearlesson">
     <div class="video-container" data-externalref="{{externalref}}">
         <iframe class="videoframe" src="{{src}}" title="{{name}}" frameborder="0" allowfullscreen></iframe>
+        {{^inpage}}
             <script>
                 require([{{#firstload}}'../../../mod/clearlesson/vimeo/vimeo-sdk', {{/firstload}}'mod_clearlesson/progress-tracker'],
                 function({{#firstload}}VimeoPlayerConstructor, {{/firstload}}progressTracker) {
@@ -32,6 +33,7 @@
                     {{^editform}}progressTracker.init();{{/editform}}
                 });
             </script>
+        {{/inpage}}
     </div>
     <div class="p-2 video-title-wrapper" style="position: relative">
         <h4 class="video-title">{{name}}</h4>

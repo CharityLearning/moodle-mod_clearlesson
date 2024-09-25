@@ -42,7 +42,6 @@ var modalForm;
 export const init = () => {
     document.addEventListener('click', function(e) {
         const element = e.target;
-        // const typeSelect = document.getElementById('id_type');
         if (element.getAttribute('id') === 'resource-select-button') { // In the page form.
             e.preventDefault();
             openResourceBrowser();
@@ -60,26 +59,6 @@ export const init = () => {
                 onModalClose();
         }
         searchIfSearchbutton(e);
-        // if ((element.classList?.contains('video-details-view')
-        // || element.parentelement.classList?.contains('video-details-view'))
-        // && !element.classList?.contains('view-link')) {
-        //     e.preventDefault();
-        //     if (element.hasAttribute('data-view')) {
-        //         externalref = element.getAttribute('data-view');
-        //     } else {
-        //         externalref = element.parentElement.getAttribute('data-view');
-        //     }
-        //     // This is the {{count}} videos or playlists etc link.
-        //     const type = modalForm.modal.getRoot()[0]
-        //                 .querySelector('button.type-button.disabled-looking').getAttribute('data-type');
-        //     loadResourcePageWithFilter(externalref, type);
-        // }
-        // // This is the speaker link in the video card.
-        // if (element.classList?.contains('vid-speaker-link')) {
-        //     e.preventDefault();
-        //     externalref = element.closest('.video-card-wrapper').getAttribute('data-speakers');
-        //     loadResourcePageWithFilter(externalref, 'speakers');
-        // }
     });
 
     document.addEventListener('keydown', function(e) {
@@ -456,23 +435,6 @@ function searchResources(query) {
     return true;
 }
 
-// Not currently used.
-// /**
-//  * Load the resource page with a filter.
-//  * @param {String} externalref
-//  * @param {String} type
-//  */
-// export async function loadResourcePageWithFilter(externalref, type) {
-//     const cmid = document.querySelector('input[name="coursemodule"]').value;
-//     const courseid = document.querySelector('input[name="course"]').value;
-//     const url = window.location.href;
-//     await viewResourceType(type, cmid, courseid, url, modalForm, externalref);
-//     if (type === 'playlists' || type === 'series') {
-//         orderFilteredResources(type, externalref);
-//     }
-//     focusFilterAnimation(type);
-// }
-
 /**
  * Order filtered resources by playlist or series order.
  *
@@ -520,22 +482,6 @@ async function clearOrdering() {
         resolve();
     });
 }
-
-// /**
-//  * Focus the filter animation.
-//  * @param {String} type
-//  */
-// function focusFilterAnimation(type) {
-//     const filter = modalForm.modal.getRoot()[0].querySelector('#' + type + '-filter');
-//     scrollToTop();
-//     const filterContainer = filter.closest('.filter-parent');
-//     setTimeout(function() {
-//         filterContainer.classList.add('filter-animation');
-//         setTimeout(function() {
-//             filterContainer.classList.remove('filter-animation');
-//         }, 600);
-//     }, 200);
-// }
 
 /**
  * Scroll to the top of the browser filters.

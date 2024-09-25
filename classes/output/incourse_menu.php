@@ -37,7 +37,7 @@ use templatable;
  * Resource player Renderable.
  * @package    mod_clearlesson
  */
-class incourse_player implements \renderable, \templatable {
+class incourse_menu implements \renderable, \templatable {
     /**
      * The original resource type.
      * 'play' or 'playlists'.
@@ -58,36 +58,39 @@ class incourse_player implements \renderable, \templatable {
     public $response;
 
     /**
-     * The position of the video in the playlist.
-     * @var int
+     * The type of item to display.
+     * @var string
      */
-    public $position;
+    public $itemtype;
 
     /**
      * Construct this renderable.
      *
      * @param string $type
      * @param string $externalref
-     * @param int $position
      * @param array $response
-     * @param int $firstload
      *
      * @return void
      */
-    public function __construct(string $type, string $externalref, int $position = 1, array $response = [], int $firstload = 1) {
+    public function __construct(string $type, string $externalref, array $response = []) {
         $this->type = $type;
+        switch ($this->type) {
+            case 'collections':
+                $this->itemtype = 'series';
+                break;
+            case 'series':
+                $this->itemtype = 'playlists';
+                break;
+            default:
+                // For all other types we should be using the incourse player.
+                throw new \moodle_exception('Invalid type: ' . $this->type);
+        }
         $this->externalref = $externalref;
-        $this->position = $position;
         if (!empty($response)) {
             $this->response = $response;
         } else {
-            $this->response = \mod_clearlesson\call::get_playerform_data($this->type, $this->externalref, $this->position);
+            $this->response = \mod_clearlesson\call::get_menuform_data($this->type, $this->externalref);
         }
-        $this->response['firstload'] = $firstload;
-        // Add the resourceref to the response.
-        // The response externalref is the externalref of the first video in the resource.
-        $this->response['resourceref'] = $this->externalref;
-        $this->response['type'] = $this->type;
     }
 
     /**
@@ -97,7 +100,31 @@ class incourse_player implements \renderable, \templatable {
      * @return stdClass
      */
     public function export_array_for_template(renderer_base $output): array {
-        return $this->response;
+        $response['watchedall'] = $this->response['watchedall'];
+        $response['resources'] = $this->response['resources'];
+        // var_dump($response['resources']);
+        switch ($this->type) {
+            case 'collections':
+                $response['countstring'] = get_string('playlists', 'mod_clearlesson');
+                $response['selectstring'] = ucfirst(get_string('select')) . ' ' . get_string('series', 'mod_clearlesson');
+                break;
+            case 'series':
+                $response['countstring'] = get_string('videos', 'mod_clearlesson');
+                $response['selectstring'] = ucfirst(get_string('select')) . ' ' . get_string('playlist', 'mod_clearlesson');
+                foreach ($response['resources'] as $key => $resource) {
+                    $response['resources'][$key]['isplaylist'] = true;
+                }
+                break;
+        }
+        $response['type'] = $this->type;
+        $response['externalref'] = $this->externalref;
+        $response['itemtype'] = $this->itemtype;
+        // Add the resourceref to the response.
+        // The response externalref is the externalref of the first video in the resource.
+        $response['resourceref'] = $this->externalref;
+        $response['type'] = $this->type;
+        $response['incourse'] = true;
+        return $response;
     }
 
     /**
@@ -106,7 +133,7 @@ class incourse_player implements \renderable, \templatable {
     * @param renderer_base $output
     * @return stdClass
     */
-   public function export_for_template(renderer_base $output): stdClass {
-       return (object) $this->export_array_for_template($output);
-   } 
+    public function export_for_template(renderer_base $output): stdClass {
+        return (object) $this->export_array_for_template($output);
+    }
 }

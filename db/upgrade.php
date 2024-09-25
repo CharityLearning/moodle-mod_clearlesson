@@ -52,7 +52,8 @@ function xmldb_clearlesson_upgrade($oldversion) {
         exit(1);
     }
 
-    if ($oldverion < 2023091217) {
+    if ($oldverion < 2023091225) {
+        require_once("$CFG->libdir/resourcelib.php");
         $dbman = $DB->get_manager();
         $table = new xmldb_table('clearlesson');
         $field = new xmldb_field('completionwatchedall', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL , null, '0');
@@ -67,7 +68,47 @@ function xmldb_clearlesson_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_plugin_savepoint(true, 2023091217, 'mod', 'clearlesson');
+        // Update the plugin config displayoptions & display (defaultoption) value.
+        // The only display options available are RESOURCELIB_DISPLAY_OPEN and RESOURCELIB_DISPLAY_POPUP
+        $displayoptionsstring = RESOURCELIB_DISPLAY_OPEN . ',' . RESOURCELIB_DISPLAY_POPUP;
+        if ($record = $DB->get_record('config_plugins', array('plugin' => 'clearlesson', 'name' => 'displayoptions'))) {
+            $record->value = $displayoptionsstring;
+            $DB->update_record('config_plugins', $record);
+        } else {
+            $record = new stdClass();
+            $record->plugin = 'clearlesson';
+            $record->name = 'displayoptions';
+            $record->value = $displayoptionsstring;
+            $DB->insert_record('config_plugins', $record);
+        }
+
+        $defaultdisplayoption = RESOURCELIB_DISPLAY_OPEN;
+        if ($record = $DB->get_record('config_plugins', array('plugin' => 'clearlesson', 'name' => 'display'))) {
+            $record->value = $defaultdisplayoption;
+            $DB->update_record('config_plugins', $record);
+        } else {
+            $record = new stdClass();
+            $record->plugin = 'clearlesson';
+            $record->name = 'display';
+            $record->value = $defaultdisplayoption;
+            $DB->insert_record('config_plugins', $record);
+        }
+        // Also, for each clearlesson instance, set the display option to
+        // RESOURCELIB_DISPLAY_OPEN unless it is set to RESOURCELIB_DISPLAY_POPUP already
+        if ($instances = $DB->get_records('clearlesson')) {
+            foreach ($instances as $instance) {
+                if ($instance->display == RESOURCELIB_DISPLAY_POPUP) {
+                    continue;
+                }
+                $instance->display = RESOURCELIB_DISPLAY_OPEN;
+                $DB->update_record('clearlesson', $instance);
+            }
+        }
+        // Remove the now unused config settings.
+        $DB->delete_records('config_plugins', array('plugin' => 'clearlesson', 'name' => 'popupheight'));
+        $DB->delete_records('config_plugins', array('plugin' => 'clearlesson', 'name' => 'popupwidth'));
+
+        upgrade_plugin_savepoint(true, 2023091225, 'mod', 'clearlesson');
     }
 
     return true;

@@ -57,6 +57,14 @@ $functions = array(
         'capabilities'  => 'mod/clearlesson:view',
         'ajax' => true,
         'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
+    ),
+    'mod_clearlesson_get_player_renderable' => array(
+        'classname' => 'mod_clearlesson\external\get_player_renderable',
+        'description'   => 'Get the player renderable for a given course module.',
+        'type'          => 'read',
+        'capabilities'  => 'mod/clearlesson:view',
+        'ajax' => true,
+        'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
     )
 
 );
