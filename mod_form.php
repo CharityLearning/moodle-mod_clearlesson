@@ -31,7 +31,7 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         global $CFG, $DB, $OUTPUT, $PAGE;
         $mform = $this->_form;
         $config = get_config('clearlesson');
-
+        $PAGE->add_body_class('mod-clearlesson-body');
         $mform->addElement('header', 'general', get_string('general', 'form'));
         $mform->addElement('text', 'name', get_string('name'), array('size' => '48'));
         if (!empty($CFG->formatstringstriptags)) {
@@ -75,25 +75,24 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         $attributes['rows'] = 5;
         $element->setAttributes($attributes);
 
-        // Modal window every time for now.
-        // TODO consider allowin the option of embeding the player directly into the course page.
+        // Modal window or in page only..
+        $mform->addElement('header', 'optionssection', get_string('appearance'));
+        if ($this->current->instance) {
+            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
+        } else {
+            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
+        }
 
-        // $mform->addElement('header', 'optionssection', get_string('appearance'));
-        // if ($this->current->instance) {
-        //     $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
-        // } else {
-        //     $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
-        // }
-        // if (count($options) == 1) {
-        //     $mform->addElement('hidden', 'display');
-        //     $mform->setType('display', PARAM_INT);
-        //     reset($options);
-        //     $mform->setDefault('display', key($options));
-        // } else {
-        //     $mform->addElement('select', 'display', get_string('displayselect', 'url'), $options);
-        //     $mform->setDefault('display', $config->display);
-        //     $mform->addHelpButton('display', 'displayselect', 'url');
-        // }
+        if (count($options) == 1) {
+            $mform->addElement('hidden', 'display');
+            $mform->setType('display', PARAM_INT);
+            reset($options);
+            $mform->setDefault('display', key($options));
+        } else {
+            $mform->addElement('select', 'display', get_string('displayselect', 'url'), $options);
+            $mform->setDefault('display', $config->display);
+            $mform->addHelpButton('display', 'displayselect', 'url');
+        }
 
         // if (array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {
         //     $mform->addElement('text', 'popupwidth', get_string('popupwidth', 'url'), array('size' => 3));
@@ -120,8 +119,7 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         //     $mform->disabledIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_NEW);
         //     $mform->setDefault('printintro', $config->printintro);
         // }
-        // $this->$this->standard_coursemodule_elements();
-        // var_dump();
+        // $this->standard_coursemodule_elements();
 
         // $this->add_completion_rules();
         $this->standard_coursemodule_elements();

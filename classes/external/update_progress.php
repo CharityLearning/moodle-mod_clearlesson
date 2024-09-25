@@ -56,7 +56,8 @@ class update_progress extends \core_external\external_api {
                     'courseid' => new external_value(PARAM_INT, 'Course id'),
                     'cmid' => new external_value(PARAM_INT, 'Course module id'),
                     'resourceref' => new external_value(PARAM_TEXT, 'Externalref of resource'),
-                    'type' => new external_value(PARAM_TEXT, 'Type of resource')
+                    'type' => new external_value(PARAM_TEXT, 'Type of resource'),
+                    'pagetype' => new external_value(PARAM_TEXT, 'Type of page, "course" or "activity"')
                 )
             );
         }
@@ -64,13 +65,15 @@ class update_progress extends \core_external\external_api {
         /**
         * Update the viewed progress of a video in the Clear Lesson Platform.
         *
-        * @param string $externalref the external reference of the video
+        * @param string $externalref the external reference of the video.
+        * It's presence indicates progress should be updated in the Clear Lesson Platform.
         * @param int $duration the time watched in seconds
         * @param string $status the view status of the video for this session
         * @param int $courseid the course id
         * @param int $cmid the course module id
-        * @param string $resourceref the external reference of the resource
+        * @param string $resourceref the external reference of the parent resource
         * @param string $type the type of resource
+        * @param string $pagetype the type of page 'course' or 'activity'
         * @return array of warnings and status result
         * @since Moodle 3.0
         * @throws moodle_exception
@@ -81,7 +84,8 @@ class update_progress extends \core_external\external_api {
                                         int $courseid,
                                         int $cmid,
                                         string $resourceref,
-                                        string $type): array {
+                                        string $type,
+                                        string $pagetype): array {
 
             global $DB, $USER, $OUTPUT, $PAGE, $CFG;
             require_login();
@@ -95,7 +99,8 @@ class update_progress extends \core_external\external_api {
                             'courseid' => $courseid,
                             'cmid' => $cmid,
                             'resourceref' => $resourceref,
-                            'type' => $type]);
+                            'type' => $type,
+                            'pagetype' => $pagetype]);
             
             if ($comprec = $DB->get_record_sql('SELECT * FROM {course_modules_completion} cmc
                                             WHERE cmc.coursemoduleid = ? AND cmc.userid = ?
@@ -122,19 +127,24 @@ class update_progress extends \core_external\external_api {
             // If they have, then we can update the completion status of the module.
             if ($externalref && $response = \mod_clearlesson\call::update_progress($externalref, $duration, $status, $resourceref, $type)) {
                 // Update completion of activity module.
-                $newtrackrecord = new \stdClass();
-                $newtrackrecord->clearlessonid = $activity->id;
-                $newtrackrecord->userid = $USER->id;
-                $newtrackrecord->timemodified = time();
                 if ($response['result']['completionstatus']) {
-                    $newtrackrecord->watchedall = 1;
-                    // Update completion of course module.
-                    $updatedhtml = self::mark_module_complete_and_get_updatedhtml($activity, $course, $cm);
+                    // Update completion of course module. Updating the clearless
+                    $updatedhtml = self::mark_module_complete_and_get_updatedhtml($activity, $course, $cm, $pagetype);
+                } else if ($trackrecord = $DB->get_record('clearlesson_track',
+                    ['clearlessonid' => $activity->id, 'userid' => $USER->id], '*', IGNORE_MISSING)) {
+                    $trackrecord->timemodified = time();
+                    $trackrecord->watchedall = 0;
+                    $DB->update_record('clearlesson_track', $trackrecord);
+                    $updatedhtml = '';
                 } else {
+                    $newtrackrecord = new \stdClass();
+                    $newtrackrecord->clearlessonid = $activity->id;
+                    $newtrackrecord->userid = $USER->id;
+                    $newtrackrecord->timemodified = time();
                     $newtrackrecord->watchedall = 0;
+                    $DB->insert_record('clearlesson_track', $newtrackrecord);
                     $updatedhtml = '';
                 }
-                $DB->insert_record('clearlesson_track', $newtrackrecord);
                 return ['success' => true,
                         'activitymodulehtml' => $updatedhtml];
             } else if (!$externalref && $resourceref) { 
@@ -142,12 +152,11 @@ class update_progress extends \core_external\external_api {
                 // The videos may have been watched in other resources or on the Clear Lessons platform.
                 // Alternatively the completion conditions may have changed.
                 // Mark completed in moodle.
-                $updatedhtml = self::mark_module_complete_and_get_updatedhtml($activity, $course, $cm);
+                $updatedhtml = self::mark_module_complete_and_get_updatedhtml($activity, $course, $cm, $pagetype);
                 return ['success' => true,
                         'activitymodulehtml' => $updatedhtml];
             } else {
-                // This only happens when the user does not have a clearlessons account with a matching email.
-                // Which should neveer happen.
+                // No action taken.
                 return ['success' => false,
                         'activitymodulehtml' => ''];
             }
@@ -166,7 +175,7 @@ class update_progress extends \core_external\external_api {
             );
         }
 
-        public static function mark_module_complete_and_get_updatedhtml($activity, $course, $cm) {
+        public static function mark_module_complete_and_get_updatedhtml($activity, $course, $cm, $pagetype) {
             global $PAGE, $DB, $USER;
 
             // Check the clearlesson track and set watchedall to 1 if all videos have been watched.
@@ -179,6 +188,7 @@ class update_progress extends \core_external\external_api {
                 if (!$result->watchedall) {
                     $latestrecord = $DB->get_record('clearlesson_track', array('id' => $result->id), '*', MUST_EXIST);
                     $latestrecord->watchedall = 1;
+                    $latestrecord->timemodified = time();
                     $DB->update_record('clearlesson_track', $latestrecord);
                 }
             } else {
@@ -195,11 +205,24 @@ class update_progress extends \core_external\external_api {
             list($course, $cm) = \get_course_and_cm_from_instance($clearlesson, 'clearlesson');
             $completion = new completion_info($course);
             $completion->update_state($cm, COMPLETION_COMPLETE);
-            $format = \course_get_format($course);
-            $modinfo = $format->get_modinfo();
-            $section = $modinfo->get_section_info($cm->sectionnum);
-            $renderer = $format->get_renderer($PAGE);
 
-            return $renderer->course_section_updated_cm_item($format, $section, $cm);
+            // The format of the completion details output depends on the page type.
+            if ($pagetype == 'course') {
+                $format = \course_get_format($course);
+                $modinfo = $format->get_modinfo();
+                $section = $modinfo->get_section_info($cm->sectionnum);
+                $renderer = $PAGE->get_renderer('format_' . $course->format);
+                return $renderer->course_section_updated_cm_item($format, $section, $cm);
+            } else if ($pagetype == 'activity') {
+                $renderer = $PAGE->get_renderer('mod_clearlesson');
+                $completiondetails = \core_completion\cm_completion_details::get_instance($cm, $USER->id);
+                $activitydates = \core\activity_dates::get_dates_for_module($cm, $USER->id);
+                $activitycompletion = new \core_course\output\activity_completion($cm, $completiondetails);
+                $activitycompletiondata = (array) $activitycompletion->export_for_template($renderer);
+                $activitydates = new \core_course\output\activity_dates($activitydates);
+                $activitydatesdata = (array) $activitydates->export_for_template($renderer);
+                $data = array_merge($activitycompletiondata, $activitydatesdata);
+                return $renderer->render_from_template('core_course/activity_info', $data);
+            }
         }
 }

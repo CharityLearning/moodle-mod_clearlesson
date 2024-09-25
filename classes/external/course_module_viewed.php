@@ -75,16 +75,23 @@ class course_module_viewed extends \core_external\external_api {
                             ['courseid' => $courseid,
                             'cmid' => $cmid]);
 
-            $PAGE->set_context(\context_course::instance($courseid)); 
+            $context = \context_module::instance($cmid);
+            self::validate_context($context);
+            \require_capability('mod/clearlesson:view', $context);
+            
+            $PAGE->set_context(\context_course::instance($courseid));
+            // Get the course module and course information.
             $course = $DB->get_record('course', array('id' => $courseid));
-            $completion = new \completion_info($course);
             $format = \course_get_format($course);
             $modinfo = $format->get_modinfo();
             $cm = $modinfo->get_cm($cmid);
-            $completion->set_module_viewed($cm);
             $section = $modinfo->get_section_info($cm->sectionnum);
             $renderer = $format->get_renderer($PAGE);
+            // Get the HTML to update the course page Todo button with.
             $updatedhtml = $renderer->course_section_updated_cm_item($format, $section, $cm);
+            // Set the course module as viewed and trigger the viewed event.
+            $clearlessonref = $DB->get_record('clearlesson', array('id' => $cm->instance), '*', MUST_EXIST);
+            clearlesson_view($clearlessonref, $course, $cm, $context);
             return ['activitymodulehtml' => $updatedhtml];
         }
 

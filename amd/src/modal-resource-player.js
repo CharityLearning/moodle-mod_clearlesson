@@ -92,11 +92,6 @@ export const init = () => {
                     currentPlayerForm.modal.hide();
                 });
             }
-            // Speaker links jsut filter the browser window videos page atm.
-            // if (isSpeakerLink) {
-            //     externalref = element.getAttribute('data-speakers');
-            //     reRenderResourcePlayer(externalref, 1, 'speakers');
-            // }
         }
 
         // Select the resource and close both modals.
