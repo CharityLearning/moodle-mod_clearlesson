@@ -97,16 +97,16 @@ function xmldb_clearlesson_upgrade($oldversion) {
         // RESOURCELIB_DISPLAY_OPEN unless it is set to RESOURCELIB_DISPLAY_POPUP already
         if ($instances = $DB->get_records('clearlesson')) {
             foreach ($instances as $instance) {
-                if ($instance->display == RESOURCELIB_DISPLAY_POPUP) {
-                    continue;
+                // Remove disabled display types.
+                if ($instance->display == RESOURCELIB_DISPLAY_AUTO
+                || $instance->display == RESOURCELIB_DISPLAY_EMBED
+                || $instance->display == RESOURCELIB_DISPLAY_FRAME) {
+                    $instance->display = RESOURCELIB_DISPLAY_OPEN;
+                    $DB->update_record('clearlesson', $instance);
                 }
-                $instance->display = RESOURCELIB_DISPLAY_OPEN;
-                $DB->update_record('clearlesson', $instance);
             }
         }
-
         upgrade_plugin_savepoint(true, 2023091225, 'mod', 'clearlesson');
     }
-
     return true;
 }
