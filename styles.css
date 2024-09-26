@@ -1339,6 +1339,10 @@ body.mod-clearlesson-bodyrestricted .main-inner {
     min-height: calc(100vh - 380px);
 }
 
+body.mod-clearlesson-bodyrestricted .activity-header{
+    margin-bottom: 0px!important;
+}
+
 .mod-clearlesson .playlistimageholder {
     display: block!important;
 }

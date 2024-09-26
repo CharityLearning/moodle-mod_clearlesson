@@ -26,18 +26,21 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
     require_once("$CFG->libdir/resourcelib.php");
+    require_once("$CFG->dirroot/mod/clearlesson/lib.php");
 
     $displayoptions = resourcelib_get_displayoptions(array(/*RESOURCELIB_DISPLAY_AUTO,
                                                            RESOURCELIB_DISPLAY_EMBED,
                                                            RESOURCELIB_DISPLAY_FRAME,*/
                                                            RESOURCELIB_DISPLAY_OPEN,
-                                                           /*RESOURCELIB_DISPLAY_NEW,*/
+                                                           RESOURCELIB_DISPLAY_NEW,
                                                            RESOURCELIB_DISPLAY_POPUP,
                                                           ));
+    $displayoptions['CLEARLESSON_DISPLAY_MODAL'] = get_string('displaytypemodal', 'clearlesson');
     $defaultdisplayoptions = array(/* RESOURCELIB_DISPLAY_AUTO,
                                    RESOURCELIB_DISPLAY_EMBED,*/
                                    RESOURCELIB_DISPLAY_OPEN,
-                                  /* RESOURCELIB_DISPLAY_POPUP,*/
+                                   RESOURCELIB_DISPLAY_POPUP,
+                                   CLEARLESSON_DISPLAY_MODAL
                                   );
 
     // General settings.
@@ -71,8 +74,8 @@ if ($ADMIN->fulltree) {
         get_string('displayselectexplain', 'clearlesson'),
         RESOURCELIB_DISPLAY_AUTO,
         $displayoptions));
-    // $settings->add(new admin_setting_configtext('clearlesson/popupwidth',
-    //     get_string('popupwidth', 'clearlesson'), get_string('popupwidthexplain', 'clearlesson'), 620, PARAM_INT, 7));
-    // $settings->add(new admin_setting_configtext('clearlesson/popupheight',
-    //     get_string('popupheight', 'clearlesson'), get_string('popupheightexplain', 'clearlesson'), 450, PARAM_INT, 7));
+    $settings->add(new admin_setting_configtext('clearlesson/popupwidth',
+        get_string('popupwidth', 'clearlesson'), get_string('popupwidthexplain', 'clearlesson'), 620, PARAM_INT, 7));
+    $settings->add(new admin_setting_configtext('clearlesson/popupheight',
+        get_string('popupheight', 'clearlesson'), get_string('popupheightexplain', 'clearlesson'), 450, PARAM_INT, 7));
 }

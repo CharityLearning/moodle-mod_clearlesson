@@ -147,7 +147,7 @@ class update_progress extends \core_external\external_api {
                 }
                 return ['success' => true,
                         'activitymodulehtml' => $updatedhtml];
-            } else if (!$externalref && $resourceref) { 
+            } else if (!$externalref && $resourceref) {
                 // All the videos in the resource have already been watched, but the module has not been marked as complete.
                 // The videos may have been watched in other resources or on the Clear Lessons platform.
                 // Alternatively the completion conditions may have changed.

@@ -85,6 +85,7 @@ $string['clearlesson:view'] = 'View Clear Lesson Video';
 $string['aboutcap'] = 'About';
 $string['animation'] = 'Animation';
 $string['browseresources'] = 'Browse Resources';
+$string['displaytypemodal'] = 'Modal';
 $string['filters'] = 'Filters';
 $string['noresourceselected'] = 'No resource selected';
 $string['resourcebrowser'] = 'Resource Browser';

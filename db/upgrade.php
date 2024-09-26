@@ -104,9 +104,6 @@ function xmldb_clearlesson_upgrade($oldversion) {
                 $DB->update_record('clearlesson', $instance);
             }
         }
-        // Remove the now unused config settings.
-        $DB->delete_records('config_plugins', array('plugin' => 'clearlesson', 'name' => 'popupheight'));
-        $DB->delete_records('config_plugins', array('plugin' => 'clearlesson', 'name' => 'popupwidth'));
 
         upgrade_plugin_savepoint(true, 2023091225, 'mod', 'clearlesson');
     }
