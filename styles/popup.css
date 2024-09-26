@@ -1,0 +1,36 @@
+nav.navbar.fixed-top,
+#page-navbar,
+.secondary-navigation,
+#page-header,
+.drawer-toggles,
+#page-footer {
+    display: none!important;
+}
+
+#clearlesson-page-container {
+    padding-top: 0px!important;
+}
+
+.completion-info,
+#topofscroll,
+#page-content {
+    padding: 0px!important;
+}
+
+#page {
+    margin-top: 0px!important;
+}
+
+body.mod-clearlesson-bodyrestricted .main-inner {
+    min-height: calc(100vh - 32px);
+}
+.mod-clearlesson #menu-container {
+    padding: 1em;
+}
+
+/* on bootstrap sm */
+@media (min-width: 576px) {
+    .mod-clearlesson .video-card-body {
+        height: unset!important;
+    }
+}

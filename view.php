@@ -29,6 +29,7 @@ require_once($CFG->libdir . '/completionlib.php');
 $pluginconfig = get_config("clearlesson");
 $id = optional_param('id', 0, PARAM_INT);        // Course module ID.
 $u = optional_param('u', 0, PARAM_INT);         // URL instance id.
+$popup = optional_param('popup', 0, PARAM_INT);
 $redirect = optional_param('redirect', 0, PARAM_BOOL);
 if ($u) {  // Two ways to specify the module.
     $clearlesson = $DB->get_record('clearlesson', array('id' => $u), '*', MUST_EXIST);
@@ -45,7 +46,9 @@ require_capability('mod/clearlesson:view', $context);
 clearlesson_view($clearlesson, $course, $cm, $context);
 $PAGE->set_url('/mod/clearlesson/view.php', array('id' => $cm->id));
 $PAGE->add_body_class('mod-clearlesson-bodyrestricted');
-
+if ($popup) {
+    $PAGE->requires->css('/mod/clearlesson/styles/popup.css');
+}
 clearlesson_print_header($clearlesson, $cm, $course);
 clearlesson_print_intro($clearlesson, $cm, $course);
 
@@ -66,6 +69,9 @@ switch ($clearlesson->type) {
 
 // Open a div for the player or menu.
 echo html_writer::start_tag('div', array('id' => 'clearlesson-page-container', 'class' => 'main-inner'));
+if ($popup) {
+    echo html_writer::start_tag('div', array('id' => 'popupdiv_' . $cm->id, 'class' => 'popupdiv'));
+}
 if ($displaytype == 'player') {
     $renderable = new \mod_clearlesson\output\incourse_player($clearlesson->type,
                                                             $clearlesson->externalref);
@@ -87,6 +93,11 @@ if ($displaytype == 'player') {
     $PAGE->requires->js_call_amd('mod_clearlesson/progress-tracker', 'init');
 }
 echo html_writer::end_tag('div');
+// if ($scrollto) {
+//     echo html_writer::start_tag('script');
+//     echo "window.location.hash = '#clearlesson-$scrollto';";
+//     echo html_writer::end_tag('script');
+// }
 
 echo $OUTPUT->footer();
 // unset($exturl);

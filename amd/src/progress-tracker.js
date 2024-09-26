@@ -103,18 +103,20 @@ const updateProgress = async() => {
         return false;
     }
 
+    const args = {
+        externalref: window.extref,
+        status: window.viewedStatus,
+        duration: window.currentTime,
+        courseid: window.courseid,
+        cmid: window.cmid,
+        resourceref: window.resourceRef,
+        type: window.type,
+        pagetype: window.pageType
+    };
+
     const request = {
                         methodname: 'mod_clearlesson_update_progress',
-                        args: {
-                            externalref: window.extref,
-                            status: window.viewedStatus,
-                            duration: window.currentTime,
-                            courseid: window.courseid,
-                            cmid: window.cmid,
-                            resourceref: window.resourceRef,
-                            type: window.type,
-                            pagetype: window.pageType
-                        }
+                        args: args
                     };
 
     return Ajax.call([request])[0];

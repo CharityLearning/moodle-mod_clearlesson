@@ -31,6 +31,12 @@ define('CLEARLESSON_PRIVACY_NONE', 0);
 define('CLEARLESSON_PRIVACY_MYAUDIENCE', 1);
 define('CLEARLESSON_PRIVACY_PUBLIC', 2);
 
+/** Clearlesson modal display type 
+ * To be used along side the resourcelib display types.
+ * eg RESOURCELIB_DISPLAY_OPEN
+ */
+define('CLEARLESSON_DISPLAY_MODAL', 1982);
+
 /**
  * List of features supported in Clear Lesson module.
  * @param string $feature FEATURE_xx constant for requested feature
@@ -127,18 +133,16 @@ function clearlesson_add_instance($data, $mform) {
     }
     $data->parameters = serialize($parameters);
 
-    // $data->display = RESOURCELIB_DISPLAY_POPUP; // ALWAYS POPUP.
     // No longer used. TODO check for other unsused fields.
-    // $displayoptions = array();
-    // if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
-    //     $displayoptions['popupwidth']  = $data->popupwidth;
-    //     $displayoptions['popupheight'] = $data->popupheight;
-    // }
+    $displayoptions = array();
+    if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
+        $displayoptions['popupwidth']  = $data->popupwidth;
+        $displayoptions['popupheight'] = $data->popupheight;
+    }
     // if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME))) {
     //     $displayoptions['printintro']   = (int)!empty($data->printintro);
     // }
-    // $data->displayoptions = serialize($displayoptions);
-
+    $data->displayoptions = serialize($displayoptions);
     $data->timemodified = time();
     $data->id = $DB->insert_record('clearlesson', $data);
 
@@ -164,17 +168,15 @@ function clearlesson_update_instance($data, $mform) {
         $parameters[$data->$parameter] = $data->$variable;
     }
     $data->parameters = serialize($parameters);
-    // $data->display = RESOURCELIB_DISPLAY_POPUP; // ALWAYS POPUP.
-    // No longer used. TODO check for other unsused fields.
-    // $displayoptions = array();
-    // if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
-    //     $displayoptions['popupwidth']  = $data->popupwidth;
-    //     $displayoptions['popupheight'] = $data->popupheight;
-    // }
+    $displayoptions = array();
+    if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
+        $displayoptions['popupwidth']  = $data->popupwidth;
+        $displayoptions['popupheight'] = $data->popupheight;
+    }
     // if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME))) {
     //     $displayoptions['printintro']   = (int)!empty($data->printintro);
     // }
-    // $data->displayoptions = serialize($displayoptions);
+    $data->displayoptions = serialize($displayoptions);
     $data->externalref = clearlesson_fix_submitted_ref($data->externalref);
     $data->timemodified = time();
     $data->id           = $data->instance;
@@ -220,27 +222,44 @@ function clearlesson_get_coursemodule_info($coursemodule) {
     $info->icon = clearlesson_guess_icon($clearlessonref->externalref, 24);
     // $display = clearlesson_get_final_display_type($clearlessonref);
 
-    if ($clearlessonref->display == RESOURCELIB_DISPLAY_POPUP) {
-        // $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;$clearlessonref->type";
-        // $options = empty($clearlessonref->displayoptions) ? array() : unserialize($clearlessonref->displayoptions);
-        // $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
-        // $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
-        $onclickjs = "event.preventDefault(); 
-                    if (typeof window.openPlayer === 'undefined') {
-                        require(['mod_clearlesson/course-page'], function (coursePage) {
-                            coursePage.init();
-                            window.openPlayer(event, '$clearlessonref->type');
-                        });
-                    } else {
-                        window.openPlayer(event, '$clearlessonref->type');
-                    }";
-        // Strip any new lines from the js.
-        $info->onclick = trim(preg_replace('/\s\s+/', ' ', $onclickjs));
+    switch ($clearlessonref->display) {
+        case RESOURCELIB_DISPLAY_NEW:
+            $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;redirect=1";
+            $info->onclick = "window.open('$fullurl'); return false;";
+            break;
+        case RESOURCELIB_DISPLAY_DOWNLOAD:
+            $info->onclick = '';
+            break;
+        case RESOURCELIB_DISPLAY_OPEN:
+            $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id";
+            $info->onclick = "";
+            break;
+        case RESOURCELIB_DISPLAY_POPUP:
+            // $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&scollto=1";
+            $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&popup=1#topofscroll";
+            $options = empty($clearlessonref->displayoptions) ? array() : unserialize($clearlessonref->displayoptions);
+            $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
+            $height = empty($options['popupheight']) ? 450 : $options['popupheight'];
+            $wh = "width=$width,height=$height,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes";
+            $info->onclick = "window.open('$fullurl', '', '$wh'); return false;";
+            break;
+        case CLEARLESSON_DISPLAY_MODAL:
+            $onclickjs = "event.preventDefault(); 
+            if (typeof window.openPlayer === 'undefined') {
+                require(['mod_clearlesson/course-page'], function (coursePage) {
+                    coursePage.init();
+                    window.openPlayer(event, '$clearlessonref->type');
+                });
+            } else {
+                window.openPlayer(event, '$clearlessonref->type');
+            }";
+            // Strip any new lines from the js.
+            $info->onclick = trim(preg_replace('/\s\s+/', ' ', $onclickjs));
+            break;
+        default:
+            $info->onclick = '';
+            break;
     }
-    // else if ($display == RESOURCELIB_DISPLAY_NEW) {
-    //     $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;redirect=1";
-    //     $info->onclick = "window.open('$fullurl'); return false;";
-    // }
 
     // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
     if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {

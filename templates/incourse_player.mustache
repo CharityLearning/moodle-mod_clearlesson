@@ -24,7 +24,7 @@
     data-type={{type}} data-watchedall="{{watchedall}}">
         <div class="container-fluid">
             <div class="row">
-                <div class="{{^isvideo}}col-lg-8{{/isvideo}}{{#isvideo}}col-12{{/isvideo}} player-column">
+                <div class="{{^isvideo}}col-sm-8{{/isvideo}}{{#isvideo}}col-12{{/isvideo}} player-column">
                     <div class="box p-0">
                         {{> mod_clearlesson/elements/video_iframe}} 
                         <div class="p-2 speakerinfo d-flex bd-highlight mb-3">
@@ -66,7 +66,7 @@
                         </div>
                     </div>
                     {{^isvideo}}
-                        <div class="col-md-4 mt-2 video-list-column"{{#playlistref}} data-playlist="{{playlistref}}"{{/playlistref}}
+                        <div class="col-sm-4 mt-2 video-list-column"{{#playlistref}} data-playlist="{{playlistref}}"{{/playlistref}}
                         {{#speakeref}} data-speaker="{{speakeref}}"{{/speakeref}}>
                             <div class="col-md-12 box">
                                 <h6 class="card-subtitle mb-2 text-muted mt-2">

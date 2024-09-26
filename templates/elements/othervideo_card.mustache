@@ -19,9 +19,9 @@
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="video-card-side video-card-list has-position" data-position="{{position}}" data-type="{{type}}">
+<div class="video-card-side video-card-list has-position d-flex d-lg-block flex-wrap" data-position="{{position}}" data-type="{{type}}">
     {{#playlistref}}
-        <div class="playlist-play-content-video-number">
+        <div class="playlist-play-content-video-number d-none d-lg-block">
             {{#active}}<i class="fas fa-play"></i>{{/active}}
             {{^active}}{{position}}{{/active}}
         </div>

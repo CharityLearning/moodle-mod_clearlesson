@@ -94,21 +94,23 @@ class mod_clearlesson_mod_form extends moodleform_mod {
             $mform->addHelpButton('display', 'displayselect', 'url');
         }
 
-        // if (array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {
-        //     $mform->addElement('text', 'popupwidth', get_string('popupwidth', 'url'), array('size' => 3));
-        //     if (count($options) > 1) {
-        //         $mform->disabledIf('popupwidth', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
-        //     }
-        //     $mform->setType('popupwidth', PARAM_INT);
-        //     $mform->setDefault('popupwidth', $config->popupwidth);
+        if (array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {
+            $mform->addElement('text', 'popupwidth', get_string('popupwidth', 'url'), array('size' => 3));
+            if (count($options) > 1) {
+                $mform->disabledIf('popupwidth', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
+                $mform->hideIf('popupwidth', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
+            }
+            $mform->setType('popupwidth', PARAM_INT);
+            $mform->setDefault('popupwidth', $config->popupwidth);
 
-        //     $mform->addElement('text', 'popupheight', get_string('popupheight', 'url'), array('size' => 3));
-        //     if (count($options) > 1) {
-        //         $mform->disabledIf('popupheight', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
-        //     }
-        //     $mform->setType('popupheight', PARAM_INT);
-        //     $mform->setDefault('popupheight', $config->popupheight);
-        // }
+            $mform->addElement('text', 'popupheight', get_string('popupheight', 'url'), array('size' => 3));
+            if (count($options) > 1) {
+                $mform->disabledIf('popupheight', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
+                $mform->hideIf('popupheight', 'display', 'noteq', RESOURCELIB_DISPLAY_POPUP);
+            }
+            $mform->setType('popupheight', PARAM_INT);
+            $mform->setDefault('popupheight', $config->popupheight);
+        }
 
         // if (array_key_exists(RESOURCELIB_DISPLAY_AUTO, $options) or
         //   array_key_exists(RESOURCELIB_DISPLAY_EMBED, $options) or
