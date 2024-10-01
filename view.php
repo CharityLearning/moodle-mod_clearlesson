@@ -93,11 +93,6 @@ if ($displaytype == 'player') {
     $PAGE->requires->js_call_amd('mod_clearlesson/progress-tracker', 'init');
 }
 echo html_writer::end_tag('div');
-// if ($scrollto) {
-//     echo html_writer::start_tag('script');
-//     echo "window.location.hash = '#clearlesson-$scrollto';";
-//     echo html_writer::end_tag('script');
-// }
 
 echo $OUTPUT->footer();
 // unset($exturl);

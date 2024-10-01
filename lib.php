@@ -227,9 +227,6 @@ function clearlesson_get_coursemodule_info($coursemodule) {
             $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;redirect=1";
             $info->onclick = "window.open('$fullurl'); return false;";
             break;
-        case RESOURCELIB_DISPLAY_DOWNLOAD:
-            $info->onclick = '';
-            break;
         case RESOURCELIB_DISPLAY_OPEN:
             $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id";
             $info->onclick = "";
