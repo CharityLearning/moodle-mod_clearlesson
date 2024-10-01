@@ -75,13 +75,12 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         $attributes['rows'] = 5;
         $element->setAttributes($attributes);
 
-        // Modal window or in page only..
         $mform->addElement('header', 'optionssection', get_string('appearance'));
+        $default = '';
         if ($this->current->instance) {
-            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions), $this->current->display);
-        } else {
-            $options = resourcelib_get_displayoptions(explode(',', $config->displayoptions));
+            $default = $this->current->display;
         }
+        $options = clearlesson_get_display_options($config->displayoptions, $display);
 
         if (count($options) == 1) {
             $mform->addElement('hidden', 'display');
