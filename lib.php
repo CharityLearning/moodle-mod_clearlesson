@@ -465,3 +465,16 @@ function clearlesson_get_resource_type_options() {
             'series' => 'series',
             'collections' => 'collections'];
 }
+
+function clearlesson_get_display_options($displayoptionsstring, $default = '') {
+    $displayoptionsarray = explode(',', $displayoptionsstring);
+    if ($default) {
+        $options = resourcelib_get_displayoptions($displayoptionsarray, $default);
+    } else {
+        $options = resourcelib_get_displayoptions($displayoptionsarray);
+    }
+    if (in_array(CLEARLESSON_DISPLAY_MODAL, $displayoptionsarray)) {
+        $options[CLEARLESSON_DISPLAY_MODAL] = get_string('displaytypemodal', 'clearlesson');
+    }
+    return $options;
+}
