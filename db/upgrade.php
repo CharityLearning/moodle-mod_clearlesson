@@ -52,8 +52,106 @@ function xmldb_clearlesson_upgrade($oldversion) {
         exit(1);
     }
 
-    if ($oldverion < 2023091225) {
+    if ($oldverion < 2023091300) {
         require_once("$CFG->libdir/resourcelib.php");
+        require_once("$CFG->dirroot/mod/clearlesson/lib.php");
+
+        if ($olddisplayoptions = $DB->get_record('config_plugins', array('plugin' => 'clearlesson', 'name' => 'displayoptions'))) {
+            $olddisplaysettings = explode(',', $olddisplayoptions->value);
+            $olddisplayoptions = [RESOURCELIB_DISPLAY_AUTO,
+                                    RESOURCELIB_DISPLAY_EMBED,
+                                    RESOURCELIB_DISPLAY_FRAME,
+                                    RESOURCELIB_DISPLAY_OPEN,
+                                    RESOURCELIB_DISPLAY_NEW,
+                                    RESOURCELIB_DISPLAY_POPUP];
+            // Out of the above display options, which ones are not in the old display settings?
+            $notused = [];
+            foreach ($olddisplaysettings as $oldsetting) {
+                if (!in_array($oldsetting, $olddisplayoptions)) {
+                    $notused[] = $oldoption;
+                }
+            }
+        } else {
+            $notused = [];
+        }
+        $redundant = [RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME];
+        // Add the now redunant options to the notused options, if they are not already there.
+        $unwantedoptions = array_merge($notused, $redundant);
+        // Update the plugin config displayoptions & display (defaultoption) value.
+        $newdisplayoptions = [RESOURCELIB_DISPLAY_OPEN,
+                                RESOURCELIB_DISPLAY_NEW,
+                                RESOURCELIB_DISPLAY_POPUP,
+                                CLEARLESSON_DISPLAY_MODAL];
+        // Remove any unwanted options from the new display options. What remains will be the new display settings for the plugin.
+        $newdisplaysettings = [];
+        foreach ($newdisplayoptions as $newoption) {
+            if (!in_array($newoption, $unwantedoptions)) {
+                $newdisplaysettings[] = $newoption;
+            }
+        }
+        $displayoptionsstring = implode(',', $newdisplaysettings);
+
+        // Insert or update the new display settings for the plugin.
+        if ($record = $DB->get_record('config_plugins', array('plugin' => 'clearlesson', 'name' => 'displayoptions'))) {
+            if ($record->value != $displayoptionsstring) {
+                $record->value = $displayoptionsstring;
+                $DB->update_record('config_plugins', $record);
+            }
+        } else {
+            $record = new stdClass();
+            $record->plugin = 'clearlesson';
+            $record->name = 'displayoptions';
+            $record->value = $displayoptionsstring;
+            $DB->insert_record('config_plugins', $record);
+        }
+
+        // Determine the new default display config setting for the plugin.
+        $defaultdisplay = RESOURCELIB_DISPLAY_OPEN;
+        foreach ($newdisplaysettings as $newdisplaysetting) {
+            if (!in_array($newdisplaysetting, $unwantedoptions)) {
+                $defaultdisplay = $newdisplaysetting;
+                break;
+            }
+        }
+
+        // Insert or update the default display setting for the plugin if required.
+        if ($result = $DB->get_record('config_plugins', array('plugin' => 'clearlesson', 'name' => 'display'))) {
+            if ($result->value != $defaultdisplay) {
+                $result->value = $defaultdisplay;
+                $DB->update_record('config_plugins', $result);
+            }
+        } else {
+            $result = new stdClass();
+            $result->plugin = 'clearlesson';
+            $result->name = 'display';
+            $result->value = $defaultdisplay;
+            $DB->insert_record('config_plugins', $result);
+        }
+
+        // By this stage the plugin config has already been updated but we still need to update the instances.
+        if ($defaultdisplay == RESOURCELIB_DISPLAY_POPUP) {
+            // Never update a clearlesson instance diplay setting to popup.
+            // In doing this we greatly simplify the code required in this file because
+            // no longer need to worry about the required displaysettings JSON column.
+            // There is a low chance of this code getting used, but it is here just in case.
+            $defaultdisplay = CLEARLESSON_DISPLAY_MODAL;
+        }
+
+        // For each clearlesson instance,
+        // if the display option is in the unwanted options,
+        // set it to the default display option.
+        if ($instances = $DB->get_records('clearlesson')) {
+            foreach ($instances as $instance) {
+                // Update any disabled display types to the default display type.
+                if ($instance->display != $defaultdisplay && in_array($instance->display, $unwantedoptions)) {
+                    $instance->display = $defaultdisplay;
+                    $DB->update_record('clearlesson', $instance);
+                }
+            }
+        }
+
+        // Add the new completionwatchedall field to the clearlesson table.
+        // This field will be used to set if the 'watchedall' completion rule is enabled for that clearlesson.
         $dbman = $DB->get_manager();
         $table = new xmldb_table('clearlesson');
         $field = new xmldb_field('completionwatchedall', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL , null, '0');
@@ -63,50 +161,13 @@ function xmldb_clearlesson_upgrade($oldversion) {
 
         $table = new xmldb_table('clearlesson_track');
         // Define field watchedall to be added to clearlesson_track.
+        // This field will be used to record if a user has watched all the videos in a clearlesson.
         $field = new xmldb_field('watchedall', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL , null, '0');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        // Update the plugin config displayoptions & display (defaultoption) value.
-        // The only display options available are RESOURCELIB_DISPLAY_OPEN and RESOURCELIB_DISPLAY_POPUP
-        $displayoptionsstring = RESOURCELIB_DISPLAY_OPEN . ',' . RESOURCELIB_DISPLAY_POPUP;
-        if ($record = $DB->get_record('config_plugins', array('plugin' => 'clearlesson', 'name' => 'displayoptions'))) {
-            $record->value = $displayoptionsstring;
-            $DB->update_record('config_plugins', $record);
-        } else {
-            $record = new stdClass();
-            $record->plugin = 'clearlesson';
-            $record->name = 'displayoptions';
-            $record->value = $displayoptionsstring;
-            $DB->insert_record('config_plugins', $record);
-        }
-
-        $defaultdisplayoption = RESOURCELIB_DISPLAY_OPEN;
-        if ($record = $DB->get_record('config_plugins', array('plugin' => 'clearlesson', 'name' => 'display'))) {
-            $record->value = $defaultdisplayoption;
-            $DB->update_record('config_plugins', $record);
-        } else {
-            $record = new stdClass();
-            $record->plugin = 'clearlesson';
-            $record->name = 'display';
-            $record->value = $defaultdisplayoption;
-            $DB->insert_record('config_plugins', $record);
-        }
-        // Also, for each clearlesson instance, set the display option to
-        // RESOURCELIB_DISPLAY_OPEN unless it is set to RESOURCELIB_DISPLAY_POPUP already
-        if ($instances = $DB->get_records('clearlesson')) {
-            foreach ($instances as $instance) {
-                // Remove disabled display types.
-                if ($instance->display == RESOURCELIB_DISPLAY_AUTO
-                || $instance->display == RESOURCELIB_DISPLAY_EMBED
-                || $instance->display == RESOURCELIB_DISPLAY_FRAME) {
-                    $instance->display = RESOURCELIB_DISPLAY_OPEN;
-                    $DB->update_record('clearlesson', $instance);
-                }
-            }
-        }
-        upgrade_plugin_savepoint(true, 2023091225, 'mod', 'clearlesson');
+        upgrade_plugin_savepoint(true, 2023091300, 'mod', 'clearlesson');
     }
     return true;
 }

@@ -28,17 +28,11 @@ if ($ADMIN->fulltree) {
     require_once("$CFG->libdir/resourcelib.php");
     require_once("$CFG->dirroot/mod/clearlesson/lib.php");
 
-    $displayoptions = resourcelib_get_displayoptions(array(/*RESOURCELIB_DISPLAY_AUTO,
-                                                           RESOURCELIB_DISPLAY_EMBED,
-                                                           RESOURCELIB_DISPLAY_FRAME,*/
-                                                           RESOURCELIB_DISPLAY_OPEN,
-                                                           RESOURCELIB_DISPLAY_NEW,
-                                                           RESOURCELIB_DISPLAY_POPUP,
-                                                          ));
-    $displayoptions['CLEARLESSON_DISPLAY_MODAL'] = get_string('displaytypemodal', 'clearlesson');
-    $defaultdisplayoptions = array(/* RESOURCELIB_DISPLAY_AUTO,
-                                   RESOURCELIB_DISPLAY_EMBED,*/
-                                   RESOURCELIB_DISPLAY_OPEN,
+    $displayoptions = resourcelib_get_displayoptions([RESOURCELIB_DISPLAY_OPEN,
+                                                    RESOURCELIB_DISPLAY_NEW,
+                                                    RESOURCELIB_DISPLAY_POPUP]);
+    $displayoptions[CLEARLESSON_DISPLAY_MODAL] = get_string('displaytypemodal', 'clearlesson');
+    $defaultdisplayoptions = array(RESOURCELIB_DISPLAY_OPEN,
                                    RESOURCELIB_DISPLAY_POPUP,
                                    CLEARLESSON_DISPLAY_MODAL
                                   );
@@ -48,11 +42,6 @@ if ($ADMIN->fulltree) {
         get_string('clearlessonurl', 'clearlesson'),
         get_string('clearlessonurldesc', 'clearlesson'),
         '', PARAM_URL));
-    // $settings->add(new admin_setting_configtext('clearlesson/framesize',
-    //     get_string('framesize', 'clearlesson'),
-    //     get_string('configframesize', 'clearlesson'),
-    //     130,
-    //     PARAM_INT));
     $settings->add(new admin_setting_configpasswordunmask('clearlesson/apikey', get_string('apikey', 'clearlesson'),
         get_string('apikeydesc', 'clearlesson'), ''));
     $settings->add(new admin_setting_configpasswordunmask('clearlesson/secretkey', get_string('secretkey', 'clearlesson'),
