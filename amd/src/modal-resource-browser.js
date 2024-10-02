@@ -59,6 +59,12 @@ export const init = () => {
                 onModalClose();
         }
         searchIfSearchbutton(e);
+
+        if (element.closest('.form-autocomplete-suggestions li[role="option"]')) {
+            // An autocomplete option has been selected.
+            // Hide any error messages on the resource selector group.
+            document.getElementById('fgroup_id_error_ref_select_group').removeAttribute('style');
+        }
     });
 
     document.addEventListener('keydown', function(e) {
@@ -93,6 +99,12 @@ export const init = () => {
             }
             searchIfSearchbutton(e);
         }
+    });
+
+    Utils.waitForElement('.form-autocomplete-selection', document, function() {
+        // Unlock these two elements when the autocomplete has loaded.
+        document.getElementById('id_type').removeAttribute('disabled');
+        document.getElementById('resource-select-button').removeAttribute('disabled');
     });
 };
 

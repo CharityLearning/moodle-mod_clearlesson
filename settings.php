@@ -32,10 +32,9 @@ if ($ADMIN->fulltree) {
                                                     RESOURCELIB_DISPLAY_NEW,
                                                     RESOURCELIB_DISPLAY_POPUP]);
     $displayoptions[CLEARLESSON_DISPLAY_MODAL] = get_string('displaytypemodal', 'clearlesson');
-    $defaultdisplayoptions = array(RESOURCELIB_DISPLAY_OPEN,
+    $defaultdisplayoptions = [RESOURCELIB_DISPLAY_OPEN,
                                    RESOURCELIB_DISPLAY_POPUP,
-                                   CLEARLESSON_DISPLAY_MODAL
-                                  );
+                                   CLEARLESSON_DISPLAY_MODAL];
 
     // General settings.
     $settings->add(new admin_setting_configtext('clearlesson/clearlessonurl',
