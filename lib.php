@@ -220,7 +220,6 @@ function clearlesson_get_coursemodule_info($coursemodule) {
     $info->name = $clearlessonref->name;
     // Note: there should be a way to differentiate links from normal resources.
     $info->icon = clearlesson_guess_icon($clearlessonref->externalref, 24);
-    // $display = clearlesson_get_final_display_type($clearlessonref);
 
     switch ($clearlessonref->display) {
         case RESOURCELIB_DISPLAY_NEW:

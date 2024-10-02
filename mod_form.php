@@ -42,10 +42,10 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $options = clearlesson_get_resource_type_options();
-        $select = $mform->addElement('select', 'type', get_string('type', 'clearlesson'), $options);
-
+        $select = $mform->addElement('select', 'type', get_string('type', 'clearlesson'), $options, ['disabled' => 'disabled']);
         $browseresourcesstring = get_string('browseresources', 'clearlesson');
-        $buttonhtml = '<button type="button" id="resource-select-button" class="btn btn-primary">' . $browseresourcesstring . '</button>';
+        $buttonhtml = '<button type="button" id="resource-select-button"
+                        class="btn btn-primary" disabled="disabled">' . $browseresourcesstring . '</button>';
         $refselectgroup = [];
         $autocompleteoptions = [
             'multiple' => false,
@@ -80,7 +80,7 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         if ($this->current->instance) {
             $default = $this->current->display;
         }
-        $options = clearlesson_get_display_options($config->displayoptions, $display);
+        $options = clearlesson_get_display_options($config->displayoptions, $default);
 
         if (count($options) == 1) {
             $mform->addElement('hidden', 'display');
@@ -191,10 +191,11 @@ class mod_clearlesson_mod_form extends moodleform_mod {
     }
 
     public function validation($data, $files) {
-        // TODO this.
-        // var_dump($data);
-        // die();
-        return array();
+        $errors = [];
+        if (empty($data['externalref'])) {
+            $errors['ref_select_group'] = get_string('pleaseselectaresource', 'mod_clearlesson');
+        }
+        return $errors;
     }
 
 }
