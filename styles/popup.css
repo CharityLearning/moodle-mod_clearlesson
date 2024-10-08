@@ -14,7 +14,8 @@ nav.navbar.fixed-top,
 .completion-info,
 #topofscroll,
 #page-content {
-    padding: 0px!important;
+    padding-top: 0px!important;
+    padding-bottom: 3px!important;
 }
 
 #page {
@@ -22,15 +23,39 @@ nav.navbar.fixed-top,
 }
 
 body.mod-clearlesson-bodyrestricted .main-inner {
-    min-height: calc(100vh - 32px);
+    min-height: calc(100vh - 64px);
 }
+
+.mod-clearlesson .player-row {
+    padding-bottom: 1em;
+}
+
+.mod-clearlesson .player-row > * {
+    max-height: calc(100vh - 64px);
+}
+
+.mod-clearlesson .player-column {
+    height: calc(100vh - 64px);
+}
+
 .mod-clearlesson #menu-container {
     padding: 1em;
 }
 
 /* on bootstrap sm */
 @media (min-width: 576px) {
-    .mod-clearlesson .video-card-body {
-        height: unset!important;
+    .mod-clearlesson-bodyrestricted.is-video .automatic-completion-conditions {
+        margin-left: 8.33%!important;
+    }
+}
+
+@media (max-width: 575px) {
+    .mod-clearlesson-bodyrestricted .automatic-completion-conditions {
+        margin-left: 0px!important;
+    }
+    .mod-clearlesson-bodyrestricted.is-video .activity-header {
+        display: flex!important;
+        justify-content: center!important;
+        align-items: center!important;
     }
 }

@@ -46,8 +46,13 @@ require_capability('mod/clearlesson:view', $context);
 clearlesson_view($clearlesson, $course, $cm, $context);
 $PAGE->set_url('/mod/clearlesson/view.php', array('id' => $cm->id));
 $PAGE->add_body_class('mod-clearlesson-bodyrestricted');
+$PAGE->add_body_class('mod-clearlesson-' . $clearlesson->type);
 if ($popup) {
     $PAGE->requires->css('/mod/clearlesson/styles/popup.css');
+    $PAGE->add_body_class('mod-clearlesson-popup');
+}
+if ($clearlesson->type == 'play') {
+    $PAGE->add_body_class('is-video');
 }
 clearlesson_print_header($clearlesson, $cm, $course);
 clearlesson_print_intro($clearlesson, $cm, $course);

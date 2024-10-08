@@ -21,7 +21,7 @@
 }}
 <div class="mod-clearlesson">
     <div class="video-container" data-externalref="{{externalref}}">
-        <iframe class="videoframe" src="{{src}}" title="{{name}}" frameborder="0" allowfullscreen></iframe>
+        <iframe class="videoframe" src="{{src}}" title="{{name}}" frameborder="1" allowfullscreen></iframe>
         {{^inpage}}
             <script>
                 require([{{#firstload}}'../../../mod/clearlesson/vimeo/vimeo-sdk', {{/firstload}}'mod_clearlesson/progress-tracker'],
@@ -36,7 +36,7 @@
         {{/inpage}}
     </div>
     <div class="p-2 video-title-wrapper" style="position: relative">
-        <h4 class="video-title">{{name}}</h4>
+        <h4 class="video-title ml-2">{{name}}</h4>
         {{> mod_clearlesson/elements/icons/watched_check}}
     </div>
 </div>

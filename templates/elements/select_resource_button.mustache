@@ -19,13 +19,7 @@
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="d-flex">
-    <div class="spacer" style="flex-grow: 10"></div>
-    {{#editor}}
-        <a href="javascript:void(0)" class="settings-icon playlist-edit mr-2" data-playlistid={{playlistid}}>
-            <i class="fas fa-cog"></i>
-        </a>
-    {{/editor}}
+<div class="select-button-container">
     <button data-type="{{^itemtype}}{{type}}{{/itemtype}}{{itemtype}}" data-externalref="{{externalref}}"
     class="btn btn-primary btn-sm select-resource-button px-3" style="font-size:13px;">{{selectstring}}</button>
 </div>

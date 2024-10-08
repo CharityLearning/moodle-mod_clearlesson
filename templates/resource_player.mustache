@@ -22,11 +22,11 @@
 <div class="mod-clearlesson">
     <div class="page-content-wrapper">
         <div class="container-fluid pt-5">
-            <div class="row">
+            <div class="row player-row {{#isvideo}}video{{/isvideo}}">
                 <div class="col-lg-8 player-column">
                     <div class="box p-0">
                         {{> mod_clearlesson/elements/video_iframe}} 
-                        <div class="p-2 speakerinfo d-flex bd-highlight mb-3">
+                        <div class="p-2 speakerinfo d-flex bd-highlight mb-1">
                             <div class="mr-auto bd-highlight">
                                 <div class="d-flex bd-highlight">
                                     <div class="mr-auto bd-highlight">
@@ -37,9 +37,10 @@
                                     </div>
                                 </div>
                             </div>
+                            {{> mod_clearlesson/elements/icons/watched_check}}
                         </div>
                     </div>
-                    <div class="single-video-info-content box mb-3 tab-content mt-2">
+                    <div class="single-video-info-content box mb-3 tab-content mt-1">
                         <nav class="">
                             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                 <a href="#nav-home" class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" role="tab" aria-controls="nav-home" aria-selected="true">
@@ -50,7 +51,7 @@
                                 </a>
                             </div>
                         </nav>
-                        <div class="tab-pane fade show active mt-4" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                        <div class="tab-pane fade show active p-4 " id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                             <h6 class="">{{#str}} topicscap, mod_clearlesson {{/str}}</h6>
                             <p class="tags mb-0">
                                 {{#topics}}
@@ -58,14 +59,14 @@
                                 {{/topics}}
                             </p>
                         </div>
-                        <div class="tab-pane fade mt-2" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                        <div class="tab-pane fade p-4" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                             <h6 class="">{{#str}} transcriptcap, mod_clearlesson {{/str}}</h6>
                                 <p class="">{{transcript}}</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 mt-2 video-list-column"{{#playlistref}} data-playlist="{{playlistref}}"{{/playlistref}}
+                <div class="col-lg-4 video-list-column"{{#playlistref}} data-playlist="{{playlistref}}"{{/playlistref}}
                     {{#speakeref}} data-speaker="{{speakeref}}"{{/speakeref}}>
                     <div class="col-md-12 box">
                         <h6 class="card-subtitle mb-2 text-muted mt-2">

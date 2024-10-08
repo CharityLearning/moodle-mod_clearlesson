@@ -231,7 +231,6 @@ function clearlesson_get_coursemodule_info($coursemodule) {
             $info->onclick = "";
             break;
         case RESOURCELIB_DISPLAY_POPUP:
-            // $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&scollto=1";
             $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&popup=1#topofscroll";
             $options = empty($clearlessonref->displayoptions) ? array() : unserialize($clearlessonref->displayoptions);
             $width  = empty($options['popupwidth']) ? 620 : $options['popupwidth'];
