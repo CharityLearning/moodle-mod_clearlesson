@@ -1406,6 +1406,10 @@ body.mod-clearlesson-bodyrestricted .activity-header{
     margin-bottom: 0px;
 }
 
+.mod-clearlesson .tab-content {
+    padding: 0px;
+}
+
 .mod-clearlesson .single-video-info-content,
 .mod-clearlesson .single-video-info-content .nav-tabs a {
     background-color: white;
@@ -1441,8 +1445,13 @@ body.mod-clearlesson-bodyrestricted .activity-header{
 
 .mod-clearlesson .player-column > *:not(.tab-content) {
     border: 1px solid rgb(222, 226, 230);
-    box-shadow: 0 1px 6px rgba(0, 0, 0, .07);
 }
+
+.mod-clearlesson .player-column > * {
+    box-shadow: 0px 1px 6px rgba(0, 0, 0, .07)!important;
+}
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .07)!important;
+} */
 
 .mod-clearlesson .tab-pane {
     overflow-y: auto;
@@ -1454,6 +1463,10 @@ body.mod-clearlesson-bodyrestricted .activity-header{
     border-left: 1px solid rgb(222, 226, 230);
     border-bottom: 1px solid rgb(222, 226, 230);
     height: calc(100% - 40.5px);
+}
+
+.mod-clearlesson .player-row.video .tab-pane {
+    height: calc(100% - 43px);
 }
 
 .mod-clearlesson .nav-tabs {
