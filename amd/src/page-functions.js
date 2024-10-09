@@ -178,7 +178,6 @@ export async function openNewMenuModal(e, url, firstLoad, completionDropdown) {
     newMenuModal.addEventListener(newMenuModal.events.LOADED, function() {
         const modalRootInner = newMenuModal.modal.getRoot()[0].children[0];
         setModalBodyGrey(modalRootInner);
-        setModalFullscreen(modalRootInner);
         updateCompletionStatusIfIncorrect(completionDropdown, modalRootInner);
         window.updateProgress = false;
     });

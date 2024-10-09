@@ -64,7 +64,8 @@ class incourse_player_form extends \mod_clearlesson\forms\base_dynamic_form {
                                                                 $this->externalref,
                                                                 $position,
                                                                 [],
-                                                                $firstload);                                       
+                                                                $firstload);    
+        $renderable->modal = true;                                   
         $output = $PAGE->get_renderer('mod_clearlesson');
         $dform->addElement('html', $output->render_incourse_player($renderable));
         $dform->addElement('hidden', 'type', $this->type);

@@ -109,17 +109,6 @@ async function openResourceMenu(externalref, name, speaker = false) {
     currentMenuForm = menuForm;
 
     menuForm.addEventListener(menuForm.events.LOADED, async function() {
-        // Set the modal to nearly fullscreen size.
-        let modalHeight = Math.ceil(window.innerHeight * 0.94);
-        let modalWidth = Math.ceil(window.innerWidth * 0.94);
-        modalWidth = modalWidth > 1800 ? 1800 : modalWidth;
-        const modalRootInner = menuForm.modal.getRoot()[0].children[0];
-        modalRootInner.setAttribute('style',
-            'width: ' + modalWidth +
-            'px;max-width: ' + modalWidth +
-            'px;height: ' + modalHeight +
-            'px;max-height: ' + modalHeight + 'px;'
-        );
         setButtons(await selectString, resourceType, externalref, backString);
     });
 

@@ -52,6 +52,7 @@ class incourse_menu_form extends \mod_clearlesson\forms\base_dynamic_form {
 
         $renderable = new \mod_clearlesson\output\incourse_menu($this->type,
                                                                 $this->externalref);
+        $renderable->modal = true;
         $output = $PAGE->get_renderer('mod_clearlesson');
         $dform->addElement('html', $output->render_incourse_menu($renderable));
         $dform->addElement('hidden', 'type', $this->type);

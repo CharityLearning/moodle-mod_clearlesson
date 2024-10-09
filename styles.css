@@ -587,7 +587,6 @@
 
 .mod-clearlesson .video-card-side.video-card-list .video-card-image {
     float: left;
-
     width: 122px;
     height: 77px;
     margin: 0 12px 0 0;
@@ -595,29 +594,23 @@
 
 .mod-clearlesson .video-card-side.video-card-list .play-video-card-image {
     float: left;
-
     width: 170px;
-    /* height: 96px; */
     margin: 0 12px 0 0;
 }
 
 .mod-clearlesson .play-playlist-video-card-image {
     float: left;
-
     width: 127.5px;
-    /* height: 75px; */
     margin: 0 12px 0 0;
 }
 
 
 .mod-clearlesson .play-video-card-body {
-
     height: 100px;
     position: relative;
 }
 
 .mod-clearlesson .play-playlist-video-card-body {
-
     height: 75px;
     position: relative;
 }
@@ -633,7 +626,6 @@
 
 .mod-clearlesson .video-card-side .video-card-image {
     float: left;
-
     width: 122px;
     height: 68px !important;
     margin: 0 12px 0 0;
@@ -645,10 +637,8 @@
 
 .mod-clearlesson .video-card-list {
     display: inline-block;
-
     width: 100%;
     margin-bottom: 1rem;
-
     background: transparent none repeat scroll 0 0;
     box-shadow: none;
 }
@@ -668,9 +658,7 @@
 .mod-clearlesson .video-card .progress {
     position: relative;
     top: -6px;
-
     height: 6px;
-
     border: none;
     border-radius: 0;
     background: rgba(0, 0, 0, .1);
@@ -679,36 +667,32 @@
 .mod-clearlesson .video-card .progress-none {
     position: relative;
     top: -6px;
-
     height: 6px;
-
     border: none;
     border-radius: 0;
 }
 
 .mod-clearlesson .video-card .progress-bar {
     height: 6px;
-
     border-radius: 0;
-    /* background: #f54029 !important; */
-background: var(--info) !important;
+    background: var(--info) !important;
 }
 
 /* Card */
 .mod-clearlesson div.page-title {
-font-size: 1rem;
-font-weight: 600;
+    font-size: 1rem;
+    font-weight: 600;
 
-overflow: hidden;
+    overflow: hidden;
 
-max-width: 99%;
-padding: 20px 24px 20px 0;
+    max-width: 99%;
+    padding: 20px 24px 20px 0;
 
-cursor: pointer;
-white-space: nowrap;
-text-overflow: ellipsis;
+    cursor: pointer;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
-color: #121212;
+    color: #121212;
 }
 
 .mod-clearlesson h1.card-title {
@@ -1273,8 +1257,6 @@ color: #121212;
 
 .mod-clearlesson .menu-item-card .play-video-card-image {
     height: unset!important;
-    /* width: 127.5px;
-    height: 72px; */
 }
 
 .mod-clearlesson .menu-item-card-image:hover .play-icon {
@@ -1395,32 +1377,37 @@ body.mod-clearlesson-bodyrestricted .activity-header{
     position: relative;
     right: 0.5em;
 }
-.mod-clearlesson .player-row > * {
-    max-height: calc(100vh - 360px);
-    min-height:767px;
-}
-
-.modal-body .mod-clearlesson .player-row > * {
-    max-height: unset;
-    min-height: 900px;
-}
-
+.mod-clearlesson .player-row > *,
 .mod-clearlesson .player-column {
     height: calc(100vh - 360px);
     min-height:767px;
+}
+
+.mod-clearlesson .player-column {
     display: flex;
     flex-direction: column;
 }
 
-.modal-body .mod-clearlesson .player-column {
+.modal-body .mod-clearlesson .player-column,
+.modal-body .mod-clearlesson .player-row > * {
     max-height: unset;
-    min-height: 1080px;
+    height: calc(94vh - 170px);
+}
+
+.modal-body .mod-clearlesson .player-row.video .player-column,
+.modal-body .mod-clearlesson .player-row.video > * {
+    max-height: unset;
+    height: calc(94vh - 400px);
 }
 
 .mod-clearlesson .tab-content {
     overflow-y: auto;
     flex-grow: 1;
     margin-bottom: 0px;
+}
+
+.mod-clearlesson .tab-content.single-video-info-content {
+    overflow-y: visible;
 }
 
 .mod-clearlesson .single-video-info-content,
@@ -1445,7 +1432,7 @@ body.mod-clearlesson-bodyrestricted .activity-header{
 }
 
 .mod-clearlesson .player-row > .video-list-column {
-    overflow-y: scroll;
+    overflow-y: auto;
     scrollbar-width: thin!important;
     scrollbar-color: rgb(222, 226, 230)!important;
     border: 1px solid rgb(222, 226, 230);
@@ -1501,10 +1488,6 @@ body.mod-clearlesson-bodyrestricted .activity-header{
     bottom: 0.5em;
     left: 1em;
 }
-
-/* .mod-clearlesson .video-card .video-card-body {
-    
-} */
 
 .mod-clearlesson .select-button-container button {
     border-bottom: 1px solid rgba(var(--primary), 1.5);

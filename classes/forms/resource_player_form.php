@@ -43,7 +43,7 @@ class resource_player_form extends base_dynamic_form {
         $renderable = new \mod_clearlesson\output\resource_player($this->_ajaxformdata['type'],
                                                                 $this->_ajaxformdata['externalref'],
                                                                 $this->_ajaxformdata['position']);
-
+        $renderable->modal = true;
         $output = $PAGE->get_renderer('mod_clearlesson');
         $dform->addElement('html', $output->render_resource_player($renderable));
     }
