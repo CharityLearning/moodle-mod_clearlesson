@@ -30,6 +30,8 @@ data-collections="{{collections}}" {{#hidden}}aria-hidden="true"{{/hidden}}>
                 {{#src}}<a href="javascript:void(0)" class="play-icon mini-player" data-externalref="{{externalref}}" data-src="{{src}}">
                     <i class="fas fa-play-circle"></i>
                 </a>{{/src}}
+                {{^src}}<a href="javascript:void(0)" class="view-icon view-link" title="View" data-externalref="{{externalref}}" data-type="{{#isplaylist}}playlists{{/isplaylist}}{{^isplaylist}}series{{/isplaylist}}">
+                    <i class="fa fa-eye"></i></a>{{/src}}
                 <div class="time">{{duration}}</div>
                 <div class="video-player-link menu-item-thumbnail" href="javascript:void(0)">
                     {{#thumbnail}}<img class="img-fluid" src="{{thumbnail}}" alt="{{name}}">{{/thumbnail}}

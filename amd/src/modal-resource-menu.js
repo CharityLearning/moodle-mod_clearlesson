@@ -63,9 +63,10 @@ export const init = async() => {
 
         if (externalref) {
             e.preventDefault();
-            if (element.classList.contains('view-link')) {
+            if (element.classList.contains('view-link')
+                || element.parentElement.classList.contains('view-link')) {
                 const type = document.getElementById('menu-container').getAttribute('data-itemtype');
-                const card = element.closest('.menu-item-title');
+                const card = element.closest('.menu-item-card');
                 const name = card.querySelector('.card-title').innerText.trim();
                 reRenderResourceMenu(externalref, name, type);
             } else {

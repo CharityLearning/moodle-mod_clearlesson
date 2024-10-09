@@ -1259,7 +1259,7 @@
     height: unset!important;
 }
 
-.mod-clearlesson .menu-item-card-image:hover .play-icon {
+.mod-clearlesson .menu-item-card-image:hover a:is(.play-icon, .view-icon) {
     font-size: 35px;
  
     position: absolute;
@@ -1406,13 +1406,12 @@ body.mod-clearlesson-bodyrestricted .activity-header{
     margin-bottom: 0px;
 }
 
-.mod-clearlesson .tab-content.single-video-info-content {
-    overflow-y: visible;
-}
-
 .mod-clearlesson .single-video-info-content,
 .mod-clearlesson .single-video-info-content .nav-tabs a {
     background-color: white;
+}
+.mod-clearlesson .single-video-info-content .nav-tabs a:focus {
+    box-shadow: inset 0 0 0.1rem 0.2rem var(--primary)!important;
 }
 
 .mod-clearlesson .single-video-info-content .nav-tabs a:not(.active) {
