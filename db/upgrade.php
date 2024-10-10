@@ -52,7 +52,7 @@ function xmldb_clearlesson_upgrade($oldversion) {
         exit(1);
     }
 
-    if ($oldverion < 2023091300) {
+    if ($oldverion < 2023091301) {
         require_once("$CFG->libdir/resourcelib.php");
         require_once("$CFG->dirroot/mod/clearlesson/lib.php");
 
@@ -166,8 +166,15 @@ function xmldb_clearlesson_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
+        // The reset date field will be used to mark when the clearlesson completion was reset for the user.
+        // Track records with a reset date greater than 0 will be ignored 
+        // when checking if a user has watched all the videos in a clearlesson.
+        $field = new xmldb_field('resetdate', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL , null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
 
-        upgrade_plugin_savepoint(true, 2023091300, 'mod', 'clearlesson');
+        upgrade_plugin_savepoint(true, 2023091301, 'mod', 'clearlesson');
     }
     return true;
 }
