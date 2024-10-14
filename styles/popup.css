@@ -30,11 +30,10 @@ body.mod-clearlesson-bodyrestricted .main-inner {
     padding-bottom: 1em;
 }
 
-.mod-clearlesson .player-row > * {
-    max-height: calc(100vh - 64px);
-}
-
+.mod-clearlesson .player-row > *,
+.mod-clearlesson .player-row,
 .mod-clearlesson .player-column {
+    max-height: calc(100vh - 64px);
     height: calc(100vh - 64px);
 }
 

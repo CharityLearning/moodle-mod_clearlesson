@@ -42,6 +42,7 @@ class resource_menu_form extends \mod_clearlesson\forms\base_dynamic_form {
         }
         $renderable = new \mod_clearlesson\output\resource_menu($this->_ajaxformdata['type'],
                                                                 $this->_ajaxformdata['externalref']);
+        $renderable->modal = true;
         $output = $PAGE->get_renderer('mod_clearlesson');
         $dform->addElement('html', $output->render_resource_menu($renderable));
     }

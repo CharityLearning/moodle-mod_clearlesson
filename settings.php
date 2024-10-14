@@ -51,10 +51,37 @@ if ($ADMIN->fulltree) {
         get_string('displayoptions', 'clearlesson'), get_string('configdisplayoptions', 'clearlesson'),
         $defaultdisplayoptions, $displayoptions));
 
+    $recompletioninstalled = false;
+    if (\core_plugin_manager::instance()->get_plugin_info('local_recompletion')) {
+        $recompletioninstalled = true;
+    }
+    $pathwaysinstalled = false;
+    if (\core_plugin_manager::instance()->get_plugin_info('tool_pathways')) {
+        $pathwaysinstalled = true;
+    }
+
+    if ($recompletioninstalled && $pathwaysinstalled) {
+        $title = get_string('resetrenewclearwatched', 'clearlesson');
+        $infotext = get_string('resetrenewclearwatchedinfo', 'clearlesson');
+    }
+    if ($recompletioninstalled && !$pathwaysinstalled) {
+        $title = get_string('resetclearwatched', 'clearlesson');
+        $infotext = get_string('resetclearwatchedinfo', 'clearlesson');
+    }
+    if ($pathwaysinstalled && !$recompletioninstalled) {
+        $title = get_string('renewclearwatched', 'clearlesson');
+        $infotext = get_string('renewclearwatchedinfo', 'clearlesson');
+    }
+
+    if ($recompletioninstalled || $pathwaysinstalled) {
+        $settings->add(new admin_setting_configcheckbox('clearlesson/clearwatched',
+        $title, $infotext, 1));
+    }
+
     // Modedit defaults.
     $settings->add(new admin_setting_heading('clearlessonmodeditdefaults',
-    get_string('modeditdefaults', 'admin'),
-    get_string('condifmodeditdefaults', 'admin')));
+        get_string('modeditdefaults', 'admin'),
+        get_string('condifmodeditdefaults', 'admin')));
     $settings->add(new admin_setting_configcheckbox('clearlesson/printintro',
         get_string('printintro', 'clearlesson'), get_string('printintroexplain', 'clearlesson'), 1));
     $settings->add(new admin_setting_configselect('clearlesson/display',

@@ -35,36 +35,39 @@ class incourse_player_form extends \mod_clearlesson\forms\base_dynamic_form {
      * Define the form.
      */
     public function definition() {
-        global $DB, $PAGE, $USER;
+        global $PAGE;
         $dform = $this->_form;
         if (!isset($this->_ajaxformdata['cmid'])) {
             throw new \moodle_exception('Missing form param/s');
         }
+
         if (isset($this->_ajaxformdata['position'])) {
             $position = $this->_ajaxformdata['position'];
         } else {
             $position = 1;
         }
+
         if (isset($this->_ajaxformdata['firstload'])) {
             $firstload = $this->_ajaxformdata['firstload'];
         } else {
             throw new \moodle_exception('Missing form param/s');
         }
 
+        $this->get_resource_properties(); // Get the externalref, instance and type from the database using the cmid.
         // If an externalref is provided we use it to open that playlist.
         // For all other circumstances get the externalref and type from the database using the cmid.
         if (isset($this->_ajaxformdata['externalref']) && $this->_ajaxformdata['externalref']) {
             $this->externalref = $this->_ajaxformdata['externalref'];
             $this->type = 'playlists';
-        } else {
-            $this->get_resource_properties();
         }
 
         $renderable = new \mod_clearlesson\output\incourse_player($this->type,
                                                                 $this->externalref,
                                                                 $position,
                                                                 [],
-                                                                $firstload);                                       
+                                                                $firstload,
+                                                                $this->instance);    
+        $renderable->modal = true;                                   
         $output = $PAGE->get_renderer('mod_clearlesson');
         $dform->addElement('html', $output->render_incourse_player($renderable));
         $dform->addElement('hidden', 'type', $this->type);

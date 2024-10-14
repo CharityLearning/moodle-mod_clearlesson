@@ -58,6 +58,11 @@ class incourse_menu implements \renderable, \templatable {
     public $response;
 
     /**
+     * Is this for a modal.
+     */
+    public $modal = false;
+
+    /**
      * The type of item to display.
      * @var string
      */
@@ -69,10 +74,12 @@ class incourse_menu implements \renderable, \templatable {
      * @param string $type
      * @param string $externalref
      * @param array $response
+     * @param int $instance
      *
      * @return void
      */
-    public function __construct(string $type, string $externalref, array $response = []) {
+    public function __construct(string $type, string $externalref, array $response = [], int $instance = 0) {
+        global $USER, $DB;
         $this->type = $type;
         switch ($this->type) {
             case 'collections':
@@ -89,7 +96,23 @@ class incourse_menu implements \renderable, \templatable {
         if (!empty($response)) {
             $this->response = $response;
         } else {
-            $this->response = \mod_clearlesson\call::get_menuform_data($this->type, $this->externalref);
+            $resetdate = 0;
+            if ($instance) {
+                // Get the resetdate if relevant.
+                // If the user has reset the activity, the resetdate will be the date of the reset.
+                // Video watched data that occurred before the reset will be ignored.
+                $resetdatesql = "SELECT ct.userid, MAX(ct.resetdate) AS resetdate
+                                    FROM {clearlesson_track} ct
+                                    WHERE ct.clearlessonid = {$instance}
+                                        AND ct.userid = {$USER->id}
+                                    GROUP BY ct.userid
+                                    LIMIT 1";
+
+                if ($trackresult = $DB->get_record_sql($resetdatesql)) {
+                    $resetdate = $trackresult->resetdate;
+                }
+            }
+            $this->response = \mod_clearlesson\call::get_menuform_data($this->type, $this->externalref, $resetdate);
         }
     }
 
@@ -100,31 +123,34 @@ class incourse_menu implements \renderable, \templatable {
      * @return stdClass
      */
     public function export_array_for_template(renderer_base $output): array {
-        $response['watchedall'] = $this->response['watchedall'];
-        $response['resources'] = $this->response['resources'];
+        $this->response['watchedall'];
+        $this->response['resources'];
         // var_dump($response['resources']);
         switch ($this->type) {
             case 'collections':
-                $response['countstring'] = get_string('playlists', 'mod_clearlesson');
-                $response['selectstring'] = ucfirst(get_string('select')) . ' ' . get_string('series', 'mod_clearlesson');
+                $this->response['countstring'] = get_string('playlists', 'mod_clearlesson');
+                $this->response['selectstring'] = ucfirst(get_string('select')) . ' ' . get_string('series', 'mod_clearlesson');
                 break;
             case 'series':
-                $response['countstring'] = get_string('videos', 'mod_clearlesson');
-                $response['selectstring'] = ucfirst(get_string('select')) . ' ' . get_string('playlist', 'mod_clearlesson');
-                foreach ($response['resources'] as $key => $resource) {
-                    $response['resources'][$key]['isplaylist'] = true;
+                $this->response['countstring'] = get_string('videos', 'mod_clearlesson');
+                $this->response['selectstring'] = ucfirst(get_string('select')) . ' ' . get_string('playlist', 'mod_clearlesson');
+                foreach ($this->response['resources'] as $key => $resource) {
+                    $this->response['resources'][$key]['isplaylist'] = true;
                 }
                 break;
         }
-        $response['type'] = $this->type;
-        $response['externalref'] = $this->externalref;
-        $response['itemtype'] = $this->itemtype;
+        $this->response['type'] = $this->type;
+        $this->response['externalref'] = $this->externalref;
+        $this->response['itemtype'] = $this->itemtype;
         // Add the resourceref to the response.
         // The response externalref is the externalref of the first video in the resource.
-        $response['resourceref'] = $this->externalref;
-        $response['type'] = $this->type;
-        $response['incourse'] = true;
-        return $response;
+        $this->response['resourceref'] = $this->externalref;
+        $this->response['type'] = $this->type;
+        $this->response['incourse'] = true;
+        if ($this->modal) {
+            $this->response['modal'] = true;
+        }
+        return $this->response;
     }
 
     /**

@@ -52,6 +52,11 @@ abstract class base_dynamic_form extends \core_form\dynamic_form  {
      * @var int
      */
     protected $watchedall;
+    /**
+     * The resource instance id.
+     * @var int
+     */
+    protected $instance;
 
     /**
      * Define the form.
@@ -113,7 +118,7 @@ abstract class base_dynamic_form extends \core_form\dynamic_form  {
     }
 
     /**
-     * Get the resource properties.
+     * Get the externalref, instance and type from the database using the cmid.
      */
     protected function get_resource_properties() {
         global $DB;
@@ -124,6 +129,7 @@ abstract class base_dynamic_form extends \core_form\dynamic_form  {
         if ($resource = $DB->get_record_sql($sql)) {
             $this->type = $resource->type;
             $this->externalref = $resource->externalref;
+            $this->instance = $resource->id;
         } else {
             throw new \moodle_exception('Resource not found');
         }

@@ -52,10 +52,13 @@ class custom_completion extends activity_custom_completion {
 
         // If completion option is enabled, evaluate it and return true/false
         if ($clearlesson->completionwatchedall) {
-            $sql = "SELECT ct.userid, MAX(ct.watchedall) AS watchedall
-                    FROM mdl_clearlesson_track ct
+            $sql = "SELECT ct.userid,
+                        MAX(ct.watchedall) AS watchedall
+                    FROM {clearlesson_track} ct
                     WHERE ct.clearlessonid = {$clearlessonid}
                         AND ct.userid = {$userid}
+                        AND ct.watchedall = 1
+                        AND ct.resetdate = 0
                         GROUP BY ct.userid";
             
             if ($result = $DB->get_record_sql($sql)) {

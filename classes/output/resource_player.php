@@ -88,6 +88,9 @@ class resource_player implements \renderable, \templatable {
      * @return stdClass
      */
     public function export_array_for_template(renderer_base $output): array {
+        if ($this->modal) {
+            $this->response['modal'] = true;
+        }
         return $this->response;
     }
 

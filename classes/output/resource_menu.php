@@ -100,26 +100,28 @@ class resource_menu implements \renderable, \templatable {
      * @return stdClass
      */
     public function export_array_for_template(renderer_base $output): array {
-        $response['resources'] = $this->response['resources'];
         switch ($this->type) {
             case 'collections':
-                $response['countstring'] = get_string('playlists', 'mod_clearlesson');
-                $response['selectstring'] = ucfirst(get_string('select')) . ' ' . get_string('series', 'mod_clearlesson');
+                $this->response['countstring'] = get_string('playlists', 'mod_clearlesson');
+                $this->response['selectstring'] = ucfirst(get_string('select')) . ' ' . get_string('series', 'mod_clearlesson');
                 break;
             case 'series':
-                $response['countstring'] = get_string('videos', 'mod_clearlesson');
-                $response['selectstring'] = ucfirst(get_string('select')) . ' ' . get_string('playlist', 'mod_clearlesson');
+                $this->response['countstring'] = get_string('videos', 'mod_clearlesson');
+                $this->response['selectstring'] = ucfirst(get_string('select')) . ' ' . get_string('playlist', 'mod_clearlesson');
                 break;
             case 'speakers':
             case 'topics':
             case 'playlists':
-                $response['selectstring'] = ucfirst(get_string('select')) . ' ' . get_string('video', 'mod_clearlesson');
+                $this->response['selectstring'] = ucfirst(get_string('select')) . ' ' . get_string('video', 'mod_clearlesson');
                 break;
         }
-        $response['type'] = $this->type;
-        $response['externalref'] = $this->externalref;
-        $response['itemtype'] = $this->itemtype;
-        return $response;
+        $this->response['type'] = $this->type;
+        $this->response['externalref'] = $this->externalref;
+        $this->response['itemtype'] = $this->itemtype;
+        if ($this->modal) {
+            $this->response['modal'] = true;
+        }
+        return $this->response;
     }
 
     /**
