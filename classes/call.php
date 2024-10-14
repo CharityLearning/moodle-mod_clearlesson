@@ -121,16 +121,20 @@ class call {
      * @param string $type The type of resource.
      * @param string $externalref The externalref of the resource.
      * @param int $position The position of the resource.
-     * @param bool $watchedall Whether all videos have been watched.
+     * @param int $resetdate The resetdate of the activity if any.
      */
-    public static function get_playerform_data(string $type, string $externalref, int $position = 1): array {
+    public static function get_playerform_data(string $type, string $externalref, int $position = 1, int $resetdate = 0): array {
         $response = self::initate_call('/api/v1/get_playerform_data.php', ['type' => $type,
                                                                     'externalref' => $externalref,
-                                                                    'position' => $position]);
+                                                                    'position' => $position,
+                                                                    'resetdate' => $resetdate]);
         // debugging 
         // var_dump($response);
         $decodedresponse = json_decode($response, true);
-        // var_dump($decodedresponse['records']['watchedall']);
+        // echo '<pre>';
+        // var_dump($decodedresponse);
+        // echo '</pre>';
+        // die();
         $decodedresponse['records']['videowatchedstring'] = get_string('videowatched', 'clearlesson');
         return $decodedresponse['records'];
     }
@@ -140,10 +144,12 @@ class call {
      * 
      * @param string $type The type of resource.
      * @param string $externalref The externalref of the resource.
+     * @param int $resetdate The resetdate of the activity if any.
      */
-    public static function get_menuform_data(string $type, string $externalref): array {
+    public static function get_menuform_data(string $type, string $externalref, int $resetdate = 0): array {
         $response = self::initate_call('/api/v1/get_menuform_data.php', ['type' => $type,
-                                                                    'externalref' => $externalref]);
+                                                                    'externalref' => $externalref,
+                                                                    'resetdate' => $resetdate]);
         // debugging 
         // var_dump($response);
         $decodedresponse = json_decode($response, true);
@@ -159,18 +165,21 @@ class call {
      * @param string $status The status of the video.
      * @param string $resourceref The resourceref of the video.
      * @param string $type The type of resource.
+     * @param string $resetdate The resetdate of the activity if any.
      */
     public static function update_progress(string $externalref,
                                             int $duration,
                                             string $status,
                                             string $resourceref,
-                                            string $type): array {
+                                            string $type,
+                                            string $resetdate): array {
         // var_dump($resourceref);
         $response = self::initate_call('/api/v1/update_progress.php', ['externalref' => $externalref,
                                                                     'duration' => $duration,
                                                                     'status' => $status,
                                                                     'resourceref' => $resourceref,
-                                                                    'type' => $type]);
+                                                                    'type' => $type,
+                                                                    'resetdate' => $resetdate]);
         // debugging 
         // var_dump($response);
         $decodedresponse = json_decode($response, true);
@@ -183,10 +192,12 @@ class call {
      * 
      * @param string $externalref The externalref of the video.
      * @param string $type The type of resource.
+     * @param int $resetdate The resetdate of the activity if any.
      */
-    public static function get_video_count(string $externalref, string $type) {
+    public static function get_video_count(string $externalref, string $type, int $resetdate = 0): int {
         $response = self::initate_call('/api/v1/get_video_count.php', ['externalref' => $externalref,
-                                                                    'type' => $type]);
+                                                                    'type' => $type,
+                                                                    'resetdate' => $resetdate]);
         // debugging 
         // var_dump($response);
         $decodedresponse = json_decode($response, true);

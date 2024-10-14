@@ -35,23 +35,25 @@ class incourse_menu_form extends \mod_clearlesson\forms\base_dynamic_form {
      * Define the form.
      */
     public function definition() {
-        global $DB, $PAGE, $USER;
+        global $PAGE;
         $dform = $this->_form;
         if (!isset($this->_ajaxformdata['cmid'])) {
             throw new \moodle_exception('Missing form param/s');
         }
 
+        $this->get_resource_properties(); // Get the externalref, instance and type from the database using the cmid.
         if (isset($this->_ajaxformdata['externalref'])) {
             // If an externalref is passed, this is a series.
             // It will be the 2nd level of the menu, opened when a collection menu item is clicked.
             $this->externalref = $this->_ajaxformdata['externalref'];
             $this->type = 'series';
-        } else {
-            $this->get_resource_properties(); // Get the externalref and type from the database using the cmid.
         }
 
         $renderable = new \mod_clearlesson\output\incourse_menu($this->type,
-                                                                $this->externalref);
+                                                                $this->externalref,
+                                                                [],
+                                                                $this->instance);
+        $renderable->modal = true;
         $output = $PAGE->get_renderer('mod_clearlesson');
         $dform->addElement('html', $output->render_incourse_menu($renderable));
         $dform->addElement('hidden', 'type', $this->type);

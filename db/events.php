@@ -15,16 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Folder module version information
+ * This file defines observers needed by the plugin.
  *
- * @package    mod_clearlesson
- * @copyright  2017 Josh Willcock  {@link http://josh.cloud}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author     Dan Watkins
+ * @copyright  2024 Dan Watkins
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2023091304;       // The current module version (Date: YYYYMMDDXX)
-$plugin->requires  = 2016091200;    // Requires this Moodle version
-$plugin->component = 'mod_clearlesson';        // Full name of the plugin (used for diagnostics).
-$plugin->maturity = 'MATURITY_STABLE';
+$observers = array(
+    [
+        'eventname' => '\local_recompletion\event\completion_reset',
+        'callback' => 'mod_clearlesson_observer::completion_reset',
+    ],
+);

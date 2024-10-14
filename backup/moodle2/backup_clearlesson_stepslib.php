@@ -37,12 +37,12 @@ class backup_clearlesson_activity_structure_step extends backup_activity_structu
         // Define each element separated.
         $clearlesson = new backup_nested_element('clearlesson', array('id'), array(
             'course', 'name', 'intro', 'introformat', 'externalref', 'display',
-            'displayoptions', 'parameters', 'timemodified', 'type', 'watchedall'));
+            'displayoptions', 'parameters', 'timemodified', 'type', 'completionwatchedall'));
 
         // Build the tree.
         if ($userinfo) {
             $clearlessontrack = new backup_nested_element('clearlesson_track', array('id'), array(
-            'userid', 'clearlessonid', 'timemodified'));
+            'userid', 'clearlessonid', 'timemodified', 'watchedall', 'resetdate'));
             $clearlesson->add_child($clearlessontrack);
         }
         // Define sources.

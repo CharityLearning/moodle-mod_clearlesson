@@ -44,6 +44,7 @@ class resource_browser_form extends \mod_clearlesson\forms\base_dynamic_form {
                                                                     $destinationtype,
                                                                     $filtervalue,
                                                                     $lazyload);
+        $renderable->modal = true;
         $output = $PAGE->get_renderer('mod_clearlesson');
         $dform->addElement('html', $output->render_resource_browser($renderable));
     }

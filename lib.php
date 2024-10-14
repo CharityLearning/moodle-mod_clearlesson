@@ -139,9 +139,6 @@ function clearlesson_add_instance($data, $mform) {
         $displayoptions['popupwidth']  = $data->popupwidth;
         $displayoptions['popupheight'] = $data->popupheight;
     }
-    // if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME))) {
-    //     $displayoptions['printintro']   = (int)!empty($data->printintro);
-    // }
     $data->displayoptions = serialize($displayoptions);
     $data->timemodified = time();
     $data->id = $DB->insert_record('clearlesson', $data);
@@ -173,9 +170,6 @@ function clearlesson_update_instance($data, $mform) {
         $displayoptions['popupwidth']  = $data->popupwidth;
         $displayoptions['popupheight'] = $data->popupheight;
     }
-    // if (in_array($data->display, array(RESOURCELIB_DISPLAY_AUTO, RESOURCELIB_DISPLAY_EMBED, RESOURCELIB_DISPLAY_FRAME))) {
-    //     $displayoptions['printintro']   = (int)!empty($data->printintro);
-    // }
     $data->displayoptions = serialize($displayoptions);
     $data->externalref = clearlesson_fix_submitted_ref($data->externalref);
     $data->timemodified = time();
@@ -240,13 +234,16 @@ function clearlesson_get_coursemodule_info($coursemodule) {
             break;
         case CLEARLESSON_DISPLAY_MODAL:
             $onclickjs = "event.preventDefault(); 
-            if (typeof window.openPlayer === 'undefined') {
-                require(['mod_clearlesson/course-page'], function (coursePage) {
-                    coursePage.init();
+            if (typeof window.buttonClicktimeOut === 'undefined' || window.buttonClicktimeOut === false) {
+                window.buttonClicktimeOut = true;
+                if (typeof window.openPlayer === 'undefined') {
+                    require(['mod_clearlesson/course-page'], function (coursePage) {
+                        coursePage.init();
+                        window.openPlayer(event, '$clearlessonref->type');
+                    });
+                } else {
                     window.openPlayer(event, '$clearlessonref->type');
-                });
-            } else {
-                window.openPlayer(event, '$clearlessonref->type');
+                }
             }";
             // Strip any new lines from the js.
             $info->onclick = trim(preg_replace('/\s\s+/', ' ', $onclickjs));
@@ -262,10 +259,12 @@ function clearlesson_get_coursemodule_info($coursemodule) {
         $info->customdata['customcompletionrules']['completionwatchedall'] = $clearlessonref->completionwatchedall;
     }
 
+    $info->content = '';
     if ($coursemodule->showdescription) {
         // Convert intro to html. Do not filter cached version, filters run at display time.
         $info->content = format_module_intro('url', $clearlessonref, $coursemodule->id, false);
     }
+
     return $info;
 }
 
@@ -394,6 +393,7 @@ function clearlesson_check_updates_since(cm_info $cm, $from, $filter = array()) 
     $updates = course_check_module_updates_since($cm, $from, array('content'), $filter);
     return $updates;
 }
+
 function clearlesson_redirect_post($data, array $headers = null) {
     global $CFG;
     $pluginconfig = get_config('clearlesson');
@@ -415,6 +415,7 @@ function clearlesson_redirect_post($data, array $headers = null) {
         throw new \moodle_exception(get_string('invalidresponse', 'clearlesson'));
     }
 }
+
 function clearlesson_build_url($url, $pluginconfig) {
     if (substr($pluginconfig->clearlessonurl, -1) != '/') {
         $pluginconfig->clearlessonurl .= '/';
@@ -428,6 +429,7 @@ function clearlesson_build_url($url, $pluginconfig) {
     $url = $pluginconfig->clearlessonurl.$url->type.'/'.$url->externalref;
     return $url;
 }
+
 function clearlesson_set_header($pluginconfig) {
     return array('Content-Type' => 'application/jose',
     'Authorization' => 'APIKEY '.$pluginconfig->apikey,
@@ -464,6 +466,13 @@ function clearlesson_get_resource_type_options() {
             'collections' => 'collections'];
 }
 
+/**
+ * Get the display options for the clearlesson module.
+ * We are adding the modal display type to the resourcelib display options if appropriate.
+ * 
+ * @param string $displayoptionsstring The display options string.
+ * @param string $default The default display option.
+ */
 function clearlesson_get_display_options($displayoptionsstring, $default = '') {
     $displayoptionsarray = explode(',', $displayoptionsstring);
     if ($default) {

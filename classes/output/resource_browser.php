@@ -38,6 +38,46 @@ use templatable;
  * @package    mod_clearlesson
  */
 class resource_browser implements \renderable, \templatable {
+    /**
+    * The playerdata response, if provided.
+    * @var array
+    */
+    public $response;
+
+    /**
+     * Is this for a modal.
+     */
+    public $modal = false;
+
+    /**
+     * The original type of resource.
+     * @var string
+     */
+    public $originaltype;
+
+    /**
+     * The type of resource to load.
+     * @var string
+     */
+    public $loadtype;
+
+    /**
+     * The type of resource to load.
+     * @var string
+     */
+    public $destinationtype;
+
+    /**
+     * The filter value to apply.
+     * @var string
+     */
+    public $filtervalue;
+
+    /**
+     * Should we lazyload the resources.
+     * @var bool
+     */
+    public $lazyload;
 
     /**
      * Construct this renderable.
@@ -166,6 +206,9 @@ class resource_browser implements \renderable, \templatable {
             $resources[] = $resource;
         }
         $this->response['resources'] = $resources;
+        if ($this->modal) {
+            $this->response['modal'] = true;
+        }
         return $this->response;
     }
 

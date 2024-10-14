@@ -19,7 +19,7 @@
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="col-xl-6 col-sm-6 mb-3 {{#hidden}}d-none{{/hidden}}" id="menu-item-{{id}}" 
+<div class="col-12 {{^modal}}col-lg-6{{/modal}} mb-3 {{#hidden}}d-none{{/hidden}}" id="menu-item-{{id}}" 
 data-speakers="{{speakers}}" data-topics="{{topics}}" data-animation="{{animation}}"
 data-hiddenby="{{hiddenby}}" data-playlists="{{playlists}}" data-series="{{series}}" 
 data-collections="{{collections}}" {{#hidden}}aria-hidden="true"{{/hidden}}>
@@ -30,6 +30,8 @@ data-collections="{{collections}}" {{#hidden}}aria-hidden="true"{{/hidden}}>
                 {{#src}}<a href="javascript:void(0)" class="play-icon mini-player" data-externalref="{{externalref}}" data-src="{{src}}">
                     <i class="fas fa-play-circle"></i>
                 </a>{{/src}}
+                {{^src}}<a href="javascript:void(0)" class="view-icon view-link" title="View" data-externalref="{{externalref}}" data-type="{{#isplaylist}}playlists{{/isplaylist}}{{^isplaylist}}series{{/isplaylist}}">
+                    <i class="fa fa-eye"></i></a>{{/src}}
                 <div class="time">{{duration}}</div>
                 <div class="video-player-link menu-item-thumbnail" href="javascript:void(0)">
                     {{#thumbnail}}<img class="img-fluid" src="{{thumbnail}}" alt="{{name}}">{{/thumbnail}}

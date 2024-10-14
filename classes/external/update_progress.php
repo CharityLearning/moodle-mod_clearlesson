@@ -111,27 +111,49 @@ class update_progress extends \core_external\external_api {
                 }
             }
 
-            $activitysql = "SELECT cl.*, cm.completion
+            $activitysql = "SELECT cl.id,
+                                    MAX(cm.completion) as completion,
+                                    MAX(cl.completionwatchedall) as completionwatchedall,
+                                    ct.resetdate
                                 FROM {course_modules} cm
                                 JOIN {clearlesson} cl ON cm.instance = cl.id
-                                WHERE cm.id = ?";
-            if ($activity = $DB->get_record_sql($activitysql, [$cmid])) {
-                if (!$activity->completion > 0
-                || !$activity->completionwatchedall
-                || $status !== 'watched') {
-                    $resourceref = '';
+                                LEFT JOIN {clearlesson_track} ct ON cl.id = ct.clearlessonid
+                                WHERE cm.id = ?
+                                GROUP BY cl.id, ct.resetdate
+                                ORDER BY ct.resetdate DESC";
+            $resetdate = 0;
+            if ($activityarray = $DB->get_records_sql($activitysql, [$cmid])) {
+                // Activity array is an array of objects.
+                // Each item is for the same activity, but with different resetdates or a reset date of 0.
+                foreach ($activityarray as $activity) {
+                    if ($activity->resetdate) {
+                        // Record the latest reset date.
+                        $resetdate = $activity->resetdate;
+                    } else if (!$activity->completion // If completion is not enabled,
+                                || $activity->completionwatchedall // or if all videos have already been watched,
+                                || $status !== 'watched') { // or if the current video has not been watched,
+                                // then we don't need to check if all videos in the resource have been watched.
+                                    $resourceref = '';
+                    }
                 }
             }
 
             // If a '$resourceref' is set, then we need to check if all videos in the resource have been watched.
             // If they have, then we can update the completion status of the module.
-            if ($externalref && $response = \mod_clearlesson\call::update_progress($externalref, $duration, $status, $resourceref, $type)) {
+            if ($externalref && $response = \mod_clearlesson\call::update_progress($externalref,
+                                                                                    $duration,
+                                                                                    $status,
+                                                                                    $resourceref,
+                                                                                    $type,
+                                                                                    $resetdate)) {
                 // Update completion of activity module.
                 if ($response['result']['completionstatus']) {
-                    // Update completion of course module. Updating the clearless
+                    // All videos in the resource have now been watched, mark the module as complete if required.
                     $updatedhtml = self::mark_module_complete_and_get_updatedhtml($activity, $course, $cm, $pagetype);
                 } else if ($trackrecord = $DB->get_record('clearlesson_track',
-                    ['clearlessonid' => $activity->id, 'userid' => $USER->id], '*', IGNORE_MISSING)) {
+                                                ['clearlessonid' => $activity->id,
+                                                'userid' => $USER->id,
+                                                'resetdate' => 0], '*', IGNORE_MISSING)) {
                     $trackrecord->timemodified = time();
                     $trackrecord->watchedall = 0;
                     $DB->update_record('clearlesson_track', $trackrecord);
@@ -152,7 +174,7 @@ class update_progress extends \core_external\external_api {
                 // The videos may have been watched in other resources or on the Clear Lessons platform.
                 // Alternatively the completion conditions may have changed.
                 // Mark completed in moodle.
-                $updatedhtml = self::mark_module_complete_and_get_updatedhtml($activity, $course, $cm, $pagetype);
+                $updatedhtml = self::mark_module_complete_and_get_updatedhtml($activity, $course, $cm, $pagetype, $resetdate);
                 return ['success' => true,
                         'activitymodulehtml' => $updatedhtml];
             } else {
@@ -183,7 +205,9 @@ class update_progress extends \core_external\external_api {
             FROM {clearlesson_track} ct
             WHERE ct.clearlessonid = {$activity->id}
                 AND ct.userid = {$USER->id}
-                GROUP BY ct.userid";
+                AND ct.resetdate = 0
+                GROUP BY ct.userid
+                LIMIT 1";
             if ($result = $DB->get_record_sql($sql)) {
                 if (!$result->watchedall) {
                     $latestrecord = $DB->get_record('clearlesson_track', array('id' => $result->id), '*', MUST_EXIST);
@@ -197,6 +221,7 @@ class update_progress extends \core_external\external_api {
                 $newrecord->userid = $USER->id;
                 $newrecord->watchedall = 1;
                 $newrecord->timemodified = time();
+                $newrecord->resetdate = 0;
                 $DB->insert_record('clearlesson_track', $newrecord);
             } 
 

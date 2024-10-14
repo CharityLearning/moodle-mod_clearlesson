@@ -30,14 +30,16 @@ import Ajax from 'core/ajax';
 import {get_string as getString} from 'core/str';
 import * as pageFunctions from './page-functions';
 
-// eslint-disable-next-line no-unused-vars
-var url, playerModal, formClass, backString, modalType, playerModalFromMenu, newMenuModal, completionInfoElement;
+var url, playerModal, formClass, backString, modalType, playerModalFromMenu, completionInfoElement;
 var firstLoad = 1;
 
 export const init = () => {
     var position = 1;
+    window.buttonClicktimeOut = false;
     window.pageType = 'course';
     window.openPlayer = async(e, type) => {
+        // Window.buttonClicktimeOut is set to true and checked in the course page link onclick.
+        modalDoubleClickTimeout();
         if (e.target.href.includes('clearlesson')) {
             e.preventDefault();
             backString = await getString('back');
@@ -84,7 +86,8 @@ export const init = () => {
                 pageFunctions.setModalButtons(modalRootInner, backString);
                 pageFunctions.setModalBodyGrey(modalRootInner);
 
-                if (type !== 'play') {
+                // Fullscreen modal for series, topics and playlists.
+                if (type !== 'play' && modalType === 'player') {
                     pageFunctions.setModalFullscreen(modalRootInner);
                 }
 
@@ -144,7 +147,7 @@ export const init = () => {
                                                                                 backString);
                 } else {
                     // For collections we'll open the series menu.
-                    newMenuModal = await pageFunctions.openNewMenuModal(e, url, firstLoad, completionInfoElement);
+                    await pageFunctions.openNewMenuModal(e, url, firstLoad, completionInfoElement);
                 }
             } else {
                 position = parseInt(element.closest('.has-position').getAttribute('data-position'));
@@ -161,12 +164,29 @@ export const init = () => {
  * @param {String} url The URL of the resource.
  */
 async function reRenderCoursePlayerModal(position, url) {
+    var theModal;
+    const formParams = {cmid: window.cmid, course: window.courseid, url: url, position: position, firstload: 0};
+    if (modalType === 'player') {
+        theModal = playerModal;
+    }
+    if (modalType === 'menu') {
+        theModal = playerModalFromMenu;
+        formParams.externalref = document.querySelector('.incourse-player').getAttribute('data-resourceref');
+    }
+    const serialFormParams = Utils.serialize(formParams);
     if (window.updateProgress) {
         await progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
     }
-    const formParams = {cmid: window.cmid, course: window.courseid, url: url, position: position, firstload: 0};
-    const serialFormParams = Utils.serialize(formParams);
-    const bodyContent = playerModal.getBody(serialFormParams);
-    await playerModal.modal.setBodyContent(bodyContent);
+    const bodyContent = theModal.getBody(serialFormParams);
+    await theModal.modal.setBodyContent(bodyContent);
     pageFunctions.setWindowWatched();
+}
+
+/**
+ * Prevent double clicks opening duplicate modals.
+ */
+function modalDoubleClickTimeout() {
+    setTimeout(function() {
+        window.buttonClicktimeOut = false;
+    }, 600);
 }

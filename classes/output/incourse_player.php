@@ -64,6 +64,11 @@ class incourse_player implements \renderable, \templatable {
     public $position;
 
     /**
+     * Is this for a modal.
+     */
+    public $modal = false;
+
+    /**
      * Construct this renderable.
      *
      * @param string $type
@@ -71,17 +76,44 @@ class incourse_player implements \renderable, \templatable {
      * @param int $position
      * @param array $response
      * @param int $firstload
+     * @param int $instance
      *
      * @return void
      */
-    public function __construct(string $type, string $externalref, int $position = 1, array $response = [], int $firstload = 1) {
+    public function __construct(string $type,
+                                string $externalref,
+                                int $position = 1,
+                                array $response = [],
+                                int $firstload = 1,
+                                int $instance = 0) {
+        global $DB, $USER;
         $this->type = $type;
         $this->externalref = $externalref;
         $this->position = $position;
         if (!empty($response)) {
             $this->response = $response;
         } else {
-            $this->response = \mod_clearlesson\call::get_playerform_data($this->type, $this->externalref, $this->position);
+            $resetdate = 0;
+            if ($instance) {
+                // Get the resetdate if relevant.
+                // If the user has reset the activity, the resetdate will be the date of the reset.
+                // Video watched data that occurred before the reset will be ignored.
+                $resetdatesql = "SELECT ct.userid, MAX(ct.resetdate) AS resetdate
+                                    FROM {clearlesson_track} ct
+                                    WHERE ct.clearlessonid = {$instance}
+                                        AND ct.userid = {$USER->id}
+                                    GROUP BY ct.userid
+                                    LIMIT 1";
+
+                if ($trackresult = $DB->get_record_sql($resetdatesql)) {
+                    $resetdate = (int) $trackresult->resetdate;
+                }
+            }
+            
+            $this->response = \mod_clearlesson\call::get_playerform_data($this->type,
+                                                                        $this->externalref,
+                                                                        $this->position,
+                                                                        $resetdate);
         }
         $this->response['firstload'] = $firstload;
         // Add the resourceref to the response.
@@ -97,6 +129,9 @@ class incourse_player implements \renderable, \templatable {
      * @return stdClass
      */
     public function export_array_for_template(renderer_base $output): array {
+        if ($this->modal) {
+            $this->response['modal'] = true;
+        }
         return $this->response;
     }
 
