@@ -40,8 +40,8 @@ class resource_menu_form extends \mod_clearlesson\forms\base_dynamic_form {
         if (!isset($this->_ajaxformdata['type']) || !isset($this->_ajaxformdata['externalref'])) {
             throw new \moodle_exception('Missing form param/s');
         }
-        $renderable = new \mod_clearlesson\output\resource_menu($this->_ajaxformdata['type'],
-                                                                $this->_ajaxformdata['externalref']);
+        $renderable = new \mod_clearlesson\output\resource_menu(type: $this->_ajaxformdata['type'],
+                                                                externalref: $this->_ajaxformdata['externalref']);
         $renderable->modal = true;
         $output = $PAGE->get_renderer('mod_clearlesson');
         $dform->addElement('html', $output->render_resource_menu($renderable));

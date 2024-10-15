@@ -71,16 +71,18 @@ class get_player_renderable extends \core_external\external_api {
                             'course' => $course,
                             'position' => $position]);
 
-            $sql = "SELECT cl.type, cl.externalref
+            $sql = "SELECT cl.id, cl.type, cl.externalref
                     FROM {clearlesson} cl
                     JOIN {course_modules} cm ON cl.id = cm.instance
                     WHERE cm.id = :cmid";
             $clearlesson = $DB->get_record_sql($sql, ['cmid' => $cmid]);
                     
-            $renderable = new \mod_clearlesson\output\incourse_player($clearlesson->type,
-                                                                        $clearlesson->externalref,
-                                                                        $position,
-                                                                        [], 0);
+            $renderable = new \mod_clearlesson\output\incourse_player(type: $clearlesson->type,
+                                                                        externalref: $clearlesson->externalref,
+                                                                        position: $position,
+                                                                        response: [],
+                                                                        firstload: 0,
+                                                                        instance: $clearlesson->id);
             return $renderable;
         }
 

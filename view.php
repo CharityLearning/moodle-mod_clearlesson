@@ -77,17 +77,25 @@ echo html_writer::start_tag('div', array('id' => 'clearlesson-page-container', '
 if ($popup) {
     echo html_writer::start_tag('div', array('id' => 'popupdiv_' . $cm->id, 'class' => 'popupdiv'));
 }
+
+// var_dump($resetdate);
 if ($displaytype == 'player') {
-    $renderable = new \mod_clearlesson\output\incourse_player($clearlesson->type,
-                                                            $clearlesson->externalref);
+    $renderable = new \mod_clearlesson\output\incourse_player(type: $clearlesson->type,
+                                                            externalref: $clearlesson->externalref,
+                                                            position: 1,
+                                                            response: [],
+                                                            firstload: 1,
+                                                            instance: $clearlesson->id);
     $renderable->response['inpage'] = 1;
     $output = $PAGE->get_renderer('mod_clearlesson');
     echo $output->render_incourse_player($renderable);
 }
 
 if ($displaytype == 'menu') {
-    $renderable = new \mod_clearlesson\output\incourse_menu($clearlesson->type,
-                                                              $clearlesson->externalref);
+    $renderable = new \mod_clearlesson\output\incourse_menu(type: $clearlesson->type,
+                                                            externalref: $clearlesson->externalref,
+                                                            response: [],
+                                                            instance: $clearlesson->id);
     $renderable->inpage = 1;
     $output = $PAGE->get_renderer('mod_clearlesson');
     echo $output->render_incourse_menu($renderable);

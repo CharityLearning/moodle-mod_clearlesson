@@ -98,18 +98,18 @@ class incourse_player implements \renderable, \templatable {
                 // Get the resetdate if relevant.
                 // If the user has reset the activity, the resetdate will be the date of the reset.
                 // Video watched data that occurred before the reset will be ignored.
-                $resetdatesql = "SELECT ct.userid, MAX(ct.resetdate) AS resetdate
+                $resetdatesql = "SELECT ct.userid,
+                                    MAX(ct.resetdate) AS resetdate
                                     FROM {clearlesson_track} ct
                                     WHERE ct.clearlessonid = {$instance}
                                         AND ct.userid = {$USER->id}
                                     GROUP BY ct.userid
                                     LIMIT 1";
-
+                
                 if ($trackresult = $DB->get_record_sql($resetdatesql)) {
                     $resetdate = (int) $trackresult->resetdate;
                 }
             }
-            
             $this->response = \mod_clearlesson\call::get_playerform_data($this->type,
                                                                         $this->externalref,
                                                                         $this->position,

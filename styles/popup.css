@@ -37,7 +37,7 @@ body.mod-clearlesson-bodyrestricted .main-inner {
     height: calc(100vh - 64px);
 }
 
-.mod-clearlesson #menu-container {
+.mod-clearlesson .menu-container {
     padding: 1em;
 }
 

@@ -154,8 +154,9 @@ export async function openPlayerFromMenu(e, url, firstLoad, completionDropdown, 
  * @param {string} url The URL to use for the AJAX call.
  * @param {number} firstLoad The first load flag.
  * @param {HTMLelement} completionDropdown The completion dropdown/button (may not be present).
+ * @param {string} backString The string to use for the back button.
  */
-export async function openNewMenuModal(e, url, firstLoad, completionDropdown) {
+export async function openNewMenuModal(e, url, firstLoad, completionDropdown, backString) {
     var newMenuModal;
     const menuItem = e.target.closest('.menu-item');
     const externalRef = menuItem.getAttribute('data-externalref');
@@ -178,6 +179,7 @@ export async function openNewMenuModal(e, url, firstLoad, completionDropdown) {
     newMenuModal.addEventListener(newMenuModal.events.LOADED, function() {
         const modalRootInner = newMenuModal.modal.getRoot()[0].children[0];
         setModalBodyGrey(modalRootInner);
+        setModalButtons(modalRootInner, backString);
         updateCompletionStatusIfIncorrect(completionDropdown, modalRootInner);
         window.updateProgress = false;
     });

@@ -49,10 +49,10 @@ class incourse_menu_form extends \mod_clearlesson\forms\base_dynamic_form {
             $this->type = 'series';
         }
 
-        $renderable = new \mod_clearlesson\output\incourse_menu($this->type,
-                                                                $this->externalref,
-                                                                [],
-                                                                $this->instance);
+        $renderable = new \mod_clearlesson\output\incourse_menu(type: $this->type,
+                                                                externalref: $this->externalref,
+                                                                response: [],
+                                                                instance: $this->instance);
         $renderable->modal = true;
         $output = $PAGE->get_renderer('mod_clearlesson');
         $dform->addElement('html', $output->render_incourse_menu($renderable));

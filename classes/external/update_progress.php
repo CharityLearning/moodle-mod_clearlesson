@@ -114,27 +114,20 @@ class update_progress extends \core_external\external_api {
             $activitysql = "SELECT cl.id,
                                     MAX(cm.completion) as completion,
                                     MAX(cl.completionwatchedall) as completionwatchedall,
-                                    ct.resetdate
+                                    MAX(ct.resetdate) as resetdate
                                 FROM {course_modules} cm
                                 JOIN {clearlesson} cl ON cm.instance = cl.id
                                 LEFT JOIN {clearlesson_track} ct ON cl.id = ct.clearlessonid
                                 WHERE cm.id = ?
-                                GROUP BY cl.id, ct.resetdate
-                                ORDER BY ct.resetdate DESC";
-            $resetdate = 0;
-            if ($activityarray = $DB->get_records_sql($activitysql, [$cmid])) {
-                // Activity array is an array of objects.
-                // Each item is for the same activity, but with different resetdates or a reset date of 0.
-                foreach ($activityarray as $activity) {
-                    if ($activity->resetdate) {
-                        // Record the latest reset date.
-                        $resetdate = $activity->resetdate;
-                    } else if (!$activity->completion // If completion is not enabled,
-                                || $activity->completionwatchedall // or if all videos have already been watched,
-                                || $status !== 'watched') { // or if the current video has not been watched,
-                                // then we don't need to check if all videos in the resource have been watched.
-                                    $resourceref = '';
-                    }
+                                GROUP BY cl.id";
+
+            if ($activity = $DB->get_record_sql($activitysql, [$cmid])) {
+                $resetdate = $activity->resetdate;
+                if (!$activity->completion // If completion is not enabled,
+                    || !$activity->completionwatchedall // or if the completionwatchedall rule is not enabled,
+                    || $status !== 'watched') { // or if the current video has not been watched in this viewing,
+                    // then we don't need to check if all videos in the resource have been watched.
+                        $resourceref = '';
                 }
             }
 
@@ -148,12 +141,15 @@ class update_progress extends \core_external\external_api {
                                                                                     $resetdate)) {
                 // Update completion of activity module.
                 if ($response['result']['completionstatus']) {
+                    // var_dump($response);
                     // All videos in the resource have now been watched, mark the module as complete if required.
                     $updatedhtml = self::mark_module_complete_and_get_updatedhtml($activity, $course, $cm, $pagetype);
+                    // var_dump($updatedhtml);
+                    // var_dump('completed1');
                 } else if ($trackrecord = $DB->get_record('clearlesson_track',
                                                 ['clearlessonid' => $activity->id,
                                                 'userid' => $USER->id,
-                                                'resetdate' => 0], '*', IGNORE_MISSING)) {
+                                                'resetdate' => 0])) {
                     $trackrecord->timemodified = time();
                     $trackrecord->watchedall = 0;
                     $DB->update_record('clearlesson_track', $trackrecord);
@@ -167,6 +163,7 @@ class update_progress extends \core_external\external_api {
                     $DB->insert_record('clearlesson_track', $newtrackrecord);
                     $updatedhtml = '';
                 }
+                // var_dump('not completed', $status);
                 return ['success' => true,
                         'activitymodulehtml' => $updatedhtml];
             } else if (!$externalref && $resourceref) {
@@ -175,6 +172,8 @@ class update_progress extends \core_external\external_api {
                 // Alternatively the completion conditions may have changed.
                 // Mark completed in moodle.
                 $updatedhtml = self::mark_module_complete_and_get_updatedhtml($activity, $course, $cm, $pagetype, $resetdate);
+                // var_dump('completed2');
+                // var_dump($updatedhtml);
                 return ['success' => true,
                         'activitymodulehtml' => $updatedhtml];
             } else {
