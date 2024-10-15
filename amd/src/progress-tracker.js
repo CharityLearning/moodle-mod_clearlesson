@@ -149,12 +149,45 @@ function videoWatched() {
 /**
  * All videos in a menu item have been watched, update the menuitem by removing the notwatched class.
  * @param {String} itemRef The externalref of the menu item.
+ * @param {Boolean} direct Is this the direct parent menu?
+ * We update the parent menu items by resource ref but sometimes 2 parents
+ * eg playlist & series will have the same resource ref. Direct determines which parent to update.
  */
-export function menuItemWatched(itemRef) {
-    const menuItem = document.querySelector('.menu-item[data-externalref="' + itemRef + '"]');
-    if (menuItem) {
-        menuItem.querySelector('.watched-check').classList.remove('notwatched');
+export function menuItemWatched(itemRef, direct = true) {
+    var domPosition;
+    const menuItems = document.querySelectorAll('.menu-item[data-externalref="' + itemRef + '"]');
+    if (!menuItems) {
+        return false;
     }
+    if (direct) {
+        domPosition = menuItems.length - 1;
+    } else {
+        domPosition = 0;
+    }
+    menuItems.forEach(function(singleItem, index) {
+        // The last menu item is the one we want to update as this will be the menuItemParent of the player.
+        if (index === domPosition) {
+            singleItem.querySelector('.watched-check').classList.remove('notwatched');
+            // If all menu items in the parent have been watched, we update the parents parent if it is present.
+            const parentMenu = singleItem.closest('.menu-container');
+            if (parentMenu) {
+                let parentWatchedAll = true;
+                parentMenu.querySelectorAll('.watched-check').forEach(function(watchedCheck) {
+                    if (watchedCheck.classList.contains('notwatched')) {
+                        parentWatchedAll = false;
+                    }
+                });
+                if (parentWatchedAll) {
+                    const parentResourceRef = parentMenu.getAttribute('data-resourceref');
+                    if (direct) { // There will only be ever be 2 parents.
+                        // No infinite loops please.
+                        menuItemWatched(parentResourceRef, false);
+                    }
+                }
+            }
+        }
+    });
+    return true;
 }
 
 /**
@@ -168,7 +201,7 @@ export async function updateProgressAndActivity() {
             activityInfo = document.querySelector('.activity[data-id="' + window.cmid + '"]');
         }
         if (window.pageType === 'activity') {
-            activityInfo = document.querySelector('.activity-header');
+            activityInfo = document.querySelector('.activity-information');
         }
         if (activityInfo) {
             activityInfo.outerHTML = response.activitymodulehtml;

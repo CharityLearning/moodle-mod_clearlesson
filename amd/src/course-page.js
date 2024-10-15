@@ -147,7 +147,7 @@ export const init = () => {
                                                                                 backString);
                 } else {
                     // For collections we'll open the series menu.
-                    await pageFunctions.openNewMenuModal(e, url, firstLoad, completionInfoElement);
+                    await pageFunctions.openNewMenuModal(e, url, firstLoad, completionInfoElement, backString);
                 }
             } else {
                 position = parseInt(element.closest('.has-position').getAttribute('data-position'));

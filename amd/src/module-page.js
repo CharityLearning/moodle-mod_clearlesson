@@ -94,7 +94,7 @@ export const init = async(type) => {
                     playerModalFromMenu = await pageFunctions.openPlayerFromMenu(e, url, firstLoad, completionDropdown, backString);
                 } else {
                     // For collections we'll open the series menu.
-                    newMenuModal = await pageFunctions.openNewMenuModal(e, url, firstLoad, completionDropdown);
+                    newMenuModal = await pageFunctions.openNewMenuModal(e, url, firstLoad, completionDropdown, backString);
                 }
             } else {
                 position = parseInt(element.closest('.has-position').getAttribute('data-position'));
