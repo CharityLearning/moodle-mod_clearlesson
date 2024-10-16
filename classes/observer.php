@@ -42,7 +42,7 @@ class mod_clearlesson_observer {
      */
     public static function completion_reset(\local_recompletion\event\completion_reset $event) {
         global $DB;
-        $clearwatched = get_config('mod_clearlesson', 'clearwatched');
+        $clearwatched = get_config('mod_clearlesson', 'recompletionclearwatched');
         // False is returned when the config is not set, so use the default setting of 'Yes';
         if ($clearwatched === false || $clearwatched) {
             // Set the reset date for the last track record.
