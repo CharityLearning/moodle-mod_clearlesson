@@ -258,6 +258,7 @@ function clearlesson_get_variable_values($clearlesson, $cm, $course, $config) {
 
 /**
  * BC internal function
+ *
  * @param object $clearlesson
  * @param object $config
  * @return string
@@ -276,6 +277,7 @@ function clearlesson_get_encrypted_parameter($clearlesson, $config) {
 
 /**
  * Optimised mimetype detection from general clearlesson
+ *
  * @param $fullclearlesson
  * @param int $size of the icon.
  * @return string|null mimetype or null when the filetype is not relevant.

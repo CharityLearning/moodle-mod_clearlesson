@@ -63,7 +63,6 @@ class mod_clearlesson_mod_form extends moodleform_mod {
             }
         ];
         $refselectgroup[] =& $mform->createElement('autocomplete', 'externalref',
-                    // get_string('externalref', 'clearlesson'),
                     get_string('selectaresource', 'clearlesson'),
                     [], $autocompleteoptions);
         $mform->setType('externalref', PARAM_TEXT);
@@ -111,18 +110,6 @@ class mod_clearlesson_mod_form extends moodleform_mod {
             $mform->setDefault('popupheight', $config->popupheight);
         }
 
-        // if (array_key_exists(RESOURCELIB_DISPLAY_AUTO, $options) or
-        //   array_key_exists(RESOURCELIB_DISPLAY_EMBED, $options) or
-        //   array_key_exists(RESOURCELIB_DISPLAY_FRAME, $options)) {
-        //     $mform->addElement('checkbox', 'printintro', get_string('printintro', 'url'));
-        //     $mform->disabledIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_POPUP);
-        //     $mform->disabledIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_OPEN);
-        //     $mform->disabledIf('printintro', 'display', 'eq', RESOURCELIB_DISPLAY_NEW);
-        //     $mform->setDefault('printintro', $config->printintro);
-        // }
-        // $this->standard_coursemodule_elements();
-
-        // $this->add_completion_rules();
         $this->standard_coursemodule_elements();
         $PAGE->requires->js_call_amd('mod_clearlesson/modal-resource-browser', 'init');
         $PAGE->requires->js_call_amd('mod_clearlesson/modal-resource-menu', 'init');
@@ -187,7 +174,6 @@ class mod_clearlesson_mod_form extends moodleform_mod {
                 $i++;
             }
         }
-        // $defaultvalues['completionwatchedall'] = !empty($defaultvalues['completion']) ? 1 : 0;
     }
 
     public function validation($data, $files) {

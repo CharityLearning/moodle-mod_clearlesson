@@ -180,6 +180,7 @@ async function reRenderCoursePlayerModal(position, url) {
     const bodyContent = theModal.getBody(serialFormParams);
     await theModal.modal.setBodyContent(bodyContent);
     pageFunctions.setWindowWatched();
+    document.querySelector('.incourse-player').scrollIntoView({behavior: 'smooth'});
 }
 
 /**

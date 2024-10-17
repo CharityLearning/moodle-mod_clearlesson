@@ -51,6 +51,7 @@ if ($ADMIN->fulltree) {
         get_string('displayoptions', 'clearlesson'), get_string('configdisplayoptions', 'clearlesson'),
         $defaultdisplayoptions, $displayoptions));
 
+    $recompletioninstalled = false;
     if (\core_plugin_manager::instance()->get_plugin_info('local_recompletion')) {
         $settings->add(new admin_setting_configcheckbox('clearlesson/recompletionclearwatched',
         get_string('resetclearwatched', 'clearlesson'),

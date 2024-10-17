@@ -78,7 +78,6 @@ if ($popup) {
     echo html_writer::start_tag('div', array('id' => 'popupdiv_' . $cm->id, 'class' => 'popupdiv'));
 }
 
-// var_dump($resetdate);
 if ($displaytype == 'player') {
     $renderable = new \mod_clearlesson\output\incourse_player(type: $clearlesson->type,
                                                             externalref: $clearlesson->externalref,
