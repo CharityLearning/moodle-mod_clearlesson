@@ -114,9 +114,9 @@ export const init = async(type) => {
  * @param {Number} position The position of the resource in the list.
  * @param {String} url The URL of the resource.
  */
-async function reRenderPlayer(position, url) { // TODO rewrite this for page output.
+async function reRenderPlayer(position, url) {
     if (window.updateProgress) {
-        await progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
+        progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
     }
     const data = await getPlayerRenderable(position, url);
     const {html, js} = await Templates.renderForPromise('mod_clearlesson/incourse_player', data.response);
@@ -127,6 +127,7 @@ async function reRenderPlayer(position, url) { // TODO rewrite this for page out
     await Templates.runTemplateJS(js);
     progressTracker.init();
     pageFunctions.setWindowWatched();
+    document.querySelector('.incourse-player').scrollIntoView({behavior: 'smooth'});
 }
 
 /**
@@ -153,7 +154,7 @@ function getPlayerRenderable(position) {
  */
 async function reRenderModulePlayerModal(position, url) {
     if (window.updateProgress) {
-        await progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
+        progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
     }
     const externalref = document.querySelector('.incourse-player').getAttribute('data-resourceref');
     const formParams = {cmid: window.cmid,
@@ -166,5 +167,6 @@ async function reRenderModulePlayerModal(position, url) {
     const bodyContent = playerModalFromMenu.getBody(serialFormParams);
     await playerModalFromMenu.modal.setBodyContent(bodyContent);
     pageFunctions.setWindowWatched();
+    document.querySelector('.incourse-player').scrollIntoView({behavior: 'smooth'});
 }
 

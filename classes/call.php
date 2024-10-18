@@ -89,11 +89,7 @@ class call {
                                                                     'query' => $query,
                                                                     'exactref' => $exactref,
                                                                     'small' => true]);
-
-        // debugging 
-        // var_dump($response);
         $decodedresponse = json_decode($response, true);
-        // var_dump($decodedresponse);
         return $decodedresponse['records'];
     }
 
@@ -104,14 +100,12 @@ class call {
      */
     public static function get_browserform_data(string $type): array {
         $response = self::initate_call('/api/v1/get_browserform_data.php', ['type' => $type]);
-        // debugging 
-        // var_dump($response);
+
         $decodedresponse = json_decode($response, true);
         $decodedresponse['records'][$type] = true;
         if ($type == 'series') {
             $decodedresponse['records']['isseries'] = true;
         }
-        // var_dump($decodedresponse);
         return $decodedresponse['records'];
     }
 
@@ -128,13 +122,7 @@ class call {
                                                                     'externalref' => $externalref,
                                                                     'position' => $position,
                                                                     'resetdate' => $resetdate]);
-        // debugging 
-        // var_dump($response);
         $decodedresponse = json_decode($response, true);
-        // echo '<pre>';
-        // var_dump($decodedresponse);
-        // echo '</pre>';
-        // die();
         $decodedresponse['records']['videowatchedstring'] = get_string('videowatched', 'clearlesson');
         return $decodedresponse['records'];
     }
@@ -150,10 +138,7 @@ class call {
         $response = self::initate_call('/api/v1/get_menuform_data.php', ['type' => $type,
                                                                     'externalref' => $externalref,
                                                                     'resetdate' => $resetdate]);
-        // debugging 
-        // var_dump($response);
         $decodedresponse = json_decode($response, true);
-        // var_dump($decodedresponse);
         return $decodedresponse['records'];
     }
 
@@ -173,17 +158,14 @@ class call {
                                             string $resourceref,
                                             string $type,
                                             string $resetdate): array {
-        // var_dump($resourceref);
+
         $response = self::initate_call('/api/v1/update_progress.php', ['externalref' => $externalref,
                                                                     'duration' => $duration,
                                                                     'status' => $status,
                                                                     'resourceref' => $resourceref,
                                                                     'type' => $type,
                                                                     'resetdate' => $resetdate]);
-        // debugging 
-        // var_dump($response);
         $decodedresponse = json_decode($response, true);
-        // var_dump($decodedresponse);
         return $decodedresponse;
     }
 
@@ -198,10 +180,7 @@ class call {
         $response = self::initate_call('/api/v1/get_video_count.php', ['externalref' => $externalref,
                                                                     'type' => $type,
                                                                     'resetdate' => $resetdate]);
-        // debugging 
-        // var_dump($response);
         $decodedresponse = json_decode($response, true);
-        // var_dump($decodedresponse);
         return $decodedresponse['records'];
     }
 }

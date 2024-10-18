@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/mod/clearlesson/lib.php');
  *
  * @package    mod_clearlesson
  * @category   external
- * @copyright  2017 Josh Willcock
+ * @copyright  2024 Dan Watkins
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.1
  */

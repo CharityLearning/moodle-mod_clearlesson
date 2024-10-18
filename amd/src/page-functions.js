@@ -56,7 +56,7 @@ export function updateCompletionStatusIfIncorrect(completionInfoElement, pageCle
 
         Utils.waitForElement('.incourse', pageClearlessonElement, async function() {
             if (pageClearlessonElement.querySelector('.incourse').getAttribute('data-watchedall') == '1') {
-                window.viewedStatus = 'watched';
+                window.watchedAll = true;
                 window.updateProgress = false;
                 if (!moodleCompleted) {
                     // If the completionwatchedall rule is enabled, we can mark the activity as complete.
@@ -64,7 +64,7 @@ export function updateCompletionStatusIfIncorrect(completionInfoElement, pageCle
                     if (ruleCheckElement.outerHTML.includes(watchdAllRuleString)) {
                         window.currentTime = 0;
                         window.extref = '';
-                        await progressTracker.updateProgressAndActivity(); // We ignore window.updateProgress here.
+                        progressTracker.updateProgressAndActivity(); // We ignore window.updateProgress here.
                     }
                 }
             }
@@ -117,7 +117,7 @@ export async function openPlayerFromMenu(e, url, firstLoad, completionDropdown, 
     const externalRef = elementAncestor.getAttribute('data-externalref');
 
     if (window.updateProgress) {
-        await progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
+        progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
     }
 
     playerModalFromMenu = new ModalForm({
@@ -163,7 +163,7 @@ export async function openNewMenuModal(e, url, firstLoad, completionDropdown, ba
     const instanceName = menuItem.querySelector('.menu-item-title > .searchable').innerHTML;
 
     if (window.updateProgress) {
-        await progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
+        progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
     }
 
     newMenuModal = new ModalForm({

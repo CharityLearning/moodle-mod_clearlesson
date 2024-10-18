@@ -68,7 +68,7 @@ export const init = () => {
             }
 
             if (window.updateProgress) {
-                await progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
+                progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
             }
 
             playerModal = new ModalForm({
@@ -175,11 +175,12 @@ async function reRenderCoursePlayerModal(position, url) {
     }
     const serialFormParams = Utils.serialize(formParams);
     if (window.updateProgress) {
-        await progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
+        progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
     }
     const bodyContent = theModal.getBody(serialFormParams);
     await theModal.modal.setBodyContent(bodyContent);
     pageFunctions.setWindowWatched();
+    document.querySelector('.incourse-player').scrollIntoView({behavior: 'smooth'});
 }
 
 /**
