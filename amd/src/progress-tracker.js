@@ -25,6 +25,8 @@
 
 import Ajax from 'core/ajax';
 
+var loopCount = 0;
+
 export const init = async() => {
     if (typeof window.VimeoPlayerConstructor === 'undefined') {
         setTimeout(init, 100);
@@ -43,8 +45,23 @@ export const init = async() => {
         return title;
     });
 
+    const container = iframe.closest('.incourse');
+    if (container?.getAttribute('data-watchedall') == '1') {
+        // If all videos in the resource have already been watched, we don't update the progress.
+        // If the resource has been watched but the completion status is incorrect,
+        // we'll update it in moodle via the page-functions method updateCompletionStatusIfIncorrect.
+        window.watchedAll = true;
+        window.updateProgress = false;
+    } else {
+        window.watchedAll = false;
+        window.updateProgress = true;
+    }
+
+    window.viewedStatus =
+        container?.querySelector('.video-title-wrapper .watched-check')?.classList
+            .contains('notwatched') ? 'unwatched' : 'watched';
+
     // When progress is updated, if the video has a higher status already, we don't update it.
-    window.viewedStatus = 'unwatched';
     window.player.on('play', function() {
         if (window.viewedStatus === 'unwatched') {
             window.viewedStatus = 'inprogress';
@@ -54,7 +71,7 @@ export const init = async() => {
     window.player.on('ended', async function() {
         if (window.updateProgress) {
             videoWatched();
-            await updateProgressAndActivity();
+            updateProgressAndActivity();
         }
     });
 
@@ -77,14 +94,14 @@ export const init = async() => {
     // Before the user leaves the page, we update the progress.
     window.addEventListener('beforeunload', async function() {
         if (window.updateProgress) {
-            await updateProgressAndActivity();
+            updateProgressAndActivity();
         }
     }, true);
 
     // Every 30 minutes we update the progress.
     setInterval(async function() {
         if (window.updateProgress) {
-            await updateProgressAndActivity();
+            updateProgressAndActivity();
         }
     }, 1800000);
 };
@@ -95,13 +112,19 @@ export const init = async() => {
  * @return {Promise} The promise with the response of the AJAX call.
  */
 const updateProgress = async() => {
+    if (typeof window.viewedStatus === 'undefined'
+        && (window.type === 'series' || window.type === 'collections')) {
+        window.viewedStatus = (window.watchedAll) ? 'watched' : 'unwatched';
+    }
+
     if (typeof window.extref === 'undefined'
-        || typeof window.viewedStatus === 'undefined' || typeof window.currentTime === 'undefined'
+        || typeof window.currentTime === 'undefined' || typeof window.viewedStatus === 'undefined'
         || typeof window.courseid === 'undefined' || typeof window.cmid === 'undefined'
         || typeof window.resourceRef === 'undefined' || typeof window.type === 'undefined'
-        || typeof window.pageType === 'undefined') {
+        || typeof window.pageType === 'undefined' || typeof window.watchedAll === 'undefined') {
         return false;
     }
+    loopCount = 0;
 
     const args = {
         externalref: window.extref,
@@ -111,7 +134,8 @@ const updateProgress = async() => {
         cmid: window.cmid,
         resourceref: window.resourceRef,
         type: window.type,
-        pagetype: window.pageType
+        pagetype: window.pageType,
+        watchedall: window.watchedAll
     };
 
     const request = {
@@ -171,13 +195,13 @@ export function menuItemWatched(itemRef, direct = true) {
             // If all menu items in the parent have been watched, we update the parents parent if it is present.
             const parentMenu = singleItem.closest('.menu-container');
             if (parentMenu) {
-                let parentWatchedAll = true;
+                let watchedAll = true;
                 parentMenu.querySelectorAll('.watched-check').forEach(function(watchedCheck) {
                     if (watchedCheck.classList.contains('notwatched')) {
-                        parentWatchedAll = false;
+                        watchedAll = false;
                     }
                 });
-                if (parentWatchedAll) {
+                if (watchedAll) {
                     const parentResourceRef = parentMenu.getAttribute('data-resourceref');
                     if (direct) { // There will only be ever be 2 parents.
                         // No infinite loops please.
@@ -196,6 +220,12 @@ export function menuItemWatched(itemRef, direct = true) {
 export async function updateProgressAndActivity() {
     var activityInfo;
     const response = await updateProgress();
+    if (!response) {
+        if (loopCount++ < 20) {
+            setTimeout(updateProgressAndActivity, 100);
+            return false;
+        }
+    }
     if (response?.activitymodulehtml) {
         if (window.pageType === 'course') {
             activityInfo = document.querySelector('.activity[data-id="' + window.cmid + '"]');
@@ -206,5 +236,8 @@ export async function updateProgressAndActivity() {
         if (activityInfo) {
             activityInfo.outerHTML = response.activitymodulehtml;
         }
+        window.watchedAll = true;
+        document.querySelector('.incourse')?.setAttribute('data-watchedall', '1');
     }
+    return true;
 }

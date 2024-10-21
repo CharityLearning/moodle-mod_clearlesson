@@ -125,7 +125,6 @@ class incourse_menu implements \renderable, \templatable {
     public function export_array_for_template(renderer_base $output): array {
         $this->response['watchedall'];
         $this->response['resources'];
-        // var_dump($response['resources']);
         switch ($this->type) {
             case 'collections':
                 $this->response['countstring'] = get_string('playlists', 'mod_clearlesson');

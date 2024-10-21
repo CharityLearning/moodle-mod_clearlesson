@@ -57,7 +57,8 @@ class update_progress extends \core_external\external_api {
                     'cmid' => new external_value(PARAM_INT, 'Course module id'),
                     'resourceref' => new external_value(PARAM_TEXT, 'Externalref of resource'),
                     'type' => new external_value(PARAM_TEXT, 'Type of resource'),
-                    'pagetype' => new external_value(PARAM_TEXT, 'Type of page, "course" or "activity"')
+                    'pagetype' => new external_value(PARAM_TEXT, 'Type of page, "course" or "activity"'),
+                    'watchedall' => new external_value(PARAM_BOOL, 'Whether all videos in the resource have been watched')
                 )
             );
         }
@@ -74,6 +75,8 @@ class update_progress extends \core_external\external_api {
         * @param string $resourceref the external reference of the parent resource
         * @param string $type the type of resource
         * @param string $pagetype the type of page 'course' or 'activity'
+        * @param bool $watchedall whether all videos in the resource have been watched
+        *
         * @return array of warnings and status result
         * @since Moodle 3.0
         * @throws moodle_exception
@@ -85,11 +88,13 @@ class update_progress extends \core_external\external_api {
                                         int $cmid,
                                         string $resourceref,
                                         string $type,
-                                        string $pagetype): array {
+                                        string $pagetype,
+                                        bool $watchedall): array {
 
             global $DB, $USER, $OUTPUT, $PAGE, $CFG;
             require_login();
-            $PAGE->set_context(\context_system::instance()); // Use module context?
+            // Set module context.
+            $PAGE->set_context(\context_module::instance($cmid));
 
             $params = self::validate_parameters(
                         self::execute_parameters(),
@@ -100,11 +105,13 @@ class update_progress extends \core_external\external_api {
                             'cmid' => $cmid,
                             'resourceref' => $resourceref,
                             'type' => $type,
-                            'pagetype' => $pagetype]);
+                            'pagetype' => $pagetype,
+                            'watchedall' => $watchedall]);
             
             if ($comprec = $DB->get_record_sql('SELECT * FROM {course_modules_completion} cmc
                                             WHERE cmc.coursemoduleid = ? AND cmc.userid = ?
                                                 ORDER BY cmc.id DESC LIMIT 1', [$cmid, $USER->id])) {
+
                 if ($comprec->completionstate > 0) {
                     return ['success' => true,
                             'activitymodulehtml' => '']; // Module already completed, do nothing.
@@ -125,7 +132,7 @@ class update_progress extends \core_external\external_api {
                 $resetdate = $activity->resetdate;
                 if (!$activity->completion // If completion is not enabled,
                     || !$activity->completionwatchedall // or if the completionwatchedall rule is not enabled,
-                    || $status !== 'watched') { // or if the current video has not been watched in this viewing,
+                    || $watchedall) { // or if we already know all the videos in the resource have been watched,
                     // then we don't need to check if all videos in the resource have been watched.
                         $resourceref = '';
                 }
@@ -133,7 +140,7 @@ class update_progress extends \core_external\external_api {
 
             // If a '$resourceref' is set, then we need to check if all videos in the resource have been watched.
             // If they have, then we can update the completion status of the module.
-            if ($externalref && $response = \mod_clearlesson\call::update_progress($externalref,
+            if (!$watchedall && $externalref && $response = \mod_clearlesson\call::update_progress($externalref,
                                                                                     $duration,
                                                                                     $status,
                                                                                     $resourceref,
@@ -141,11 +148,8 @@ class update_progress extends \core_external\external_api {
                                                                                     $resetdate)) {
                 // Update completion of activity module.
                 if ($response['result']['completionstatus']) {
-                    // var_dump($response);
-                    // All videos in the resource have now been watched, mark the module as complete if required.
+                    // All videos in the resource have now been watched, check & mark the module as complete if so.
                     $updatedhtml = self::mark_module_complete_and_get_updatedhtml($activity, $course, $cm, $pagetype);
-                    // var_dump($updatedhtml);
-                    // var_dump('completed1');
                 } else if ($trackrecord = $DB->get_record('clearlesson_track',
                                                 ['clearlessonid' => $activity->id,
                                                 'userid' => $USER->id,
@@ -163,17 +167,14 @@ class update_progress extends \core_external\external_api {
                     $DB->insert_record('clearlesson_track', $newtrackrecord);
                     $updatedhtml = '';
                 }
-                // var_dump('not completed', $status);
                 return ['success' => true,
                         'activitymodulehtml' => $updatedhtml];
-            } else if (!$externalref && $resourceref) {
+            } else if ($watchedall && $status == 'watched') {
                 // All the videos in the resource have already been watched, but the module has not been marked as complete.
                 // The videos may have been watched in other resources or on the Clear Lessons platform.
                 // Alternatively the completion conditions may have changed.
                 // Mark completed in moodle.
                 $updatedhtml = self::mark_module_complete_and_get_updatedhtml($activity, $course, $cm, $pagetype, $resetdate);
-                // var_dump('completed2');
-                // var_dump($updatedhtml);
                 return ['success' => true,
                         'activitymodulehtml' => $updatedhtml];
             } else {
@@ -198,7 +199,6 @@ class update_progress extends \core_external\external_api {
 
         public static function mark_module_complete_and_get_updatedhtml($activity, $course, $cm, $pagetype) {
             global $PAGE, $DB, $USER;
-
             // Check the clearlesson track and set watchedall to 1 if all videos have been watched.
             $sql = "SELECT ct.userid, MAX(ct.watchedall) AS watchedall, MAX(ct.id) AS id
             FROM {clearlesson_track} ct
@@ -228,6 +228,7 @@ class update_progress extends \core_external\external_api {
             $clearlesson = $DB->get_record('clearlesson', array('id' => $activity->id), '*', MUST_EXIST);
             list($course, $cm) = \get_course_and_cm_from_instance($clearlesson, 'clearlesson');
             $completion = new completion_info($course);
+            // Mark the module as complete, if it is not already.
             $completion->update_state($cm, COMPLETION_COMPLETE);
 
             // The format of the completion details output depends on the page type.

@@ -54,9 +54,10 @@ export function updateCompletionStatusIfIncorrect(completionInfoElement, pageCle
             }
         }
 
+
         Utils.waitForElement('.incourse', pageClearlessonElement, async function() {
             if (pageClearlessonElement.querySelector('.incourse').getAttribute('data-watchedall') == '1') {
-                window.viewedStatus = 'watched';
+                window.watchedAll = true;
                 window.updateProgress = false;
                 if (!moodleCompleted) {
                     // If the completionwatchedall rule is enabled, we can mark the activity as complete.
@@ -64,9 +65,11 @@ export function updateCompletionStatusIfIncorrect(completionInfoElement, pageCle
                     if (ruleCheckElement.outerHTML.includes(watchdAllRuleString)) {
                         window.currentTime = 0;
                         window.extref = '';
-                        await progressTracker.updateProgressAndActivity(); // We ignore window.updateProgress here.
+                        progressTracker.updateProgressAndActivity(); // We ignore window.updateProgress here.
                     }
                 }
+            } else {
+                window.watchedAll = false;
             }
         });
     }
@@ -117,7 +120,7 @@ export async function openPlayerFromMenu(e, url, firstLoad, completionDropdown, 
     const externalRef = elementAncestor.getAttribute('data-externalref');
 
     if (window.updateProgress) {
-        await progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
+        progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
     }
 
     playerModalFromMenu = new ModalForm({
@@ -139,8 +142,6 @@ export async function openPlayerFromMenu(e, url, firstLoad, completionDropdown, 
             setWindowWatched();
             firstLoad = 0;
         });
-
-        updateCompletionStatusIfIncorrect(completionDropdown, modalRootInner);
         setModalButtons(modalRootInner, backString);
     });
 
@@ -163,7 +164,7 @@ export async function openNewMenuModal(e, url, firstLoad, completionDropdown, ba
     const instanceName = menuItem.querySelector('.menu-item-title > .searchable').innerHTML;
 
     if (window.updateProgress) {
-        await progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
+        progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
     }
 
     newMenuModal = new ModalForm({
@@ -180,7 +181,6 @@ export async function openNewMenuModal(e, url, firstLoad, completionDropdown, ba
         const modalRootInner = newMenuModal.modal.getRoot()[0].children[0];
         setModalBodyGrey(modalRootInner);
         setModalButtons(modalRootInner, backString);
-        updateCompletionStatusIfIncorrect(completionDropdown, modalRootInner);
         window.updateProgress = false;
     });
 
@@ -192,7 +192,7 @@ export async function openNewMenuModal(e, url, firstLoad, completionDropdown, ba
  * Set the watched status of the window.
  */
 export function setWindowWatched() {
-    const watchedCheck = document.querySelector('.incourse-player .player-column .watched-check');
+    const watchedCheck = document.querySelector('.incourse-player .player-column .video-title-wrapper .watched-check');
     // If the video has been watched already dont update the progress.
     window.updateProgress = watchedCheck?.classList.contains('notwatched');
 }

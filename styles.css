@@ -1561,10 +1561,7 @@ body.mod-clearlesson-bodyrestricted .activity-header{
         padding-right: 15px;
     }
 
-    .mod-clearlesson .video-list-column > .box > .video-card-side > *:is(.video-card-image,
-                                                                        .play-video-card-image,
-                                                                        .play-playlist-video-card-image,
-                                                                        .play-video-card-body,
+    .mod-clearlesson .video-list-column > .box > .video-card-side > *:is(.play-video-card-body,
                                                                         .video-card-body,
                                                                         .play-playlist-video-card-body) {
         padding-left: 5px;
@@ -1575,6 +1572,10 @@ body.mod-clearlesson-bodyrestricted .activity-header{
                                                                         .play-video-card-body,
                                                                         .play-playlist-video-card-body) {
         padding-right: 10px;
+    }
+
+    .mod-clearlesson .video-card-list {
+        margin-bottom: 0px!important;
     }
 
     .mod-clearlesson .video-card-side.video-card-list .watched-check i {

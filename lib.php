@@ -133,7 +133,6 @@ function clearlesson_add_instance($data, $mform) {
     }
     $data->parameters = serialize($parameters);
 
-    // No longer used. TODO check for other unsused fields.
     $displayoptions = array();
     if ($data->display == RESOURCELIB_DISPLAY_POPUP) {
         $displayoptions['popupwidth']  = $data->popupwidth;
