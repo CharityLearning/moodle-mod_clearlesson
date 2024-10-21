@@ -85,6 +85,7 @@ export const init = async() => {
 
 /**
  * Open the resource menu modal.
+ *
  * @param {String} externalref
  * @param {String} name
  * @param {Boolean} speaker
