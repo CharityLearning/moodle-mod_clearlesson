@@ -19,7 +19,7 @@
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="d-flex flex-nowrap justify-content-between w-100 video-card-wrapper collection-card mb-4 mx-3 {{#hidden}}d-none{{/hidden}}" 
+<div class="d-flex flex-nowrap justify-content-between w-100 video-card-wrapper collection-card col-xl-3 col-sm-6 mb-4 {{#hidden}}d-none{{/hidden}}" 
  data-animation="{{animation}}" data-hiddenby="{{hiddenby}}" id="resource-{{id}}" {{#hidden}}aria-hidden="true{{/hidden}}">
     <div class="video-card w-100">
         <div class="video-card-image">
@@ -42,9 +42,10 @@
                 <div class="video-details d-flex">
                     <a class="video-details-view" data-view="{{externalref}}"><i class="fas fa-video"></i>{{countstring}}</a>
                 </div>
-                <span class="searchable card-title">{{name}}</span>
+                <a href="javascript:void(0)" class="searchable card-title video-details-view" data-view="{{externalref}}">{{name}}</a>
             </div>
         </div>
+        <button class="card-menu-button collection searchable btn btn-secondary" data-view="{{externalref}}">{{menubuttonstring}}</button>
         {{#showselectbutton}}
             {{> mod_clearlesson/elements/select_resource_button }}
         {{/showselectbutton}}

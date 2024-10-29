@@ -19,11 +19,18 @@
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="input-group mr-3 mb-2" style="width:300px;">
-    <input class="form-control" id='search' name="search" value="" autocomplete="off" placeholder="Search" type="text">
-    <div class="input-group-append search-button-parent">
-        <button class="cl-search-append btn btn-secondary" z-index="1" style="height:36.5px!important;">
+<div class="input-group mt-2 d-flex align-items-center mod-clearlesson-backgrounddgrey mt-4 mb-2"
+style="width:290px; max-width: 290px; background-color: white; position:relative; z-index: 2; overflow-y: hidden; height: 38px; position: sticky; left: 0.25em; {{^filtersexist}} margin-right: 0.5em;{{/filtersexist}}">
+    <input class="form-control" id="search" name="search" value="" autocomplete="off" placeholder="Search" type="text"
+    style="height:36px!important; width: calc(100% - 38px);">
+    <div class="input-group-append search-button-parent"
+    style="position: relative; right: 0px; top:0px; height: 36px!important;">
+        <button class="cl-search-append btn btn-outline-info pt-1" z-index="1" style="height: 36px!important;">
             <i class="fa fa-search"></i>
         </button>
+    </div>
+    <div class="clear-search-container" style="height:36px!important; position: absolute; right: 0em">
+        <button class="clear-search-button btn btn-clear" aria-hidden="true" style="height:36px!important; cursor: pointer"
+        aria-label="{{#str}} clear, core {{/str}}"><i class="icon fa fa-times fa-fw" title="{{#str}} clearsearch, mod_clearlesson {{/str}}"></i></button>
     </div>
 </div>

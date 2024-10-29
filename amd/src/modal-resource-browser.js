@@ -65,6 +65,15 @@ export const init = () => {
             // Hide any error messages on the resource selector group.
             document.getElementById('fgroup_id_error_ref_select_group').removeAttribute('style');
         }
+
+        if (element.closest('#open-filters-parent')) {
+            e.preventDefault();
+            toggleFilters('open');
+        }
+        if (element.closest('#close-filters-parent')) {
+            e.preventDefault();
+            toggleFilters('close');
+        }
     });
 
     document.addEventListener('keydown', function(e) {
@@ -120,6 +129,12 @@ function searchIfSearchbutton(e) {
         e.preventDefault();
         searchResources(document.getElementById('search').value);
     }
+    if (e.target.classList?.contains('clear-search-button')
+    || e.target.parentElement?.classList?.contains('clear-search-button')) {
+        e.preventDefault();
+        document.getElementById('search').value = '';
+        searchResources();
+    }
 }
 
 /**
@@ -143,12 +158,12 @@ async function openResourceBrowser() {
 
     modalForm = browserForm;
 
-    browserForm.addEventListener(browserForm.events.LOADED, function() {
+    browserForm.addEventListener(browserForm.events.LOADED, async function() {
         // Set the modal to nearly fullscreen size.
         let modalHeight = Math.ceil(window.innerHeight * 0.94);
         let modalWidth = Math.ceil(window.innerWidth * 0.94);
         modalWidth = modalWidth > 1800 ? 1800 : modalWidth;
-        const modalRootInner = browserForm.modal.getRoot()[0].children[0];
+        const modalRootInner = await browserForm.modal.getRoot()[0].children[0];
         modalRootInner.setAttribute('style',
             'width: ' + modalWidth +
             'px;max-width: ' + modalWidth +
@@ -164,8 +179,18 @@ async function openResourceBrowser() {
         modalRootInner.addEventListener('click', function(e) {
             if (e.target.classList.contains('type-button')) {
                 e.preventDefault();
-                const type = e.target.getAttribute('data-type');
-                viewResourceType(type, cmid, courseid, url, browserForm);
+                if (!e.target.classList.contains('disabled-looking')) {
+                    const type = e.target.getAttribute('data-type');
+                    viewResourceType(type, cmid, courseid, url, browserForm);
+                }
+            }
+            if (e.target.id === 'clear-all') {
+                e.preventDefault();
+                clearAll(browserForm, true);
+            }
+            if (e.target.id === 'clear-filters') {
+                e.preventDefault();
+                clearSelect(browserForm);
             }
         });
 
@@ -314,16 +339,29 @@ function clearSelectedResource() {
  * @param {ModalForm} modalObject
  * @param {Boolean} selective
  */
-export function setWaitingCursor(waiting, modalObject, selective = true) {
+export async function setWaitingCursor(waiting, modalObject, selective = true) {
     var selector;
+    const modalElement = await modalObject.modal.getRoot()[0];
     if (selective) {
-        selector = '*:is(.browser-filters *, .modal-content > *, form, form > *, .modal-header *,';
-        selector += ' .modal-footer *, .browser-sidebar, .browser-sidebar *, .resource-container)';
+        selector = '.browser-sidebar, .browser-sidebar *';
+        updateWaitingDivs(modalElement, waiting, selector); // Sidebar first
+        selector = ' .modal-content > *, form, form > *, .modal-header *,';
+        selector += ' .modal-footer *, .resource-container  ';
         selector += ', .video-card-wrapper, .video-card-wrapper *';
+        updateWaitingDivs(modalElement, waiting, selector);
     } else {
         selector = '*';
+        updateWaitingDivs(modalElement, waiting, selector);
     }
-    const modalElement = modalObject.modal.getRoot()[0];
+}
+
+/**
+ * Update the waiting cursor on a set of elements.
+ * @param {HTMLElement} modalElement
+ * @param {Boolean} waiting
+ * @param {String} selector
+ */
+function updateWaitingDivs(modalElement, waiting, selector) {
     const resources = [...modalElement.querySelectorAll(selector)];
     if (waiting) {
         for (const node of resources) {
@@ -343,21 +381,20 @@ export function setWaitingCursor(waiting, modalObject, selective = true) {
         }
     }
 }
-
 /**
  * Filter the resources in the browser by hiding them in the DOM.
  * @param {String} filterName
  * @param {String} selectedValue
  */
-async function filterResources(filterName, selectedValue,) {
+async function filterResources(filterName, selectedValue) {
     return new Promise((resolve) => {
         if (filterValues[filterName] === selectedValue) {
             return;
         }
         setWaitingCursor(true, modalForm);
         // The timeout is required to allow the DOM to update before we start filtering.
-        setTimeout(function() {
-            const resources = modalForm.modal.getRoot()[0].getElementsByClassName('video-card-wrapper');
+        setTimeout(async function() {
+            const resources = await modalForm.modal.getRoot()[0].getElementsByClassName('video-card-wrapper');
                 for (const resource of resources) {
                     const showResource = checkDisplayResource(resource, filterName, selectedValue);
                     toggleElement(resource, showResource, filterName);
@@ -406,6 +443,9 @@ function toggleElement(element, display, filterName) {
             hiddenByList = hiddenByList.trim();
             element.setAttribute('data-hiddenby', hiddenByList);
             if (hiddenByList === '') {
+                if (element.classList.contains('collection-card')) {
+                    element.classList.add('d-flex');
+                }
                 element.classList.remove('d-none');
                 element.setAttribute('aria-hidden', 'false');
             }
@@ -415,6 +455,9 @@ function toggleElement(element, display, filterName) {
         if (hiddenByList === '' || !hiddenByList.includes(filterName)) {
             hiddenByList += ' ' + filterName;
             element.setAttribute('data-hiddenby', hiddenByList.trim());
+            if (element.classList.contains('collection-card')) {
+                element.classList.remove('d-flex');
+            }
             element.classList.add('d-none');
             element.setAttribute('aria-hidden', 'true');
         }
@@ -426,9 +469,15 @@ function toggleElement(element, display, filterName) {
  *
  * @param {String} query
  */
-function searchResources(query) {
+async function searchResources(query = '') {
     const lowerQuery = query.trim().toLowerCase();
-    const resources = modalForm.modal.getRoot()[0].getElementsByClassName('video-card-wrapper');
+    const clearSearchButton = document.querySelector('.clear-search-button');
+    if (lowerQuery === '') {
+        clearSearchButton.classList.remove('move');
+    } else {
+        clearSearchButton.classList.add('move');
+    }
+    const resources = await modalForm.modal.getRoot()[0].getElementsByClassName('video-card-wrapper');
     for (const resource of resources) {
         const searchables = resource.getElementsByClassName('searchable');
         var display = false;
@@ -453,9 +502,9 @@ function searchResources(query) {
  * @param {String} type
  * @param {String} selectedValue
  */
-function orderFilteredResources(type, selectedValue) {
+async function orderFilteredResources(type, selectedValue) {
     let positionArray = [];
-    modalForm.modal.getRoot()[0].querySelectorAll('.video-card-wrapper:not(.d-none)')
+    await modalForm.modal.getRoot()[0].querySelectorAll('.video-card-wrapper:not(.d-none)')
     .forEach(function(resource) {
         const list = resource.getAttribute('data-' + type);
         if (list) {
@@ -499,5 +548,159 @@ async function clearOrdering() {
  * Scroll to the top of the browser filters.
  */
 function scrollToTop() {
-    document.getElementsByClassName('browser-filters')[0].scrollIntoView({behavior: 'smooth', block: 'end'});
+    document.getElementById('resource-container').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+/**
+ * Clear all filters and the search bar.
+ *
+ * @param {ModalForm} browserForm
+ */
+function clearAll(browserForm) {
+    clearSelect(browserForm, true);
+}
+
+/**
+ * Clear all filters.
+ * @param {ModalForm} browserForm
+ * @param {Boolean} all
+ */
+async function clearSelect(browserForm, all = false) {
+    let emptyCount = 0;
+    for (var filterC in filterValues) {
+        if (filterValues[filterC] == '') {
+            emptyCount++;
+        }
+    }
+    const doc = await browserForm.modal.getRoot()[0];
+    const query = doc.querySelector('#search').value.trim().toLowerCase();
+    for (var filter in filterValues) {
+        let filterElement = doc.querySelector('#' + filter + '-filter');
+        if (filterElement) {
+            filterElement.value = '';
+        }
+    }
+    if (emptyCount === filterValues.length
+        && (query === '' || !all)) {
+        return false;
+    } else {
+        setWaitingCursor(true, browserForm);
+    }
+    setTimeout(function() {
+        const cardArray = [];
+        doc.querySelectorAll('.video-card-wrapper').forEach(function(card) {
+            if (query !== '' && all) {
+                const searchables = card.getElementsByClassName('searchable');
+                var display = false;
+                if (query === '') {
+                    display = true;
+                } else {
+                    for (const searchItem of searchables) {
+                        display = searchItem.textContent.toLowerCase().includes(query);
+                        if (display) {
+                            break;
+                        }
+                    }
+                }
+                if (display) {
+                    card.setAttribute('data-hiddenby', '');
+                    card.classList.remove('d-none');
+                    card.setAttribute('aria-hidden', 'false');
+                    if (card.classList.contains('collection-card')) {
+                        card.classList.add('d-flex');
+                    }
+                } else {
+                    card.setAttribute('data-hiddenby', 'search');
+                    card.classList.add('d-none');
+                    card.setAttribute('aria-hidden', 'true');
+                    if (card.classList.contains('collection-card')) {
+                        card.classList.remove('d-flex');
+                    }
+                }
+            } else {
+                card.setAttribute('data-hiddenby', '');
+                card.classList.remove('d-none');
+                card.setAttribute('aria-hidden', 'false');
+            }
+            card.style.order = '';
+            cardArray.push(card);
+            card.remove();
+        });
+
+        if (all) {
+            // Clear the search.
+            doc.querySelector('#search').value = '';
+            doc.querySelector('.clear-search-button').classList.remove('move');
+        }
+        // Sort by card title
+        cardArray.sort(function(a, b) {
+            let titleA = a.querySelector('.card-title').textContent;
+            let titleB = b.querySelector('.card-title').textContent;
+            titleA = updateTiteForSorting(titleA);
+            titleB = updateTiteForSorting(titleB);
+            return titleA.localeCompare(titleB);
+        });
+        orderedResources = false;
+        // Now put the cards back in the right order.
+        const container = doc.querySelector('#resource-container');
+        cardArray.forEach(function(card) {
+            container.appendChild(card);
+        });
+        setWaitingCursor(false, browserForm);
+    }, 150);
+    return true;
+}
+
+/**
+ * Update the title for sorting.
+ *
+ * @param {String} title
+ */
+function updateTiteForSorting(title) {
+    // If the title contains any solo digit numbers, we need to add a leading zero.
+    title = title.replace(/\b\d\b/g, '0$&');
+    return title;
+}
+
+/**
+ * Toggle the filters open or closed.
+ *
+ * @param {String} action
+ */
+function toggleFilters(action) {
+    const filters = document.querySelector('.browser-sidebar');
+    const filtersInner = document.querySelector('.browser-filters');
+    const openButton = document.getElementById('open-filters-parent');
+    const closeButton = document.getElementById('close-filters-parent');
+    if (action === 'open') {
+        filters.setAttribute('aria-expanded', 'true');
+        filters.classList.add('expanded');
+        openButton.classList.add('expanded');
+        openButton.setAttribute('aria-hidden', 'true');
+        closeButton.classList.add('expanded');
+        closeButton.setAttribute('aria-hidden', 'false');
+        setTimeout(function() {
+            openButton.classList.add('d-none');
+            closeButton.classList.remove('d-none');
+            filtersInner.classList.remove('d-none');
+            filtersInner.classList.add('d-flex');
+            setTimeout(function() {
+                filtersInner.classList.add('fin');
+            }, 10);
+        }, 500);
+    } else {
+        filters.classList.remove('expanded');
+        filters.setAttribute('aria-expanded', 'false');
+        openButton.classList.remove('expanded');
+        openButton.setAttribute('aria-hidden', 'false');
+        closeButton.classList.remove('expanded');
+        closeButton.setAttribute('aria-hidden', 'true');
+        filtersInner.classList.add('d-none');
+        filtersInner.classList.remove('d-flex');
+        filtersInner.classList.remove('fin');
+        setTimeout(function() {
+            openButton.classList.remove('d-none');
+            closeButton.classList.add('d-none');
+        }, 500);
+    }
 }

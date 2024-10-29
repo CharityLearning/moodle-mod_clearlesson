@@ -46,8 +46,9 @@ export const init = async() => {
         }
 
         // This is the {{count}} videos or playlists etc link in the resource browser.
-        if ((element.classList?.contains('video-details-view'))
-        && !element.classList?.contains('view-link')) {
+        if ((element.classList?.contains('video-details-view')
+        || element.classList?.contains('card-menu-button'))
+            && !element.classList?.contains('view-link')) {
             if (element.hasAttribute('data-view')) {
                 externalref = element.getAttribute('data-view');
             } else {

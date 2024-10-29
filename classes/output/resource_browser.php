@@ -141,6 +141,7 @@ class resource_browser implements \renderable, \templatable {
             $responsefilters[] = $filter;
         }
         $this->response['filters'] = $responsefilters;
+        $this->response['filtersexist'] = !empty($responsefilters);
 
         $type = ($this->loadtype === 'play') ? 'video' : rtrim($this->loadtype, 's');
         $selectstring = get_string('select'). ' ' . get_string($type, 'mod_clearlesson');
@@ -168,9 +169,12 @@ class resource_browser implements \renderable, \templatable {
                 $this->response['videocard'] = true;
                 break;
         }
-        $this->response['viewstring'] = get_string('view', 'mod_clearlesson');
+        $viewstring = get_string('view', 'mod_clearlesson');
+        $this->response['viewstring'] = $viewstring;
         $this->response['showselectbutton'] = true;
         $this->response['selectstring'] = $selectstring;
+        $type = ($type === 'serie') ? 'series' : $type;
+        $this->response['menubuttonstring'] = $viewstring . ' ' . $type . ' ' . $whatisbeingcounted;
         $this->response['type'] = $this->loadtype;
         $resources = [];
         $x = 0;
@@ -196,8 +200,7 @@ class resource_browser implements \renderable, \templatable {
                     $resource['hiddenby'] = $this->originaltype;
                 }
             }
-            // Safari struggles with large amounts of resources.
-            // Unless lazyload is enabled;
+
             if ($this->lazyload && !$resource['hidden']) {
                 if (++$x > CLEARLESSON_LAZYLOAD_LIMIT) {
                     $resource['lazyload'] = true;

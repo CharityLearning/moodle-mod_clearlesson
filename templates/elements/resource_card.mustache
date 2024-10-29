@@ -43,9 +43,10 @@ data-hiddenby="{{hiddenby}}" id="resource-{{id}}" data-series="{{series}}" data-
                 <div class="video-details d-flex">
                     <a href="javascript:void(0)" class="video-details-view" data-view="{{externalref}}"><i class="fas fa-video"></i>{{countstring}}</a>
                 </div>
-                <span class="searchable card-title">{{name}}</span>
+                <a href="javascript:void(0)" class="searchable card-title video-details-view mb-2" data-view="{{externalref}}">{{name}}</a>
             </div>
         </div>
+        <button class="card-menu-button searchable btn btn-secondary" data-view="{{externalref}}">{{menubuttonstring}}</button>
         {{#showselectbutton}}
             {{> mod_clearlesson/elements/select_resource_button }}
         {{/showselectbutton}}

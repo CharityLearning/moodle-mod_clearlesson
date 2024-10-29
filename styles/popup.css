@@ -40,7 +40,21 @@ body.mod-clearlesson-bodyrestricted .main-inner {
 .mod-clearlesson .menu-container {
     padding: 1em;
 }
+.mod-clearlesson-popup #region-main {
+    padding-top: 0.25em;
+}
 
+.mod-clearlesson-popup .activity-header,
+.mod-clearlesson-popup .clearlesson-page-container {
+    border-radius: 0px;
+}
+ 
+
+@media (max-width: 767px) {
+    .mod-clearlesson-popup .activity-header {
+        margin: 0px!important;
+    }
+}
 /* on bootstrap sm */
 @media (min-width: 576px) {
     .mod-clearlesson-bodyrestricted.is-video .automatic-completion-conditions {

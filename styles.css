@@ -451,10 +451,10 @@
     text-align: center;
 }
 
-.mod-clearlesson .video-card:hover .play-icon,
+.mod-clearlesson .video-card .video-card-image:hover .play-icon,
 .mod-clearlesson .video-card-side:hover .play-icon,
 .mod-clearlesson .video-card-side:hover .view-icon,
-.mod-clearlesson .video-card:hover .view-icon {
+.mod-clearlesson .video-card .video-card-image:hover .view-icon {
     font-size: 35px;
 
     position: absolute;
@@ -471,6 +471,11 @@
     color: #fff;
     border-radius: 2px;
     background: #000 none repeat scroll 0 0;
+}
+
+.mod-clearlesson .video-card .searchable.video-card-title:hover,
+.mod-clearlesson .video-details-view:hover {
+    text-decoration: underline;
 }
 
 .mod-clearlesson .video-title a {
@@ -524,7 +529,7 @@
     }
 
     .mod-clearlesson .video-card-body {
-        height: 120px !important;
+        height: 130px !important;
     }
 }
 
@@ -532,18 +537,18 @@
     box-shadow: 0 5px 5px 0 rgba(184, 184, 184, .6);
 }
 
-.mod-clearlesson .video-details .video-details-view {
+.mod-clearlesson .video-details .video-details-view:not(.card-title) {
     margin-bottom: 5px;
 }
 
-.mod-clearlesson .video-card .video-details-view i,
+.mod-clearlesson .video-card .video-details-view:not(.card-title) i,
 .mod-clearlesson .video-card .video-details-time i {
     margin-right: 3px;
 
     color: #53565c;
 }
 
-.mod-clearlesson .video-card .video-details-view,
+.mod-clearlesson .video-card .video-details-view:not(.card-title),
 .mod-clearlesson .video-card .video-details-time {
     font-size: .8rem;
 
@@ -560,14 +565,14 @@
     color: #747777;
 }
 
-.mod-clearlesson .video-card a.vid-speaker-link {
-    color: #747777;
-    font-size: 14px;
+.mod-clearlesson .video-card button.vid-speaker-link,
+.mod-clearlesson button.card-menu-button {
+    font-size: 13px;
+    padding: 4px 16px;
+    border-radius: 6px;
+    border-color: rgb(206, 212, 218);
 }
 
-.mod-clearlesson .video-card a.vid-speaker-link:hover {
-    color: #747777;
-}
 
 .mod-clearlesson .video-card-side {
     transition-duration: .4s;
@@ -581,7 +586,7 @@
 .mod-clearlesson .video-card-body {
     overflow: hidden;
 
-    height: 120px;
+    height: 130px;
     padding: 10px 12px 12px 12px;
 }
 
@@ -985,7 +990,8 @@
 
     background-repeat: no-repeat;
     background-position: center center !important;
-    background-size: 100% !important;
+    background-size: cover!important;
+    height: 100% !important;
 }
 
 .mod-clearlesson .playlistvideo-2 {
@@ -994,7 +1000,38 @@
 
     background-repeat: no-repeat;
     background-position: center center !important;
-    background-size: 200% 100% !important;
+    background-size: cover!important;
+    height: 100% !important;
+}
+
+/*collection card*/
+/* .mod-clearlesson .playlistimageholder.count-2 .playlistvideo,
+.mod-clearlesson .playlistimageholder.count-3 .playlistvideo:first-of-type {
+    width: 100%;
+} */
+.mod-clearlesson .collection-thumb.count-3 {
+    flex-direction: column;
+}
+
+.mod-clearlesson .playlistimageholder:is(.count-3,.count-4) {
+    width: 50%!important;
+    height: 50%!important;
+    max-width: 50%!important;
+}
+
+.mod-clearlesson .playlistimageholder.count-3:first-of-type {
+    height: 100%!important;
+    width: 50%!important;
+    flex-basis: unset!important;
+    flex-grow: unset!important;
+    flex-shrink: unset!important;
+}
+
+.mod-clearlesson .playlistimageholder.count-4 {
+    max-height: 50%!important;
+    flex-basis: unset!important;
+    flex-grow: unset!important;
+    flex-shrink: unset!important;
 }
 
 .mod-clearlesson .playlistvideo-3 {
@@ -1015,13 +1052,21 @@
     background-size: 200% 100% !important;
 }
 
+
 .mod-clearlesson .playlistvideo-4 {
     width: 50%;
     padding-top: 27%;
 
     background-repeat: no-repeat;
     background-position: center center;
-    background-size: 100% !important;
+    background-size: cover!important;
+    height: 50% !important;
+}
+
+.mod-clearlesson .collection-thumb.count-2 .playlistvideo,
+.mod-clearlesson .collection-thumb.count-3:first-of-type .playlistvideo {
+    background-size: cover!important;
+    background-position-x: 50%!important;
 }
 
 .mod-clearlesson .playlist-videos-play {
@@ -1160,19 +1205,15 @@
     z-index: -1;
 }
  
-.mod-clearlesson a.video-details-view,
-.mod-clearlesson a.video-details-view * {
+.mod-clearlesson a.video-details-view:not(.card-title),
+.mod-clearlesson a.video-details-view:not(.card-title) * {
     color: var(--info)!important;
 }
 
-.mod-clearlesson .select-resource-button {
-    border-top-right-radius: 0!important;
-    border-bottom-left-radius: 0!important;
+.mod-clearlesson .select-resource-button,
+.mod-clearlesson .card-menu-button {
     position: relative;
-    bottom: -1px;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-    border-color: mix(var(--primary), black, 25%);
+    border-radius: 6px;
 }
 
 .mod-clearlesson .cl-search-append {
@@ -1186,52 +1227,184 @@
 
     cursor: pointer;
 
-    color: #999;
-    border: 1px solid #e4e8eb;
+    color: var(--info);
+    border: 1px solid var(--info);
     border-left: none;
     border-radius: 6px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+    border-top-right-radius: 6px!important;
+    border-bottom-right-radius: 6px!important;
     background:   #fff;
     background: #f9f9f9;
 }
 
-.mod-clearlesson .cl-search-append,
-.mod-clearlesson .filter-label {
-    border: 1px solid rgb(143,149,158)!important;
+.mod-clearlesson .cl-search-append:hover {
+    color: white;
 }
 
-.mod-clearlesson .filter-label {
-    background-color: var(--secondary);
-    margin-right: -10px;
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
-    margin-bottom: 2px;
-    font-weight: 500;
-    padding-right: 25px;
-    padding-left: 15px;
+.mod-clearlesson #search {
+    background-color: transparent;
+    border-color: var(--info);
 }
 
-.mod-clearlesson .disabled-looking {
-    opacity: 0.7;
-}
-
-.mod-clearlesson .filter-animation {
-    outline-width: 9px!important;
-    transition: outline-width 0.5s ease-in-out;
-}
-
-.mod-clearlesson .filter-parent {
-    outline-width: 0px;
-    outline-style: solid;
-    outline-color: var(--secondary)!important;
-    outline-offset: -3px;
-    transition: outline-width 0.5s ease-in-out;
+.mod-clearlesson #search:focus {
+    border-color: var(--info)!important;
+    box-shadow: inset 0 0 .2rem var(--info);
+    /* background-color: rgba(white, 0); */
 }
 
 .mod-clearlesson .filter-child {
     position: relative;
-    top: 1px;
+}
+
+.mod-clearlesson .browser-filter {
+    /* width:unset!important; */
+    height: 56px;
+    padding-top: 1.5em;
+    padding-bottom: 0.25em;
+    /* no down chevron */
+    /* for Firefox */
+    -moz-appearance: none;
+    /* for Safari, Chrome, Opera */
+    -webkit-appearance: none;
+    cursor: pointer!important;
+    border-color: var(--info);
+    width: 290px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.mod-clearlesson .browser-filter:focus {
+    box-shadow: 0 0 0 0.2rem var(--info)!important;
+}
+
+select.decorated option:hover {
+    background-color: var(--info)!important;
+}
+
+/* .mod-clearlesson .stickybar {
+    position: sticky;
+} */
+
+.mod-clearlesson .browser-filter::-ms-expand {
+    /* no down chevron */
+    display: none;
+}
+
+.mod-clearlesson .browser-filters {
+    /* position: relative; */
+    margin-left: -350px;
+    overflow: hidden;
+    opacity: 0;;
+    transition: margin-left 0.5s ease-in-out, opacity 0.2s ease-in-out;
+    z-index:1;
+}
+
+.mod-clearlesson .browser-sidebar.expanded .browser-filters.fin  {
+    opacity: 1;
+}
+
+.mod-clearlesson .browser-sidebar.expanded .browser-filters  {
+    margin-left: 0em;
+}
+
+.mod-clearlesson .browser-sidebar {
+    width: 0px;
+    overflow: hidden;
+    transition: width 0.5s ease-in-out;
+    position: sticky;
+    right: 1em;
+}
+
+.mod-clearlesson .browser-sidebar.expanded  {
+    right: 0em;
+    border-right: 1px solid var(--secondary)!important;
+    width: calc(300px + 0.5em)!important;
+    min-width: calc(300px + 0.5em)!important;
+    max-width: calc(300px + 0.5em)!important;
+}
+
+.mod-clearlesson #open-filters-parent {
+    position: sticky;
+    top: 4em;
+    left:  calc(-1px - 1em);
+    /* left: 10em;
+    top: 10em; */
+    transition: all 0.5s ease-in-out;
+    z-index: 4;
+    width: 0px;
+    height: 0px;
+    opacity: 1;
+}
+.mod-clearlesson #open-filters-button {
+    position: sticky;
+    background-color: rgb(249, 249, 249);
+    font-size: 14px;
+    padding: 16px 14px 16px 14px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    border-left: none;
+    z-index: 5;
+    /* transition: all 0.5s ease-in-out; */
+    box-shadow: 0px 0px 3px var(--info);
+    margin-left: calc(-2px - 1em);
+}
+
+.mod-clearlesson #close-filters-parent {
+    position: sticky;
+    top: 4em;
+    left: -5em;
+    transition: all 0.5s ease-in-out;
+    z-index: 4;
+    width: 0px;
+    height: 0px;
+    opacity: 0;
+}
+.mod-clearlesson #close-filters-button {
+    position: sticky;
+    background-color: rgb(249, 249, 249);
+    font-size: 16px;
+    padding: 16px 14px 16px 14px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    border-left: none;
+    z-index: 5;
+    /* transition: all 0.5s ease-in-out; */
+    box-shadow: 0px 0px 3px var(--info);
+}
+
+.mod-clearlesson #open-filters-parent.expanded {
+    left: calc(300px + 0.5em);
+    opacity: 0;
+}
+
+.mod-clearlesson #close-filters-parent.expanded {
+    left: calc(300px + 0.5em);
+    opacity: 1;
+}
+
+.mod-clearlesson #open-filters-button:hover {
+    padding-left: 20px;
+    background-color: var(--info);
+}
+
+.mod-clearlesson #close-filters-button:hover {
+    padding-left: 20px;
+    background-color: var(--info);
+}
+
+.mod-clearlesson .filter-label {
+    position: absolute;
+    top: 0.25em;
+    left: 0.75em;
+    font-weight: bold;
+    color: var(--info);
 }
 
 .mod-clearlesson .view-icon.topic-play {
@@ -1481,27 +1654,73 @@ body.mod-clearlesson-bodyrestricted .activity-header{
 }
 .mod-clearlesson .select-button-container {
     position: absolute!important;
-    bottom: 1px;
+    bottom: 0.75em;
+    font-size: 13px;
 }
 
-.mod-clearlesson .video-card-wrapper:not(.topic-card, .collection-card) .select-button-container {
-    right: 1em;
+.mod-clearlesson .video-card-wrapper:not(.topic-card) .select-button-container {
+    right: 1.75em;
 }
 
-.mod-clearlesson .video-card-wrapper:is(.topic-card, .collection-card) .select-button-container,
+.mod-clearlesson .video-card-wrapper.topic-card .select-button-container,
 .mod-clearlesson .menu-container .select-button-container {
-    right: 0em;
+    right: 0.75em;
 }
 
-.mod-clearlesson .video-card .video-details-speaker {
+.mod-clearlesson .video-card .video-details-speaker,
+.mod-clearlesson .card-menu-button {
     position: absolute!important;
-    bottom: 0.5em;
-    left: 1em;
+    bottom: 0.75em;
+    left: 1.75em;
+    font-size: 13px;
 }
 
-.mod-clearlesson .select-button-container button {
-    border-bottom: 1px solid rgba(var(--primary), 1.5);
-    border-right: 1px solid rgba(var(--primary), 1.5);
+.mod-clearlesson .card-menu-button.topic {
+    left: 0.75em;
+}
+
+/* .mod-clearlesson .select-button-container button.btn.btn-primary {
+    border: 1px solid rgba(var(--primary), 1.5)!important;
+} */
+
+/* Clear search button */
+.mod-clearlesson .clear-search-container {
+    /* width: 0px; */
+    position:relative;
+    right: -1em;
+    pointer-events: disabled;
+    /* height: 37px; */
+}
+
+.mod-clearlesson .clear-search-button {
+    position: relative;
+    pointer-events: auto;
+    /* overflow: hidden; */
+    -webkit-transition: all .4s ease-in-out;
+    -moz-transition: all .4s ease-in-out;
+    -ms-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+    right: 1.8em;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 1;
+}
+
+.mod-clearlesson .clear-search-button:focus {
+    box-shadow: none;
+}
+
+.mod-clearlesson .clear-search-button.move {
+    z-index: 3;
+    right: 1.5em;
+    pointer-events: auto;
+    opacity: 1;
+}
+
+.mod-clearlesson .clear-search-button.move i {
+    background-color: white;
+    border-radius: 50%;
 }
 
 
