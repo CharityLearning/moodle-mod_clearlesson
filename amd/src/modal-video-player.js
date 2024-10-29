@@ -33,9 +33,11 @@ var modalVideoPlayer;
 export const init = () => {
     document.addEventListener('click', function(e) {
         var element;
-        if (e.target?.classList?.contains('play-icon')) {
+        if (e.target?.classList?.contains('play-icon')
+        || e.target?.classList?.contains('video-card-title')) {
             element = e.target;
-        } else if (e.target?.parentElement.classList?.contains('play-icon')) {
+        } else if (e.target?.parentElement.classList?.contains('play-icon')
+        || e.target?.parentElement.classList?.contains('video-card-title')) {
             element = e.target.parentElement;
         }
 
@@ -82,6 +84,9 @@ async function openVideoPlayer(externalref, name, src) {
     const backString = await getString('back');
     const selectVideoString = await getString('selectvideo', 'mod_clearlesson');
     const modalRootInner = modalVideoPlayer.getRoot()[0].children[0];
+    Utils.waitForElement('.modal-header', modalRootInner, function() {
+        modalRootInner.querySelector('.modal-header').classList.add('d-none');
+    });
     Utils.waitForElement('.modal-footer button.btn-secondary', modalRootInner, function() {
         const cancelButton = modalRootInner.querySelector('.modal-footer button.btn-secondary');
         cancelButton.innerHTML = backString;

@@ -19,16 +19,30 @@
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="mod-clearlesson">
-    <div class="d-flex">
+<div class="mod-clearlesson mod-clearlesson-backgrounddgrey" style="margin-top: -2em; position: relative">
+    <div style="position: relative"></div>
+    <div id="open-filters-parent" aria-hidden="false">
+        <button class="btn btn-outline-info" id="open-filters-button">
+            <i class="fa fa-filter" aria-hidden="true"></i>
+        </button>
+    </div>
+    <div id="close-filters-parent" aria-hidden="true" class="d-none"> 
+        <button class="btn btn-outline-info" id="close-filters-button">
+            <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+    </div>
+    <div class="d-flex" style="position: relative">
         {{> mod_clearlesson/elements/browser_sidebar}}
         <div class="row w-100 ml-1" id="resource-container">
-            <div class="browser-filters d-flex flex-wrap container-fluid w-100
-            align-content-start">
-                {{#filters}}
-                    {{> mod_clearlesson/elements/browser_filter}}
-                {{/filters}}
-                {{> mod_clearlesson/elements/searchbar}}
+            <div class="type-buttons w-100 pt-4 pb-1 pl-2 mod-clearlesson-backgrounddgrey"
+            style="position:sticky;z-index:3; top: -2em!important;">
+                {{#types}}
+                    <button href="javascript:void(0)" data-type="{{key}}" class="type-button btn btn-{{^disabled}}outline-{{/disabled}}info
+                    mb-2 mx-1 py-0 {{#disabled}}disabled-looking{{/disabled}}"
+                    style="position:relative;top:1px;font-weight: 500;height: 36.5px;">
+                        {{type}}
+                    </button>
+                {{/types}}
             </div>
                 {{#resourcecard}}
                     {{#resources}}

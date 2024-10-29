@@ -19,13 +19,21 @@
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="browser-sidebar mr-3 d-flex flex-column justify-content-start" style="width:100px;">
-    <div class="type-buttons" style="position:sticky;top:1px;">
-    {{#types}}
-        <button href="javascript:void(0)" data-type="{{key}}" class="type-button btn btn-info w-100 mb-2 mx-1 pr-1 py-0 {{#disabled}}disabled-looking{{/disabled}}"
-        style="position:sticky;top:1px;border-top-right-radius:0; border-bottom-right-radius:0;font-weight: 500;height: 36.5px;">
-            {{type}}
-        </button>
-    {{/types}}
+<div class="browser-sidebar d-flex flex-column justify-content-between align-content-start align-items-start"
+style="position: relative; z-index:3;">
+    <div class="browser-filters d-none flex-column" aria-expanded="false" style="position: fixed;">
+        {{> mod_clearlesson/elements/searchbar}}
+        {{#filters}}
+            {{> mod_clearlesson/elements/browser_filter}}
+        {{/filters}}
+        {{#filtersexist}}
+            <div class="w-100 d-flex flex-nowrap px-1">
+            <button class="btn btn-outline-info mr-3 mb-2 flex-grow-1" id="clear-filters"
+            style="height: 36.5px; width:calc(50% - 6px)">{{#str}} clearfilters, mod_clearlesson {{/str}}</button>
+            <button class="btn btn-outline-info mb-2 " id="clear-all"
+            style="height: 36.5px; width:calc(50% - 6px">{{#str}} clearall, mod_clearlesson {{/str}}</button>
+            </div>
+        {{/filtersexist}}
     </div>
+    <div></div>
 </div>

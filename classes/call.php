@@ -100,7 +100,6 @@ class call {
      */
     public static function get_browserform_data(string $type): array {
         $response = self::initate_call('/api/v1/get_browserform_data.php', ['type' => $type]);
-
         $decodedresponse = json_decode($response, true);
         $decodedresponse['records'][$type] = true;
         if ($type == 'series') {

@@ -19,12 +19,13 @@
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="form-group d-flex mr-3 mb-2 filter-parent" style="height: 38px;">
+<div class="form-group d-flex mb-2 mx-1 mt-1 filter-parent" style="height: 58px; position: relative;">
     <div class="filter-child d-flex">
         <label for="{{key}}-filter" class="d-flex align-items-center filter-label">{{title}}</label>
-        <select class="form-control browser-filter" style="width:unset!important" id="{{key}}-filter" name="{{key}}" data-initial-value={{initial}}>
+        <select class="form-control browser-filter" id="{{key}}-filter"
+        name="{{key}}" data-initial-value={{initial}}>
             {{#options}}
-                <option {{#selected}}selected{{/selected}} value="{{key}}">{{value}}</option>
+                <option {{#selected}}selected{{/selected}} value="{{key}}" style="width: 290px; text-oveflow: ellipsis">{{value}}</option>
             {{/options}}
         </select>
     </div>
