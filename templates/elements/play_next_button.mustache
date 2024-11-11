@@ -15,11 +15,18 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_clearlesson/elements/icons/check_circle
+    @template mod_clearlesson/play_next_button
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="watched-check{{#position}}{{^incourse}} othervideo{{/incourse}}{{/position}}{{^watched}} notwatched{{/watched}}" {{^watched}}aria-hidden="true"{{/watched}}{{#watched}}aria-hidden="false"{{/watched}}
-style="position: absolute; {{^incourse}}{{^position}}bottom: 0em; right: 0.3em; font-size: 2.2em;{{/position}}{{#position}}bottom: 0.1em; right: -0.3em; font-size: 1em;{{/position}}{{/incourse}}{{#incourse}}bottom: 0.1em; font-size:1.5em; {{#position}}right: 0.1em;{{/position}}{{^position}}right: 0.4em;{{/position}}{{/incourse}} overflow: visible;">
-    <i class="fas fa-check-circle" style="color: var(--success);" title="{{videowatchedstring}}" alt="{{videowatchedstring}}"></i>
-</div>
+{{^isvideo}}
+    <div id="play-next-containter" class="w-100">
+        {{^islast}}
+            <button id="play-next-button" class="btn-primary loading {{^watched}} notwatched{{/watched}}"
+            title="{{playnextstring}}" alt="{{playnextstring}}"  onclick="event.preventDefault();window.playNextItem()"
+            {{^watched}}aria-hidden="true"{{/watched}}{{#watched}}aria-hidden="false"{{/watched}}>
+                &nbsp&nbsp<i class="fas fa-play"></i>&nbsp&nbsp{{playnextstring}}&nbsp&nbsp&nbsp&nbsp
+            </button>
+        {{/islast}}
+    </div>
+{{/isvideo}}

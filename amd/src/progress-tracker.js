@@ -24,12 +24,14 @@
  */
 
 import Ajax from 'core/ajax';
+import * as Utils from './utils';
 
+var beforeUnloadEventSet = false;
 var loopCount = 0;
 
 export const init = async() => {
     if (typeof window.VimeoPlayerConstructor === 'undefined') {
-        setTimeout(init, 100);
+        setTimeout(init, 50);
         return;
     }
     if (typeof window.player !== 'undefined') {
@@ -42,6 +44,12 @@ export const init = async() => {
     window.player = new window.VimeoPlayerConstructor(iframe);
 
     window.extref = await window.player.getVideoTitle().then(function(title) {
+        if (window.playNext) {
+            Utils.waitForElement('.watched-check', document, function() {
+                window.playNext = false;
+                window.player.play();
+            });
+        }
         return title;
     });
 
@@ -54,11 +62,10 @@ export const init = async() => {
         window.updateProgress = false;
     } else {
         window.watchedAll = false;
-        window.updateProgress = true;
     }
 
     window.viewedStatus =
-        container?.querySelector('.video-title-wrapper .watched-check')?.classList
+        container?.querySelector('.speakerinfo .watched-check')?.classList
             .contains('notwatched') ? 'unwatched' : 'watched';
 
     // When progress is updated, if the video has a higher status already, we don't update it.
@@ -78,8 +85,21 @@ export const init = async() => {
     window.currentTime = 0;
     window.player.on('timeupdate', function(data) {
         window.player.getDuration().then(async function(duration) {
+            const currentProgress = (data.seconds / duration);
+            const videoLink =
+            document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
+            if (videoLink) {
+                const progressBar = videoLink.closest('.video-card-side')?.querySelector('.progress-bar');
+                if (progressBar) {
+                    const existingProgress = parseFloat(progressBar.style.width.slice(0, -1));
+                    if ((currentProgress * 100) > existingProgress) {
+                        progressBar.setAttribute('style', 'width: ' + currentProgress * 100 + '%!important');
+                        progressBar.setAttribute('aria-valuenow', data.seconds);
+                    }
+                }
+            }
             // If 90% of the video has been watched, we update the status to 'watched'.
-            if (data.seconds / duration >= 0.9) {
+            if (currentProgress >= 0.9) {
                 if (window.updateProgress) {
                     videoWatched();
                     updateProgressAndActivity();
@@ -91,12 +111,18 @@ export const init = async() => {
         window.currentTime = Math.round(data.seconds);
     });
 
-    // Before the user leaves the page, we update the progress.
-    window.addEventListener('beforeunload', async function() {
-        if (window.updateProgress) {
-            updateProgressAndActivity();
-        }
-    }, true);
+    if (!beforeUnloadEventSet) {
+        window.addEventListener('beforeunload', async function() {
+            if (window.updateProgress) {
+                // If the user leaves the page, we update the progress before they go.
+                await updateProgressAndActivityPromise();
+                return undefined;
+            } else {
+                return undefined;
+            }
+        }, true);
+        beforeUnloadEventSet = true;
+    }
 
     // Every 30 minutes we update the progress.
     setInterval(async function() {
@@ -124,6 +150,8 @@ const updateProgress = async() => {
         || typeof window.pageType === 'undefined' || typeof window.watchedAll === 'undefined') {
         return false;
     }
+
+
     loopCount = 0;
 
     const args = {
@@ -152,10 +180,29 @@ const updateProgress = async() => {
 function videoWatched() {
     window.viewedStatus = 'watched';
     window.updateProgress = false;
-    document.querySelector('.video-title-wrapper .watched-check').classList.remove('notwatched');
-    const playlistVideoLink = document.querySelector('.video-card-side a[data-externalref="' + window.extref + '"]');
+    document.querySelector('.speakerinfo .watched-check').classList.remove('notwatched');
+    document.querySelector('.speakerinfo .watched-check').setAttribute('aria-hidden', 'false');
+
+    const videoLinks = document.getElementsByClassName('video-player-link');
+    if (videoLinks) {
+        const lastLinkRef = videoLinks[videoLinks.length - 1].getAttribute('data-externalref');
+        if (lastLinkRef !== window.extref) {
+            // Only reveal the play next button if this is not the last video link in the list.
+            Utils.waitForElement('.speakerinfo .watched-check:not(.notwatched)', document, function() {
+                setTimeout(function() {
+                    document.querySelector('#play-next-button')?.classList.remove('notwatched');
+                    document.querySelector('#play-next-button')?.setAttribute('aria-hidden', 'false');
+                }, 500);
+            });
+        }
+    }
+
+    const playlistVideoLink = document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
     if (playlistVideoLink) {
-        playlistVideoLink.closest('.video-card-side').querySelector('.watched-check').classList.remove('notwatched');
+        const videoCardSide = playlistVideoLink.closest('.video-card-side');
+        videoCardSide.querySelector('.progress-bar').classList.add('width100');
+        videoCardSide.querySelector('.watched-check').classList.remove('notwatched');
+        videoCardSide.querySelector('.watched-check').setAttribute('aria-hidden', 'false');
         const otherVideosColumn = playlistVideoLink.closest('.box');
         let watchedAll = true;
         otherVideosColumn.querySelectorAll('.watched-check').forEach(function(watchedCheck) {
@@ -192,6 +239,7 @@ export function menuItemWatched(itemRef, direct = true) {
         // The last menu item is the one we want to update as this will be the menuItemParent of the player.
         if (index === domPosition) {
             singleItem.querySelector('.watched-check').classList.remove('notwatched');
+            singleItem.querySelector('.watched-check').setAttribute('aria-hidden', 'false');
             // If all menu items in the parent have been watched, we update the parents parent if it is present.
             const parentMenu = singleItem.closest('.menu-container');
             if (parentMenu) {
@@ -220,24 +268,50 @@ export function menuItemWatched(itemRef, direct = true) {
 export async function updateProgressAndActivity() {
     var activityInfo;
     const response = await updateProgress();
-    if (!response) {
-        if (loopCount++ < 20) {
-            setTimeout(updateProgressAndActivity, 100);
-            return false;
+    return new Promise(function(resolve) {
+        if (!response) {
+            if (loopCount++ < 20) {
+                return new Promise(function(resolve) {
+                    setTimeout(function() {
+                        resolve();
+                    }, 50);
+                }).then(updateProgressAndActivity);
+            }
         }
-    }
-    if (response?.activitymodulehtml) {
-        if (window.pageType === 'course') {
-            activityInfo = document.querySelector('.activity[data-id="' + window.cmid + '"]');
+
+        if (response?.activitymodulehtml) {
+            if (window.pageType === 'course') {
+                activityInfo = document.querySelector('.activity[data-id="' + window.cmid + '"]');
+            }
+            if (window.pageType === 'activity') {
+                activityInfo = document.querySelector('.activity-information');
+            }
+            if (activityInfo) {
+                activityInfo.outerHTML = response.activitymodulehtml;
+            }
+            window.watchedAll = true;
+            document.querySelector('.incourse')?.setAttribute('data-watchedall', '1');
         }
-        if (window.pageType === 'activity') {
-            activityInfo = document.querySelector('.activity-information');
+        resolve(true);
+        return true;
+    });
+}
+
+/**
+ * Update the progress and activity module in the course page if required.
+ * This is designed to be used with await which will pause the script until
+ * progress has been updated.  * Great for when a playlist item is clicked.
+ * Or to update the progress before the user leaves the page.
+ */
+export async function updateProgressAndActivityPromise() {
+    const result = await updateProgressAndActivity();
+    return new Promise((resolve) => {
+        if (result) {
+            resolve(result);
+        } else {
+            setTimeout(() => {
+                updateProgressAndActivity().then((result) => resolve(result));
+            }, 50);
         }
-        if (activityInfo) {
-            activityInfo.outerHTML = response.activitymodulehtml;
-        }
-        window.watchedAll = true;
-        document.querySelector('.incourse')?.setAttribute('data-watchedall', '1');
-    }
-    return true;
+    });
 }

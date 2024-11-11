@@ -25,9 +25,9 @@
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 
-export default {/** @alias module:tool_lpmigrate/frameworks_datasource */
+export default {
     /**
-     * List frameworks.
+     * List Resources
      *
      * @param {String} type The type of resource.
      * @param {String} query The query.

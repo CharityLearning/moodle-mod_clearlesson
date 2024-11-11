@@ -174,7 +174,7 @@ class resource_browser implements \renderable, \templatable {
         $this->response['showselectbutton'] = true;
         $this->response['selectstring'] = $selectstring;
         $type = ($type === 'serie') ? 'series' : $type;
-        $this->response['menubuttonstring'] = $viewstring . ' ' . $type . ' ' . $whatisbeingcounted;
+        $this->response['menubuttonstring'] = $viewstring;
         $this->response['type'] = $this->loadtype;
         $resources = [];
         $x = 0;

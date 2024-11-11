@@ -31,15 +31,15 @@ import * as progressTracker from './progress-tracker';
 import * as pageFunctions from './page-functions';
 
 // eslint-disable-next-line no-unused-vars
-var url, backString, outputType, playerModalFromMenu, newMenuModal, completionDropdown;
+var url, backString, outputType, playerModalFromMenu, newMenuModal;
 var firstLoad = 1;
+window.playNext = false;
 
 require(['../../../mod/clearlesson/vimeo/vimeo-sdk'], function(VimeoPlayerConstructor) {
     window.VimeoPlayerConstructor = VimeoPlayerConstructor;
 });
 
 export const init = async(type) => {
-    window.updateProgress = true;
     window.pageType = 'activity';
     var position = 1;
     backString = await getString('back');
@@ -64,7 +64,8 @@ export const init = async(type) => {
             window.resourceRef = clearlessonElement.querySelector('.incourse-player').getAttribute('data-resourceref');
             window.type = clearlessonElement.querySelector('.incourse-player').getAttribute('data-type');
             pageFunctions.updateCompletionStatusIfIncorrect(completionInfoElement, clearlessonElement);
-            pageFunctions.setWindowWatched();
+            await pageFunctions.setWindowWatched();
+            pageFunctions.removeLoadingClasses(clearlessonElement);
         });
     }
 
@@ -76,33 +77,32 @@ export const init = async(type) => {
             window.type = clearlessonElement.querySelector('.incourse-menu').getAttribute('data-type');
             pageFunctions.updateCompletionStatusIfIncorrect(completionInfoElement, clearlessonElement);
             window.updateProgress = false;
+            pageFunctions.removeLoadingClasses(clearlessonElement);
         });
     }
 
     document.addEventListener('click', async function(e) {
         const element = e.target;
-        if (element.classList?.contains('play-icon')
-        || element.parentElement.classList?.contains('play-icon')
-        || element.classList?.contains('video-player-link')
-        || element.parentElement.classList?.contains('video-player-link')) {
+        const menuItem = element.closest('.menu-item');
+        if (menuItem) {
             e.preventDefault();
-            if (element.classList.contains('incourse-player-link')
-            || element.parentElement.classList.contains('incourse-player-link')) {
-                if (element.getAttribute('data-type') === 'playlists'
-                || element.parentElement.getAttribute('data-type') === 'playlists') {
-                    // 2nd level modals.
-                    playerModalFromMenu = await pageFunctions.openPlayerFromMenu(e, url, firstLoad, completionDropdown, backString);
-                } else {
-                    // For collections we'll open the series menu.
-                    newMenuModal = await pageFunctions.openNewMenuModal(e, url, firstLoad, completionDropdown, backString);
-                }
+            const itemType = menuItem.getAttribute('data-itemtype');
+            if (itemType === 'playlists') {
+                // 2nd level modals.
+                playerModalFromMenu = await pageFunctions.openPlayerFromMenu(e, url, firstLoad, backString);
             } else {
-                position = parseInt(element.closest('.has-position').getAttribute('data-position'));
-                if (element.closest('.modal-body')) {
-                    reRenderModulePlayerModal(position, url);
-                } else {
-                    reRenderPlayer(position);
-                }
+                // For collections we'll open the series menu.
+                newMenuModal = await pageFunctions.openNewMenuModal(e, url, firstLoad, backString);
+            }
+        } else if (element.classList?.contains('othervideo-title')
+        || element.parentElement?.classList?.contains('othervideo-title')
+        || element.classList?.contains('video-player-link')
+        || element.parentElement?.classList?.contains('video-player-link')) {
+            position = parseInt(element.closest('.has-position').getAttribute('data-position'));
+            if (element.closest('.modal-body')) {
+                reRenderModulePlayerModal(position, url);
+            } else {
+                reRenderPlayer(position);
             }
         }
     });
@@ -116,7 +116,7 @@ export const init = async(type) => {
  */
 async function reRenderPlayer(position, url) {
     if (window.updateProgress) {
-        progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
+        await progressTracker.updateProgressAndActivityPromise(); // Record any progress from the last player.
     }
     const data = await getPlayerRenderable(position, url);
     const {html, js} = await Templates.renderForPromise('mod_clearlesson/incourse_player', data.response);
@@ -126,8 +126,9 @@ async function reRenderPlayer(position, url) {
 
     await Templates.runTemplateJS(js);
     progressTracker.init();
-    pageFunctions.setWindowWatched();
+    await pageFunctions.setWindowWatched();
     document.querySelector('.incourse-player').scrollIntoView({behavior: 'smooth'});
+    pageFunctions.removeLoadingClasses(pageContainer);
 }
 
 /**
@@ -154,7 +155,7 @@ function getPlayerRenderable(position) {
  */
 async function reRenderModulePlayerModal(position, url) {
     if (window.updateProgress) {
-        progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
+        await progressTracker.updateProgressAndActivityPromise(); // Record any progress from the last player.
     }
     const externalref = document.querySelector('.incourse-player').getAttribute('data-resourceref');
     const formParams = {cmid: window.cmid,
@@ -166,7 +167,8 @@ async function reRenderModulePlayerModal(position, url) {
     const serialFormParams = Utils.serialize(formParams);
     const bodyContent = playerModalFromMenu.getBody(serialFormParams);
     await playerModalFromMenu.modal.setBodyContent(bodyContent);
-    pageFunctions.setWindowWatched();
+    await pageFunctions.setWindowWatched();
     document.querySelector('.incourse-player').scrollIntoView({behavior: 'smooth'});
+    pageFunctions.removeLoadingClasses(playerModalFromMenu.modal.getRoot()[0]);
 }
 

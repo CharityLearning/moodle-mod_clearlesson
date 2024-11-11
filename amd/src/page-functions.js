@@ -92,17 +92,46 @@ export function setModalButtons(modalRootInner, backString) {
 /**
  * Set the modal to nearly fullscreen size.
  * @param {HTMLelement} modalRootInner The root of the modal.
+ * @param {Boolean} popup The popup flag.
+ * @param {Boolean} player Is the modal for a player?
  */
-export function setModalFullscreen(modalRootInner) {
-    let modalHeight = Math.ceil(window.innerHeight * 0.94);
-    let modalWidth = Math.ceil(window.innerWidth * 0.94);
+export function setModalFullscreen(modalRootInner, popup = false, player = false) {
+    var modalHeight, modalWidth, style;
+    if (popup) {
+        let rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        modalHeight = Math.ceil(window.innerHeight - rem);
+        modalWidth = Math.ceil(window.innerWidth - rem);
+    } else {
+        modalHeight = Math.ceil(window.innerHeight * 0.94);
+        modalWidth = Math.ceil(window.innerWidth * 0.94);
+    }
+    const playerRatio = 1481 / 833;
+    const extraWidth = 329;
+    const extraHeight = 278;
     modalWidth = modalWidth > 1800 ? 1800 : modalWidth;
-    modalRootInner.setAttribute('style',
-        'width: ' + modalWidth +
-        'px;max-width: ' + modalWidth +
-        'px;height: ' + modalHeight +
-        'px;max-height: ' + modalHeight + 'px;'
-    );
+    // We adjust the modal width for small height windows.
+    if (player && modalWidth === 1800) {
+        const playerWidth = modalWidth - extraWidth;
+        const playerHeight = playerWidth / playerRatio;
+        if ((playerHeight + extraHeight) > modalHeight) {
+            // Adust the modalWidth to fit the player.
+            modalWidth = (modalHeight - extraHeight) * playerRatio + 32;
+        }
+    }
+
+    style = '';
+    if (window.innerWidth > 576) {
+        style += 'width: ' + modalWidth +
+                'px;max-width: ' + modalWidth + 'px;';
+    }
+    if (!player) {
+        style += 'height: ' + modalHeight +
+                'px;max-height: ' + modalHeight + 'px;';
+    }
+    if (player) {
+        style += 'height: auto';
+    }
+    modalRootInner.setAttribute('style', style);
 }
 
 /**
@@ -110,17 +139,15 @@ export function setModalFullscreen(modalRootInner) {
  * @param {Event} e The event object.
  * @param {string} url The URL to use for the AJAX call.
  * @param {number} firstLoad The first load flag.
- * @param {HTMLelement} completionDropdown The completion dropdown/button (may not be present).
  * @param {string} backString The string to use for the back button.
  */
-export async function openPlayerFromMenu(e, url, firstLoad, completionDropdown, backString) {
+export async function openPlayerFromMenu(e, url, firstLoad, backString) {
     var playerModalFromMenu;
     const elementAncestor = e.target.closest('.menu-item');
     const instanceName = elementAncestor.querySelector('.menu-item-title > .searchable').innerHTML;
     const externalRef = elementAncestor.getAttribute('data-externalref');
-
     if (window.updateProgress) {
-        progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
+        await progressTracker.updateProgressAndActivityPromise(); // Record any progress from the last player.
     }
 
     playerModalFromMenu = new ModalForm({
@@ -135,14 +162,19 @@ export async function openPlayerFromMenu(e, url, firstLoad, completionDropdown, 
 
     playerModalFromMenu.addEventListener(playerModalFromMenu.events.LOADED, function() {
         const modalRootInner = playerModalFromMenu.modal.getRoot()[0].children[0];
-        setModalFullscreen(modalRootInner);
+        if (window.innerWidth < 577) { // Video modals should fit the video player.
+            modalRootInner.setAttribute('style', 'height: unset!important;');
+        }
+        const isPopup = document.querySelector('body.mod-clearlesson-popup') ? true : false;
+        setModalFullscreen(modalRootInner, isPopup, true);
         setModalBodyGrey(modalRootInner);
 
         Utils.waitForElement('.incourse-player', modalRootInner, async function() {
-            setWindowWatched();
+            await setWindowWatched();
             firstLoad = 0;
         });
         setModalButtons(modalRootInner, backString);
+        removeLoadingClasses(modalRootInner);
     });
 
     playerModalFromMenu.show();
@@ -154,17 +186,16 @@ export async function openPlayerFromMenu(e, url, firstLoad, completionDropdown, 
  * @param {Event} e The event object.
  * @param {string} url The URL to use for the AJAX call.
  * @param {number} firstLoad The first load flag.
- * @param {HTMLelement} completionDropdown The completion dropdown/button (may not be present).
  * @param {string} backString The string to use for the back button.
  */
-export async function openNewMenuModal(e, url, firstLoad, completionDropdown, backString) {
+export async function openNewMenuModal(e, url, firstLoad, backString) {
     var newMenuModal;
     const menuItem = e.target.closest('.menu-item');
     const externalRef = menuItem.getAttribute('data-externalref');
     const instanceName = menuItem.querySelector('.menu-item-title > .searchable').innerHTML;
-
+    const isPopup = document.querySelector('body.mod-clearlesson-popup') ? true : false;
     if (window.updateProgress) {
-        progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
+        await progressTracker.updateProgressAndActivityPromise(); // Record any progress from the last player.
     }
 
     newMenuModal = new ModalForm({
@@ -179,9 +210,13 @@ export async function openNewMenuModal(e, url, firstLoad, completionDropdown, ba
 
     newMenuModal.addEventListener(newMenuModal.events.LOADED, function() {
         const modalRootInner = newMenuModal.modal.getRoot()[0].children[0];
+        if (isPopup) {
+            setModalFullscreen(modalRootInner, isPopup);
+        }
         setModalBodyGrey(modalRootInner);
         setModalButtons(modalRootInner, backString);
         window.updateProgress = false;
+        removeLoadingClasses(modalRootInner);
     });
 
     newMenuModal.show();
@@ -191,10 +226,15 @@ export async function openNewMenuModal(e, url, firstLoad, completionDropdown, ba
 /**
  * Set the watched status of the window.
  */
-export function setWindowWatched() {
-    const watchedCheck = document.querySelector('.incourse-player .player-column .video-title-wrapper .watched-check');
-    // If the video has been watched already dont update the progress.
-    window.updateProgress = watchedCheck?.classList.contains('notwatched');
+export async function setWindowWatched() {
+    return new Promise((resolve) => {
+        Utils.waitForElement('.incourse-player .player-column .video-title-wrapper', document, function() {
+            const watchedCheck = document.querySelector('.incourse-player .player-column .speakerinfo .watched-check');
+            // If the video has been watched already dont update the progress.
+            window.updateProgress = watchedCheck?.classList.contains('notwatched');
+            resolve();
+        });
+    });
 }
 
 /**
@@ -203,4 +243,28 @@ export function setWindowWatched() {
  */
 export function setModalBodyGrey(modalRootInner) {
     modalRootInner.querySelector('.modal-body').classList.add('mod-clearlesson-backgrounddgrey');
+}
+
+window.playNextItem = function() {
+    const nextVideo = document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]')
+        .closest('.video-card-side').nextElementSibling;
+    if (nextVideo) {
+        window.playNext = true;
+        nextVideo.querySelector('span').click();
+    }
+};
+
+/**
+ * Remove loading classes.
+ *
+ * @param {HTMLelement} watchElement The element to watch for.
+ */
+export function removeLoadingClasses(watchElement) {
+    Utils.waitForElement('.loading', watchElement, function() {
+        setTimeout(function() {
+            watchElement.querySelectorAll('.loading').forEach(function(element) {
+                element.classList.remove('loading');
+            });
+        }, 100);
+    });
 }

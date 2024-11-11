@@ -20,6 +20,5 @@
     Moodle template for the list of valid options in an autocomplate form element.
 }}
 <div class="select-button-container">
-    <button data-type="{{^itemtype}}{{type}}{{/itemtype}}{{itemtype}}" data-externalref="{{externalref}}"
-    class="btn btn-primary btn-sm select-resource-button px-3" style="font-size:13px;">{{selectstring}}</button>
+    {{> mod_clearlesson/elements/select_resource_button_inner }}
 </div>

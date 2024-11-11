@@ -32,6 +32,7 @@ import * as pageFunctions from './page-functions';
 
 var url, playerModal, formClass, backString, modalType, playerModalFromMenu, completionInfoElement;
 var firstLoad = 1;
+window.playNext = false;
 
 export const init = () => {
     var position = 1;
@@ -68,7 +69,7 @@ export const init = () => {
             }
 
             if (window.updateProgress) {
-                progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
+                await progressTracker.updateProgressAndActivityPromise(); // Record any progress from the last player.
             }
 
             playerModal = new ModalForm({
@@ -88,18 +89,22 @@ export const init = () => {
 
                 // Fullscreen modal for series, topics and playlists.
                 if (type !== 'play' && modalType === 'player') {
-                    pageFunctions.setModalFullscreen(modalRootInner);
+                    pageFunctions.setModalFullscreen(modalRootInner, false, true);
                 }
 
                 if (modalType === 'player') {
+                    if (window.innerWidth < 577) { // Video modals should fit the video player.
+                        modalRootInner.setAttribute('style', 'height: unset!important;');
+                    }
                     Utils.waitForElement('.incourse-player', modalRootInner, async function() {
                         // Store the resource reference and resource type for the progress tracker.
                         // These are only set from the base layer.
                         window.resourceRef = modalRootInner.querySelector('.incourse-player').getAttribute('data-resourceref');
                         pageFunctions.updateCompletionStatusIfIncorrect(completionInfoElement, modalRootInner);
                         window.type = document.querySelector('.incourse-player').getAttribute('data-type');
-                        pageFunctions.setWindowWatched();
+                        await pageFunctions.setWindowWatched();
                         firstLoad = 0;
+                        pageFunctions.removeLoadingClasses(modalRootInner);
                     });
                 }
 
@@ -111,6 +116,7 @@ export const init = () => {
                         window.type = document.querySelector('.incourse-menu').getAttribute('data-type');
                         pageFunctions.updateCompletionStatusIfIncorrect(completionInfoElement, modalRootInner);
                         window.updateProgress = false;
+                        pageFunctions.removeLoadingClasses(modalRootInner);
                     });
                 }
 
@@ -130,29 +136,27 @@ export const init = () => {
 
     document.addEventListener('click', async function(e) {
         const element = e.target;
-        if (element.classList?.contains('play-icon')
-        || element.parentElement.classList?.contains('play-icon')
-        || element.classList?.contains('video-player-link')
-        || element.parentElement.classList?.contains('video-player-link')) {
+        const menuItem = element.closest('.menu-item');
+        if (menuItem) {
             e.preventDefault();
-            if (element.classList.contains('incourse-player-link')
-            || element.parentElement.classList.contains('incourse-player-link')) {
-                if (element.getAttribute('data-type') === 'playlists'
-                || element.parentElement.getAttribute('data-type') === 'playlists') {
-                    // 2nd level modals.
-                    playerModalFromMenu = await pageFunctions.openPlayerFromMenu(e,
-                                                                                url,
-                                                                                firstLoad,
-                                                                                completionInfoElement,
-                                                                                backString);
-                } else {
-                    // For collections we'll open the series menu.
-                    await pageFunctions.openNewMenuModal(e, url, firstLoad, completionInfoElement, backString);
-                }
+            const itemType = menuItem.getAttribute('data-itemtype');
+            if (itemType === 'playlists') {
+                // 2nd level modals.
+                playerModalFromMenu = await pageFunctions.openPlayerFromMenu(e,
+                                                                            url,
+                                                                            firstLoad,
+                                                                            backString);
             } else {
-                position = parseInt(element.closest('.has-position').getAttribute('data-position'));
-                reRenderCoursePlayerModal(position, url);
+                // For collections we'll open the series menu.
+                await pageFunctions.openNewMenuModal(e, url, firstLoad, backString);
             }
+        } else if (element.classList?.contains('othervideo-title')
+        || element.parentElement?.classList?.contains('othervideo-title')
+        || element.classList?.contains('video-player-link')
+        || element.parentElement?.classList?.contains('video-player-link')) {
+            e.preventDefault();
+            position = parseInt(element.closest('.has-position').getAttribute('data-position'));
+            reRenderCoursePlayerModal(position, url);
         }
     });
 };
@@ -165,6 +169,9 @@ export const init = () => {
  */
 async function reRenderCoursePlayerModal(position, url) {
     var theModal;
+    if (window.updateProgress) {
+        await progressTracker.updateProgressAndActivityPromise(); // Record any progress from the last player.
+    }
     const formParams = {cmid: window.cmid, course: window.courseid, url: url, position: position, firstload: 0};
     if (modalType === 'player') {
         theModal = playerModal;
@@ -174,13 +181,11 @@ async function reRenderCoursePlayerModal(position, url) {
         formParams.externalref = document.querySelector('.incourse-player').getAttribute('data-resourceref');
     }
     const serialFormParams = Utils.serialize(formParams);
-    if (window.updateProgress) {
-        progressTracker.updateProgressAndActivity(); // Record any progress from the last player.
-    }
     const bodyContent = theModal.getBody(serialFormParams);
     await theModal.modal.setBodyContent(bodyContent);
-    pageFunctions.setWindowWatched();
+    await pageFunctions.setWindowWatched();
     document.querySelector('.incourse-player').scrollIntoView({behavior: 'smooth'});
+    pageFunctions.removeLoadingClasses(theModal.modal.getRoot()[0].children[0]);
 }
 
 /**

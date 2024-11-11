@@ -157,7 +157,9 @@ class get_player_renderable extends \core_external\external_api {
                             'speakeref' => new external_value(PARAM_TEXT, 'The external reference of the speaker', VALUE_OPTIONAL),
                             'topicref' => new external_value(PARAM_TEXT, 'The external reference of the topic', VALUE_OPTIONAL),
                             'playlistref' => new external_value(PARAM_TEXT, 'The external reference of the playlist', VALUE_OPTIONAL),
-                            'position' => new external_value(PARAM_INT, 'The position of the video in the resource', VALUE_OPTIONAL)
+                            'position' => new external_value(PARAM_INT, 'The position of the video in the resource', VALUE_OPTIONAL),
+                            'playnextstring' => new external_value(PARAM_TEXT, 'The play next button text', VALUE_OPTIONAL),
+                            'islast' => new external_value(PARAM_BOOL, 'Is this the last video in the resource', VALUE_OPTIONAL),
                         )
                     ),
                 )
