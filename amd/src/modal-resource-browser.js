@@ -192,6 +192,10 @@ async function openResourceBrowser() {
                 e.preventDefault();
                 clearSelect(browserForm);
             }
+            if (e.target.id === 'clear-search') {
+                e.preventDefault();
+                document.querySelector('.clear-search-button').click();
+            }
         });
 
         Utils.waitForElement('.modal-footer button.btn-primary', modalRootInner, function() {
@@ -672,35 +676,43 @@ function toggleFilters(action) {
     const filtersInner = document.querySelector('.browser-filters');
     const openButton = document.getElementById('open-filters-parent');
     const closeButton = document.getElementById('close-filters-parent');
-    if (action === 'open') {
-        filters.setAttribute('aria-expanded', 'true');
-        filters.classList.add('expanded');
-        openButton.classList.add('expanded');
-        openButton.setAttribute('aria-hidden', 'true');
-        closeButton.classList.add('expanded');
-        closeButton.setAttribute('aria-hidden', 'false');
-        setTimeout(function() {
-            openButton.classList.add('d-none');
-            closeButton.classList.remove('d-none');
-            filtersInner.classList.remove('d-none');
-            filtersInner.classList.add('d-flex');
+    const modalBody = document.querySelector('.modal-body .mod-clearlesson.browser');
+
+    setTimeout(function() {
+        if (action === 'open') {
+            modalBody.classList.add('expanded');
+            filters.setAttribute('aria-expanded', 'true');
+            filtersInner.classList.remove('inwisible-small');
+            openButton.setAttribute('aria-hidden', 'true');
+            closeButton.setAttribute('aria-hidden', 'false');
+            closeButton.classList.add('inwisible-small');
             setTimeout(function() {
-                filtersInner.classList.add('fin');
-            }, 10);
-        }, 500);
-    } else {
-        filters.classList.remove('expanded');
-        filters.setAttribute('aria-expanded', 'false');
-        openButton.classList.remove('expanded');
-        openButton.setAttribute('aria-hidden', 'false');
-        closeButton.classList.remove('expanded');
-        closeButton.setAttribute('aria-hidden', 'true');
-        filtersInner.classList.add('d-none');
-        filtersInner.classList.remove('d-flex');
-        filtersInner.classList.remove('fin');
-        setTimeout(function() {
-            openButton.classList.remove('d-none');
-            closeButton.classList.add('d-none');
-        }, 500);
-    }
+                closeButton.classList.add('d-block');
+                closeButton.classList.add('d-xl-none');
+                closeButton.classList.remove('d-none');
+                closeButton.classList.remove('inwisible-small');
+                openButton.classList.add('d-none');
+                openButton.classList.remove('d-block');
+                openButton.classList.remove('d-xl-none');
+                openButton.classList.add('inwisible-small');
+            }, 500);
+        } else {
+            modalBody.classList.remove('expanded');
+            closeButton.setAttribute('aria-hidden', 'true');
+            openButton.setAttribute('aria-hidden', 'false');
+            openButton.classList.add('inwisible-small');
+            filters.setAttribute('aria-expanded', 'false');
+            setTimeout(function() {
+                openButton.classList.remove('d-none');
+                openButton.classList.add('d-block');
+                openButton.classList.add('d-xl-none');
+                openButton.classList.remove('inwisible-small');
+                closeButton.classList.remove('d-block');
+                closeButton.classList.remove('d-xl-none');
+                closeButton.classList.add('d-none');
+                closeButton.classList.add('inwisible-small');
+                filtersInner.classList.add('inwisible-small');
+            }, 500);
+        }
+    }, 5);
 }

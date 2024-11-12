@@ -115,11 +115,18 @@ class incourse_player implements \renderable, \templatable {
                                                                         $this->position,
                                                                         $resetdate);
         }
+        if (isset($this->response['othervideos'])
+        && count($this->response['othervideos']) === $this->position) {
+            $this->response['islast'] = true;
+        } else {
+            $this->response['islast'] = false;
+        }
         $this->response['firstload'] = $firstload;
         // Add the resourceref to the response.
         // The response externalref is the externalref of the first video in the resource.
         $this->response['resourceref'] = $this->externalref;
         $this->response['type'] = $this->type;
+        $this->response['playnextstring'] = get_string('playnext', 'clearlesson');
     }
 
     /**

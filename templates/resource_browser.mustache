@@ -19,23 +19,23 @@
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="mod-clearlesson mod-clearlesson-backgrounddgrey" style="margin-top: -2em; position: relative">
+<div class="mod-clearlesson mod-clearlesson-backgrounddgrey browser" style="margin-top: -2em; position: relative">
     <div style="position: relative"></div>
-    <div id="open-filters-parent" aria-hidden="false">
+    <div id="open-filters-parent" class="d-block d-xl-none">
         <button class="btn btn-outline-info" id="open-filters-button">
-            <i class="fa fa-filter" aria-hidden="true"></i>
+            <i class="fa fa-filter"></i>
         </button>
     </div>
-    <div id="close-filters-parent" aria-hidden="true" class="d-none"> 
+    <div id="close-filters-parent" class="d-none">
         <button class="btn btn-outline-info" id="close-filters-button">
-            <i class="fa fa-times" aria-hidden="true"></i>
+            <i class="fa fa-times"></i>
         </button>
     </div>
     <div class="d-flex" style="position: relative">
         {{> mod_clearlesson/elements/browser_sidebar}}
         <div class="row w-100 ml-1" id="resource-container">
             <div class="type-buttons w-100 pt-4 pb-1 pl-2 mod-clearlesson-backgrounddgrey"
-            style="position:sticky;z-index:3; top: -2em!important;">
+            style="position:sticky;z-index:2; top: -2em!important;">
                 {{#types}}
                     <button href="javascript:void(0)" data-type="{{key}}" class="type-button btn btn-{{^disabled}}outline-{{/disabled}}info
                     mb-2 mx-1 py-0 {{#disabled}}disabled-looking{{/disabled}}"

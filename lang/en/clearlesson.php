@@ -126,6 +126,7 @@ $string['selecttopic'] = 'Select topic';
 $string['selectseries'] = 'Select series';
 $string['selectvideo'] = 'Select video';
 $string['speakerviewer'] = 'Speaker Viewer';
+$string['playnext'] = 'Play next';
 $string['playlistviewer'] = 'Playlist Viewer';
 $string['playlistvideos'] = 'Playlist videos';
 $string['playlistmenu'] = 'playlist videos';

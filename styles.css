@@ -1,3 +1,6 @@
+:root {
+    --clearlessons-gray: rgb(222, 226, 230);
+}
 #page-mod-clearlesson-view #resourceobject {
   border: 0;
   overflow: visible;
@@ -14,11 +17,6 @@
   position: relative;
 }
 
-/*
-* Styles taken from the clearlessons platform start
-*/
-
-
 /*!
  * Start Bootstrap - Simple Sidebar (https://startbootstrap.com/template-overviews/simple-sidebar)
  * Copyright 2013-2017 Start Bootstrap
@@ -26,12 +24,6 @@
  */
  @import url('https://fonts.googleapis.com/css?family=Roboto');
  /* Global */
- 
-/* This fixes some odd behaviour (whitespace on right side of screen) on Safari on the home page when dragging right on the mouse pad */
- /* #wrapper > .row {
-     margin-left: 0px!important;
-     margin-right: 0px!important;
- } */
  
 .mod-clearlesson .flex-center-align {
     display: flex;
@@ -94,7 +86,6 @@
 .mod-clearlesson .box:not(.video-list-box,
                             .single-video-info-content,
                             .video-list-column > .box) {
-    margin-bottom: 10px;
     padding: 15px;
 
     transition-duration: .4s;
@@ -115,7 +106,7 @@
     margin-top: 0px !important;
     padding-top: 0.5rem !important;
     border-style: solid;
-    border-color: rgb(222, 226, 230);
+    border-color: var(----clearlessons-gray);
     border-width: 0 1px 1px 1px;
 }
 
@@ -160,10 +151,11 @@
     position: relative;
     height: 42px;
 }
-.mod-clearlesson .speakerinfo > div {
+.mod-clearlesson .speakerinfo > div:not(.watched-check) {
     position: absolute;
     bottom: 0.7em;
     left: 1em;
+    background-color: white;
 }
 
 .mod-clearlesson .speakerinfo a {
@@ -177,6 +169,7 @@
 
     border-radius: 50%;
     object-fit: cover;
+    border: 1px solid var(----clearlessons-gray);
 }
 
 .mod-clearlesson .speakerviews .speaker-img {
@@ -193,10 +186,17 @@
     background-color: #fff;
     border: none;
 }
-
 .mod-clearlesson iframe {
     border: none;
 }
+
+.mod-clearlesson-bodyrestricted .activity-description {
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 83.33333333%;
+    margin: 0 auto;
+}
+
 .mod-clearlesson .video-button .fa-watch,
 .mod-clearlesson .dropdown-item .fa-watch {
     transform: scale(1.15);
@@ -293,17 +293,28 @@
 
 }
 
-.mod-clearlesson  .play-playlist-video-card-image .progress-bar,
-.mod-clearlesson .play-video-card-image .progress-bar {
-    background-color: var(--info);
-    border-radius: 0;
-    height: 6px;
+.mod-clearlesson .play-playlist-video-card-body ,
+.mod-clearlesson .play-video-card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.mod-clearlesson .play-playlist-video-card-image .progress,
-.mod-clearlesson .play-video-card-image .progress {
+.mod-clearlesson  .video-list-column .progress-bar {
+    background-color: var(--info);
     border-radius: 0;
-    height: 6px;
+    height: 4px;
+    transition: width 0.5s ease;
+    width: 0%;
+}
+
+.mod-clearlesson  .video-list-column .progress-bar.width100 {
+    width: 100%!important;
+}
+
+.mod-clearlesson .video-list-column .progress {
+    border-radius: 0;
+    height: 4px;
 }
 
 .mod-clearlesson .play-video-view {
@@ -313,7 +324,7 @@
 }
 
 .mod-clearlesson .video-card-side.video-card-list > .video-card-body {
-    height: unset !important;
+    height: 57px!important;
 }
 
 .mod-clearlesson .video-card-side.video-card-list > .video-card-body > .video-view {
@@ -573,7 +584,6 @@
     border-color: rgb(206, 212, 218);
 }
 
-
 .mod-clearlesson .video-card-side {
     transition-duration: .4s;
 
@@ -610,22 +620,17 @@
 }
 
 
-.mod-clearlesson .play-video-card-body {
-    height: 100px;
-    position: relative;
-}
-
+.mod-clearlesson .play-video-card-body,
 .mod-clearlesson .play-playlist-video-card-body {
-    height: 75px;
     position: relative;
 }
-
 
 .mod-clearlesson .video-card-side .video-page {
     height: auto;
 }
 
 .mod-clearlesson .video-card-side .video-title {
+    height: 48px;
     min-height: auto;
 }
 
@@ -638,18 +643,19 @@
 
 .mod-clearlesson .video-card-list .video-card-body {
     padding: 0;
+    overflow: unset;
 }
 
 .mod-clearlesson .video-card-list {
     display: inline-block;
     width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     background: transparent none repeat scroll 0 0;
     box-shadow: none;
 }
 
 .mod-clearlesson .video-card-list .video-card-body .video-title {
-    line-height: 17px;
+    line-height: 16px;
 }
 
 .mod-clearlesson .video-card-list .video-card-body .right-action {
@@ -908,7 +914,7 @@
 
     margin: 10px;
     margin-right: 20px;
-    padding: 10px;
+    padding: 10px 0px;
 
     vertical-align: middle;
 }
@@ -926,12 +932,19 @@
 
 .mod-clearlesson .playlist-play-content-video-number {
     float: left;
-    margin: 16px 0px;
-    padding: 10px;
+    position: relative;
+    margin: 8px 0px;
+    padding: 10px 0px;
     vertical-align: middle;
     position: relative;
-    max-width: 42.5px;
-    min-width: 42.5px;
+    max-width: 22.5px;
+    min-width: 22.5px;
+    left: -7px;
+    bottom: 1px;
+}
+
+.mod-clearlesson .playlist-play-content-video-number:not(.active) {
+    bottom: 5px;
 }
 
 .mod-clearlesson .playlist-content-info {
@@ -1115,18 +1128,14 @@
     padding: 0;
 }
 
-.mod-clearlesson .video-card-list {
-    display: inline-block;
-
-    width: 100%;
-    margin-bottom: 1rem;
-
-    background: transparent none repeat scroll 0 0;
-    box-shadow: none;
+.mod-clearlesson .video-card-list .video-card-body .video-title {
+    position: relative;
+    bottom:0px;
+    transition: bottom 0.3s ease-in-out;
 }
 
-.mod-clearlesson .video-card-list .video-card-body .video-title {
-    line-height: 17px;
+.mod-clearlesson .video-card-list .video-card-body:hover .video-title {
+    bottom: 3px;
 }
 
 .mod-clearlesson .video-card-list .video-card-body .right-action {
@@ -1191,12 +1200,6 @@
     }
 }
 
-/*
-* Styles taken from the clearlessons platform END
-*/
-
-/** addiditonal for mod_clearlesson */
-
 .mod-clearlesson .form-autocomplete-suggestions li[role="option"]::before {
     content: none;
 }
@@ -1251,7 +1254,6 @@
 .mod-clearlesson #search:focus {
     border-color: var(--info)!important;
     box-shadow: inset 0 0 .2rem var(--info);
-    /* background-color: rgba(white, 0); */
 }
 
 .mod-clearlesson .filter-child {
@@ -1259,7 +1261,6 @@
 }
 
 .mod-clearlesson .browser-filter {
-    /* width:unset!important; */
     height: 56px;
     padding-top: 1.5em;
     padding-bottom: 0.25em;
@@ -1284,60 +1285,41 @@ select.decorated option:hover {
     background-color: var(--info)!important;
 }
 
-/* .mod-clearlesson .stickybar {
-    position: sticky;
-} */
-
 .mod-clearlesson .browser-filter::-ms-expand {
     /* no down chevron */
     display: none;
 }
 
 .mod-clearlesson .browser-filters {
-    /* position: relative; */
-    margin-left: -350px;
+    margin-left: 0em;
+    opacity: 1;
     overflow: hidden;
-    opacity: 0;;
-    transition: margin-left 0.5s ease-in-out, opacity 0.2s ease-in-out;
+    transition: width 0.5s ease-in-out;
     z-index:1;
 }
 
-.mod-clearlesson .browser-sidebar.expanded .browser-filters.fin  {
-    opacity: 1;
-}
-
-.mod-clearlesson .browser-sidebar.expanded .browser-filters  {
-    margin-left: 0em;
-}
-
 .mod-clearlesson .browser-sidebar {
-    width: 0px;
-    overflow: hidden;
-    transition: width 0.5s ease-in-out;
-    position: sticky;
-    right: 1em;
-}
-
-.mod-clearlesson .browser-sidebar.expanded  {
-    right: 0em;
+    position:relative;
     border-right: 1px solid var(--secondary)!important;
     width: calc(300px + 0.5em)!important;
     min-width: calc(300px + 0.5em)!important;
     max-width: calc(300px + 0.5em)!important;
+    overflow: hidden;
+    transition: all 0.5s ease-in-out;
+    position: sticky;
+    right: 0em;
 }
 
 .mod-clearlesson #open-filters-parent {
     position: sticky;
     top: 4em;
-    left:  calc(-1px - 1em);
-    /* left: 10em;
-    top: 10em; */
     transition: all 0.5s ease-in-out;
     z-index: 4;
     width: 0px;
     height: 0px;
-    opacity: 1;
+    left: calc(300px + 0.5em);
 }
+
 .mod-clearlesson #open-filters-button {
     position: sticky;
     background-color: rgb(249, 249, 249);
@@ -1349,7 +1331,6 @@ select.decorated option:hover {
     border-bottom-right-radius: 50%;
     border-left: none;
     z-index: 5;
-    /* transition: all 0.5s ease-in-out; */
     box-shadow: 0px 0px 3px var(--info);
     margin-left: calc(-2px - 1em);
 }
@@ -1357,13 +1338,13 @@ select.decorated option:hover {
 .mod-clearlesson #close-filters-parent {
     position: sticky;
     top: 4em;
-    left: -5em;
     transition: all 0.5s ease-in-out;
     z-index: 4;
     width: 0px;
     height: 0px;
-    opacity: 0;
+    left: calc(300px + 0.5em);
 }
+
 .mod-clearlesson #close-filters-button {
     position: sticky;
     background-color: rgb(249, 249, 249);
@@ -1375,19 +1356,9 @@ select.decorated option:hover {
     border-bottom-right-radius: 50%;
     border-left: none;
     z-index: 5;
-    /* transition: all 0.5s ease-in-out; */
     box-shadow: 0px 0px 3px var(--info);
 }
 
-.mod-clearlesson #open-filters-parent.expanded {
-    left: calc(300px + 0.5em);
-    opacity: 0;
-}
-
-.mod-clearlesson #close-filters-parent.expanded {
-    left: calc(300px + 0.5em);
-    opacity: 1;
-}
 
 .mod-clearlesson #open-filters-button:hover {
     padding-left: 20px;
@@ -1397,6 +1368,105 @@ select.decorated option:hover {
 .mod-clearlesson #close-filters-button:hover {
     padding-left: 20px;
     background-color: var(--info);
+}
+
+@media screen and (max-width: 1199px) {
+    .mod-clearlesson .browser-sidebar {
+        transition: left 0.5s ease-in-out;
+        position: absolute;
+        right: unset;
+        left: -0.25em!important;
+        margin-left: 0px;
+        opacity: 1;
+        background-color: rgb(249, 249, 249)!important;
+    }
+
+    .mod-clearlesson #sidebar-parent {
+        position: sticky;
+    }
+    .mod-clearlesson .browser-filters {
+        top: 91px;
+        height: calc(94vh - 132px);
+        background-color: rgb(249, 249, 249)!important;
+        padding-right: 0.5em;
+        overflow: hidden;
+        width:0px;
+    }
+
+    .mod-clearlesson .browser-filter {
+        width: calc(290px - 0.75em)!important;
+    }
+    
+    .mod-clearlesson .search-parent {
+        width: calc(290px - 0.75em)!important;
+    }
+
+    .mod-clearlesson.expanded .browser-sidebar .browser-filters {
+        opacity: 1;
+        padding-right: 0.75em;
+        width: 300px;
+        border-right: 1px solid var(--secondary);
+    }
+    
+    .mod-clearlesson .inwisible-small {
+        opacity: 0;
+    }
+
+    .mod-clearlesson #open-filters-parent {
+        transition: left 0.5s ease-in-out;
+        left:  calc(-1px - 1.5em);
+    }
+    .mod-clearlesson #open-filters-parent i {
+        visibility: visible!important;
+    }
+    .mod-clearlesson.expanded #open-filters-parent i {
+        visibility: hidden!important;
+    }
+    .mod-clearlesson.expanded #open-filters-parent {
+        left: calc(300px - 0.25em);
+    }
+
+    .mod-clearlesson #close-filters-parent {
+        transition: left 0.5s ease-in-out;
+        left:  calc(-1px - 1.5em);
+    }
+    .mod-clearlesson #close-filters-parent i {
+        visibility: hidden!important;
+    }
+    .mod-clearlesson.expanded #close-filters-parent {
+        left: calc(300px - 0.25em);
+    }
+    .mod-clearlesson.expanded #close-filters-parent i {
+        visibility: visible!important;
+    }
+    .mod-clearlesson .search-parent,
+    .mod-clearlesson .filter-parent,
+    .mod-clearlesson .sidebar-element {
+        margin-left: -0.25em;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .mod-clearlesson #close-filters-parent {
+        left:  calc(-1px - 1.5em);
+    }
+    .mod-clearlesson.expanded #close-filters-parent {
+        left: calc(300px + 0.75em);
+    }
+    .mod-clearlesson #open-filters-parent {
+        left:  calc(-1px - 1.5em);
+        margin-left: -1em;
+    }
+    .mod-clearlesson.expanded #open-filters-parent {
+        left: calc(300px + 0.75em);
+        margin-left: 0;
+    }
+}
+
+@media screen and (max-width: 575px) {
+    .mod-clearlesson .browser-filters {
+        top: 4.7em;
+    }
 }
 
 .mod-clearlesson .filter-label {
@@ -1426,6 +1496,13 @@ select.decorated option:hover {
 
 .mod-clearlesson .topic-title-and-play-icon .card-title {
     max-width: 170px;
+}
+.mod-clearlesson .incourse .menu-item-card {
+    cursor: pointer;
+}
+
+.mod-clearlesson .menu-item-card .card-title:hover {
+    text-decoration: underline;
 }
 
 .mod-clearlesson .menu-item-card .play-video-card-image {
@@ -1488,7 +1565,7 @@ select.decorated option:hover {
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    font-size: 15px!important;
+    font-size: 14px!important;
 }
 
 body.mod-clearlesson-bodyrestricted #topofscroll {
@@ -1505,6 +1582,11 @@ body.mod-clearlesson-bodyrestricted .main-inner {
 body.mod-clearlesson-bodyrestricted .activity-header{
     margin-bottom: 0px!important;
 }
+
+body.mod-clearlesson-bodyrestricted .activity-information .completion-info {
+    border-bottom: none!important;
+}
+
 
 .mod-clearlesson .playlistimageholder {
     display: block!important;
@@ -1536,10 +1618,13 @@ body.mod-clearlesson-bodyrestricted .activity-header{
 .mod-clearlesson .video-list-column .box {
     margin-bottom: 0px;
 }
-/* loading class unused atm */
+
+.mod-clearlesson .video-title:not(h4) {
+    cursor: pointer;
+}
+
 .mod-clearlesson .loading {
     cursor: wait!important;
-    pointer-events: none!important;
 }
 
 .mod-clearlesson-bodyrestricted #page.drawers {
@@ -1549,71 +1634,243 @@ body.mod-clearlesson-bodyrestricted .activity-header{
 .mod-clearlesson .player-row:not(.video) {
     position: relative;
     right: 0.5em;
+    border: 1px solid var(--clearlessons-gray);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .07);
+    background-color: white!important;
 }
-.mod-clearlesson .player-row > *,
-.mod-clearlesson .player-column {
-    height: calc(100vh - 360px);
-    min-height:767px;
+.mod-clearlesson .player-row:not(.video) .box {
+    box-shadow: none!important;
+}
+
+.mod-clearlesson .player-row:not(.video) .player-column {
+    border-left: 1px solid var(--clearlessons-gray);
+}
+
+.modal .mod-clearlesson .player-row:not(.video) .video-list-column {
+    border-left: none;
+    border-right: 1px solid var(--clearlessons-gray);
+    border-bottom: 1px solid var(--clearlessons-gray);
+}
+
+.mod-clearlesson .player-row:not(.video) .player-column .box {
+    border: 0px;
+}
+
+.mod-clearlesson .container-fluid {
+    padding-right: 0px!important;
 }
 
 .mod-clearlesson .player-column {
     display: flex;
     flex-direction: column;
-}
-
-.modal-body .mod-clearlesson .player-column,
-.modal-body .mod-clearlesson .player-row > * {
-    max-height: unset;
-    height: calc(94vh - 170px);
-}
-
-.modal-body .mod-clearlesson .player-row.video .player-column,
-.modal-body .mod-clearlesson .player-row.video > * {
-    max-height: unset;
-    height: calc(94vh - 400px);
-}
-
-.mod-clearlesson .tab-content {
-    overflow-y: auto;
-    flex-grow: 1;
-    margin-bottom: 0px;
-}
-
-.mod-clearlesson .tab-content {
     padding: 0px;
 }
 
-.mod-clearlesson .single-video-info-content,
-.mod-clearlesson .single-video-info-content .nav-tabs a {
+@media screen and (max-width: 767px) {
+    .mod-clearlesson .player-column {
+        flex-direction: row;
+    }
+}
+
+.mod-clearlesson .player-column .video-title {
+    /* 2 lines max */
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    @supports (-webkit-line-clamp: 2) {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: initial;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+}
+
+/* 1314px is when the max width of #clearlesson-page-container kicks in
+At this stage the width of the  player row is 1153px and the height is 635px */
+
+:root {
+    --pageContainerHeight: 670px; /* We have added about 35px to the page container height,
+    this is needed to account for some of the longer video titles */
+    --setPageRatio: calc(1314 / 670);
+    --pagePlayerHeight: calc(100vw / var(--setPageRatio));
+
+    --pageContainerHeightSmall: 520px;
+    --setPageRatioSmall: calc(830 / 520);
+    --pagePlayerHeightSmall: calc(100vw / var(--setPageRatioSmall));
+
+    --modalPlayerWidth: calc(94vw - 1em);
+    /* here we set the ratio using the video player dynamically and add the 
+    title etc on to that in a fixed measurement*/
+    --setModalVideoRatioSmall: calc(1400 / 640);
+    --modalInnerHeight: calc(var(--modalPlayerWidth) / var(--setModalVideoRatioSmall));
+    --modalPlayerHeightSmaller: calc(var(--modalInnerHeight) + 130px);
+}
+/** 
+ * In page players with list.
+ */
+ .mod-clearlesson .player-row {
+    max-height: var(--pageContainerHeight)!important;
+    height: calc(var(--pagePlayerHeight) + 10px)!important;
+}
+
+.modal .player-row {
+    max-height: unset;
+}
+
+@media screen and (min-width: 1314px) {
+    .mod-clearlesson .player-row:not(.video) {
+        border-bottom: 1px solid var(--clearlessons-gray);
+    }
+
+    .mod-clearlesson .video-list-column {
+        max-height: calc(var(--pageContainerHeight) - 1px)!important;
+    }
+}
+/* under 1314px the height of the player is a function of the viewport width */
+@media screen and (max-width: 1313px) {
+    .mod-clearlesson .player-row {
+        overflow: hidden;
+    }
+
+    .mod-clearlesson .player-row > * {
+        max-height: var(--pageContainerHeight)!important;
+        height: calc(var(--pagePlayerHeight) + 10px)!important;
+    }
+}
+
+@media screen and (min-width: 576px) and (max-width: 767px) {
+    .mod-clearlesson .player-row,
+    .mod-clearlesson .player-row > * {
+        max-height: var(--pageContainerHeightSmall)!important;
+        height: calc(var(--pagePlayerHeightSmall) + 10px)!important;
+    }
+
+    .mod-clearlesson .player-row .video-list-column hr {
+        margin-top: 0.5rem!important;
+        margin-bottom: 0.5rem!important;
+    }
+
+    .mod-clearlesson .player-row .video-list-column .box {
+        padding-left: 8px;
+    }
+
+    .mod-clearlesson .player-row .video-card-list {
+        margin-bottom: 0.5rem;
+    }
+}
+
+.modal .mod-clearlesson .container-fluid {
+    padding-right: 15px!important;
+}
+@media screen and (max-width: 1915px) {
+    .modal .mod-clearlesson .player-row {
+        max-height: unset!important;
+        height: var(--modalPlayerHeightSmaller)!important;
+    }
+
+    .modal .mod-clearlesson .player-row > * {
+        max-height: unset!important;
+        height: var(--modalPlayerHeightSmaller)!important;
+        min-height: 335px!important; 
+    }
+
+    .modal .mod-clearlesson .player-row .player-column {
+        height: var(--modalPlayerHeightSmaller)!important;
+    }
+
+    .modal .mod-clearlesson .player-row .video-list-column {
+        height: calc(var(--modalPlayerHeightSmaller) - 1px)!important;
+    }
+
+    .modal .mod-clearlesson .player-row.video  {
+        height: 100%!important;
+    }
+    .modal .mod-clearlesson .player-row.video > * {
+        height: inherit!important;
+    }
+}
+
+@media screen and (min-width: 1916px) { 
+    .modal .mod-clearlesson .player-row,
+    .modal .mod-clearlesson .player-row > .video-list-column,
+    .modal .mod-clearlesson .player-row > .player-column  {
+        max-height: 950px!important;
+        height: calc(94vh - 240px)!important;
+    }
+
+    .modal .mod-clearlesson .player-row > .video-list-column {
+        max-height: 948px!important;
+        height: calc(94vh - 242px)!important;
+    }
+
+    .modal .mod-clearlesson .player-row > .player-column {
+        max-height: 100px!important;
+    }
+    .modal .mod-clearlesson .player-row.video {
+        max-height: 950px!important;
+        height: calc(94vh - 240px)!important;
+    }
+
+    .modal .mod-clearlesson .player-row.video > .video-list-column,
+    .mdoal .mod-clearlesson .player-row.video > .player-column {
+        height: inherit!important;
+    }
+}
+
+@media screen and (max-height: 575px) {
+    .modal .mod-clearlesson .player-row {
+        max-height: calc(100vh - 180px)!important;
+        overflow-y: scroll;
+        padding-bottom: 0px;
+    }
+    
+    .modal .mod-clearlesson .player-row > * {
+        max-height: calc(100vh - 190px)!important;
+    }
+}
+
+.mod-clearlesson #play-next-container {
+    position: relative; 
+    height: 0px; 
+    z-index:5;
+}
+
+.mod-clearlesson #play-next-button {
+    position: absolute;
+    right: 1em;
+    top: 1em;
+    padding: 0.3em; 
+    font-size: 20px;
+    opacity: 1;
+    border-radius: 30px;
+    transition: padding 0.5s ease-in-out, font-size 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.mod-clearlesson #play-next-button.notwatched {
+    opacity: 0;
+    padding: 0em;
+    font-size: 0px;
+}
+
+.mod-clearlesson #play-next-button:hover {
+    padding: 0.4em;
+    font-size: 22px;
+}
+
+.mod-clearlesson .single-video-info-content{
     background-color: white;
-}
-.mod-clearlesson .single-video-info-content .nav-tabs a:focus {
-    box-shadow: inset 0 0 0.1rem 0.2rem var(--primary)!important;
-}
-
-.mod-clearlesson .single-video-info-content .nav-tabs a:not(.active) {
-    color: #888;
-    border: 1px solid rgb(222, 226, 230);
-}
-.mod-clearlesson .single-video-info-content .nav-tabs a.active {
-    font-weight: 500;
-}
-
-.mod-clearlesson .single-video-info-content .nav-tabs {
-    background-color: rgb(249, 249, 249)!important;
-}
-
-.mod-clearlesson .single-video-info-content .tab-pane {
-    padding: 1em;
 }
 
 .mod-clearlesson .player-row > .video-list-column {
-    overflow-y: auto;
-    scrollbar-width: thin!important;
+    overflow-x: hidden;
+    overflow-y: scroll!important;
     scrollbar-color: rgb(222, 226, 230)!important;
     border: 1px solid rgb(222, 226, 230);
-    box-shadow: 0 1px 6px rgba(0, 0, 0, .07);
     background-color: white;
+    border:0px;
 }
 
 .mod-clearlesson .player-column > *:not(.tab-content) {
@@ -1622,31 +1879,6 @@ body.mod-clearlesson-bodyrestricted .activity-header{
 
 .mod-clearlesson .player-column > * {
     box-shadow: 0px 1px 6px rgba(0, 0, 0, .07)!important;
-}
-
-.mod-clearlesson .tab-pane {
-    overflow-y: auto;
-    scrollbar-width: thin!important;
-    scrollbar-color: rgb(222, 226, 230)!important;
-    padding-right: 5px;
-    max-height: 100%;
-    border-right: 1px solid rgb(222, 226, 230);
-    border-left: 1px solid rgb(222, 226, 230);
-    border-bottom: 1px solid rgb(222, 226, 230);
-    height: calc(100% - 40.5px);
-}
-
-.mod-clearlesson .player-row.video .tab-pane {
-    height: calc(100% - 43px);
-}
-
-.mod-clearlesson .nav-tabs {
-    padding-bottom: 0px!important;
-}
-.mod-clearlesson .nav-tabs a {
-    margin-bottom: -1px!important;
-    margin-left: 0px!important;
-    margin-right: 0px!important;
 }
 
 .mod-clearlesson .collection-card {
@@ -1667,7 +1899,7 @@ body.mod-clearlesson-bodyrestricted .activity-header{
     right: 0.75em;
 }
 
-.mod-clearlesson .video-card .video-details-speaker,
+.mod-clearlesson .video-card div:not(.video-buttons) .video-details-speaker,
 .mod-clearlesson .card-menu-button {
     position: absolute!important;
     bottom: 0.75em;
@@ -1675,27 +1907,28 @@ body.mod-clearlesson-bodyrestricted .activity-header{
     font-size: 13px;
 }
 
+.mod-clearlesson .video-card div .video-details-speaker {
+    margin-right: 0.25em;
+}
+
 .mod-clearlesson .card-menu-button.topic {
     left: 0.75em;
 }
 
-/* .mod-clearlesson .select-button-container button.btn.btn-primary {
-    border: 1px solid rgba(var(--primary), 1.5)!important;
-} */
+.mod-clearlesson .player-column .video-title-wrapper {
+    min-height: 3lh;
+}
 
 /* Clear search button */
 .mod-clearlesson .clear-search-container {
-    /* width: 0px; */
     position:relative;
     right: -1em;
     pointer-events: disabled;
-    /* height: 37px; */
 }
 
 .mod-clearlesson .clear-search-button {
     position: relative;
     pointer-events: auto;
-    /* overflow: hidden; */
     -webkit-transition: all .4s ease-in-out;
     -moz-transition: all .4s ease-in-out;
     -ms-transition: all .4s ease-in-out;
@@ -1739,71 +1972,67 @@ body.mod-clearlesson-bodyrestricted .activity-header{
     .mod-clearlesson .video-card-side.video-card-list div:is(.play-playlist-video-card-body,
     .play-video-card-body,
     .video-card-body) .video-title {
-        font-size: 14px!important;
+        font-size: 13px!important;
     }
 }
 
-@media screen and (min-width: 576px) and (max-width: 991px) {
-    .mod-clearlesson .video-card-side.video-card-list div:is(.play-video-card-image,
-                                                                .play-playlist-video-card-image,
-                                                                .video-card-image) {
-        float: unset;
-        width: 100%;
-        height: auto;
-        margin-right: 0px;
+@media screen and (max-width: 575px) {
+    .mod-clearlesson .player-row,
+    .modal .mod-clearlesson .player-row {
+        flex-direction: column-reverse!important;
     }
-    .mod-clearlesson .video-card-side.video-card-list div:is(.play-video-card-image,
-                                                                .play-playlist-video-card-image,
-                                                                .video-card-image) a.video-player-link {
-        display:flex;
-        justify-content: center;
-    }
-    .mod-clearlesson .video-card-side.video-card-list div:is(.play-video-card-image,
-                                                                .play-playlist-video-card-image,
-                                                                .video-card-image) img {
-        max-height: 100%!important;
+    .mod-clearlesson .player-row,
+    .mod-clearlesson .player-row > * {
+        max-height: unset!important;
+        height: unset!important;
     }
 
-    .mod-clearlesson .video-card-side.video-card-list div:is(.play-playlist-video-card-body,
-                                                                .play-video-card-body,
-                                                                .video-card-body) {
-        height: unset;
-        padding: 2px 4px;
+    .modal .mod-clearlesson .player-row {
+        max-height: unset!important;
+        height: 100%!important;
+        flex-wrap: nowrap!important;
+    }
+    .modal .mod-clearlesson .player-row > * {
+        max-height: unset!important;
+        height: unset!important;
+    }
+    .modal .mod-clearlesson .player-column,
+    .modal .mod-clearlesson .player-column > .box {
+        border-bottom: 1px solid var(--clearlessons-gray)!important;
+    }
+    .mod-clearlesson .video-list-column {
+        border: 1px solid var(--clearlessons-gray)!important;
     }
 
-    .mod-clearlesson .video-list-column > .box {
-        padding: 0px;
+    .mod-clearlesson .video-list-column h6.card-subtitle {
+        margin-bottom: 0.5em!important;
+    }
+    .mod-clearlesson .video-list-column hr {
+        display: none;
     }
 
-    .mod-clearlesson .video-list-column > .box > *:not(.video-card-side) {
-        padding-left: 15px;
-        padding-right: 15px;
+    .mod-clearlesson .video-card-side.video-card-list {
+        border: 1px solid var(--clearlessons-gray);
+        padding-bottom: 0.75em;
+        margin-bottom: 0.25em;
     }
 
-    .mod-clearlesson .video-list-column > .box > .video-card-side > *:is(.play-video-card-body,
-                                                                        .video-card-body,
-                                                                        .play-playlist-video-card-body) {
-        padding-left: 5px;
-        padding-right: 5px;
+    .mod-clearlesson .video-card-side.video-card-list > .video-card-body {
+        height: 41px!important;
+        padding: 0.5em;
     }
 
-    .mod-clearlesson .video-list-column > .box> .video-card-side > *:is(.video-card-body,
-                                                                        .play-video-card-body,
-                                                                        .play-playlist-video-card-body) {
-        padding-right: 10px;
+    .mod-clearlesson .video-card-side .video-title {
+        line-clamp: 2;
+        -webkit-line-clamp: 2;
+        height: 32px;
     }
+}
 
-    .mod-clearlesson .video-card-list {
-        margin-bottom: 0px!important;
-    }
-
-    .mod-clearlesson .video-card-side.video-card-list .watched-check i {
-        position: relative;
-        right: -0.4em;
-    }
-
-    .mod-clearlesson .video-card-list .video-card-body {
-        width: 100%;
-        border-bottom: 1px solid rgb(222, 226, 230);
+/** for some reason this does not exist in moodle bootstrap */
+@media (min-width: 1400px) {
+    .col-xxl-3 {
+        flex: 0 0 25%!important;
+        max-width: 25%!important;
     }
 }

@@ -62,7 +62,7 @@ body.mod-clearlesson-bodyrestricted .main-inner {
     }
 }
 
-@media (max-width: 575px) {
+@media (max-width: 767px) {
     .mod-clearlesson-bodyrestricted .automatic-completion-conditions {
         margin-left: 0px!important;
     }
@@ -71,4 +71,15 @@ body.mod-clearlesson-bodyrestricted .main-inner {
         justify-content: center!important;
         align-items: center!important;
     }
+
+    /** bigger modals on small popups */
+    .mod-clearlesson-popup .modal-dialog,
+    .mod-clearlesson-popup .modal-dialog-scrollable {
+        max-height:unset;
+        margin: 0.5rem!important;
+    }
+    .mod-clearlesson-popup .modal-content {
+        max-height: unset;
+    }
 }
+
