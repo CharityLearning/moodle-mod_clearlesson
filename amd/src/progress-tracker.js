@@ -83,9 +83,28 @@ export const init = async() => {
     });
 
     window.currentTime = 0;
+    var timeWatched = 0;
+    const playerElement = document.querySelector('.incourse-player');
+    const lastProgress = playerElement.getAttribute('data-progress');
+    const disableForwardSeek = (playerElement.getAttribute('data-noseek') === '0') ? false : true;
+
+    if (lastProgress) {
+        window.currentTime = parseInt(lastProgress);
+        timeWatched = window.currentTime;
+        window.player.setCurrentTime(lastProgress);
+    }
+
     window.player.on('timeupdate', function(data) {
+        // Disable seeking on the video player.
+        if (disableForwardSeek) {
+            if (data.seconds - 1 < timeWatched && data.seconds + 1 > timeWatched) {
+                timeWatched = data.seconds;
+            }
+        } else if (data.seconds > timeWatched) {
+            timeWatched = data.seconds;
+        }
         window.player.getDuration().then(async function(duration) {
-            const currentProgress = (data.seconds / duration);
+            const currentProgress = (timeWatched / duration);
             const videoLink =
             document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
             if (videoLink) {
@@ -110,6 +129,16 @@ export const init = async() => {
         // Round off and provide as integer.
         window.currentTime = Math.round(data.seconds);
     });
+
+    if (disableForwardSeek &&
+    (window.window.viewedStatus !== 'watched') &&
+    !window.watchedAll) {
+        window.player.on('seeking', function(data) {
+            if (timeWatched < data.seconds) {
+                window.player.setCurrentTime(timeWatched);
+            }
+        });
+    }
 
     if (!beforeUnloadEventSet) {
         window.addEventListener('beforeunload', async function() {
@@ -184,7 +213,7 @@ function videoWatched() {
     document.querySelector('.speakerinfo .watched-check').setAttribute('aria-hidden', 'false');
 
     const videoLinks = document.getElementsByClassName('video-player-link');
-    if (videoLinks) {
+    if (videoLinks.length > 0) {
         const lastLinkRef = videoLinks[videoLinks.length - 1].getAttribute('data-externalref');
         if (lastLinkRef !== window.extref) {
             // Only reveal the play next button if this is not the last video link in the list.

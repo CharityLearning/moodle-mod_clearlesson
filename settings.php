@@ -72,4 +72,10 @@ if ($ADMIN->fulltree) {
         get_string('popupwidth', 'clearlesson'), get_string('popupwidthexplain', 'clearlesson'), 620, PARAM_INT, 7));
     $settings->add(new admin_setting_configtext('clearlesson/popupheight',
         get_string('popupheight', 'clearlesson'), get_string('popupheightexplain', 'clearlesson'), 450, PARAM_INT, 7));
+    // Set the default setting for the noseeksetting
+    $settings->add(new admin_setting_configselect('clearlesson/defaultnoseek',
+        get_string('defaultnoseek', 'clearlesson'),
+        get_string('defaultnoseekexplain', 'clearlesson'),
+        1,
+        [1 => get_string('yes'), 0 => get_string('no')]));
 }

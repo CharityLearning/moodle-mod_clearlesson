@@ -74,6 +74,16 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         $attributes['rows'] = 5;
         $element->setAttributes($attributes);
 
+        $options = [0 => get_string('no'), 1 => get_string('yes')];
+        $mform->addElement('select', 'disableforwardseek', get_string('disableforwardseek', 'clearlesson'), $options);
+        if (isset($config->defaultnoseek) && $config->defaultnoseek) {
+            $defaultsetting = 1;
+        } else {
+            $defaultsetting = 0;
+        }
+        $mform->setDefault('disableforwardseek', $defaultsetting);
+        $mform->setType('disableforwardseek', PARAM_INT);
+
         $mform->addElement('header', 'optionssection', get_string('appearance'));
         $default = '';
         if ($this->current->instance) {
@@ -185,5 +195,4 @@ class mod_clearlesson_mod_form extends moodleform_mod {
         }
         return $errors;
     }
-
 }

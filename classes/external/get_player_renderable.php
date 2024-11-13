@@ -160,6 +160,8 @@ class get_player_renderable extends \core_external\external_api {
                             'position' => new external_value(PARAM_INT, 'The position of the video in the resource', VALUE_OPTIONAL),
                             'playnextstring' => new external_value(PARAM_TEXT, 'The play next button text', VALUE_OPTIONAL),
                             'islast' => new external_value(PARAM_BOOL, 'Is this the last video in the resource', VALUE_OPTIONAL),
+                            'progess' => new external_value(PARAM_INT, 'The progress of the video in seconds', VALUE_OPTIONAL),
+                            'disableforwardseek' => new external_value(PARAM_INT, 'Is seeking disabled', VALUE_OPTIONAL),
                         )
                     ),
                 )
