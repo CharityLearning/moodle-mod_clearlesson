@@ -52,7 +52,7 @@ function xmldb_clearlesson_upgrade($oldversion) {
         exit(1);
     }
 
-    if ($oldverion < 2023091311) {
+    if ($oldverion < 2023091312) {
         require_once("$CFG->libdir/resourcelib.php");
         require_once("$CFG->dirroot/mod/clearlesson/lib.php");
 
@@ -158,6 +158,11 @@ function xmldb_clearlesson_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
+        // Add the disable forward seek field to the clearlesson table.
+        $field = new xmldb_field('disableforwardseek', XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
 
         $table = new xmldb_table('clearlesson_track');
         // Define field watchedall to be added to clearlesson_track.
@@ -174,7 +179,7 @@ function xmldb_clearlesson_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_plugin_savepoint(true, 2023091311, 'mod', 'clearlesson');
+        upgrade_plugin_savepoint(true, 2023091312, 'mod', 'clearlesson');
     }
     return true;
 }

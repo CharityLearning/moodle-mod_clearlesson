@@ -90,6 +90,7 @@ class incourse_player implements \renderable, \templatable {
         $this->type = $type;
         $this->externalref = $externalref;
         $this->position = $position;
+
         if (!empty($response)) {
             $this->response = $response;
         } else {
@@ -121,6 +122,18 @@ class incourse_player implements \renderable, \templatable {
         } else {
             $this->response['islast'] = false;
         }
+
+        $defaultdisableseek = get_config('clearlesson', 'defaultnoseek');
+        $this->response['disableforwardseek'] = ($defaultdisableseek) ? 1 : 0;
+
+        if ($instance) {
+            $clearlesson = $DB->get_record('clearlesson', ['id' => $instance]);
+            if (!is_null($clearlesson->disableforwardseek)) {
+                // If set, individual clearlesson activity settings can override the default.
+                $this->response['disableforwardseek'] = $clearlesson->disableforwardseek;
+            }
+        }
+
         $this->response['firstload'] = $firstload;
         // Add the resourceref to the response.
         // The response externalref is the externalref of the first video in the resource.

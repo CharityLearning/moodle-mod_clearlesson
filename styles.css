@@ -1649,7 +1649,6 @@ body.mod-clearlesson-bodyrestricted .activity-information .completion-info {
 .modal .mod-clearlesson .player-row:not(.video) .video-list-column {
     border-left: none;
     border-right: 1px solid var(--clearlessons-gray);
-    border-bottom: 1px solid var(--clearlessons-gray);
 }
 
 .mod-clearlesson .player-row:not(.video) .player-column .box {
@@ -2035,4 +2034,9 @@ At this stage the width of the  player row is 1153px and the height is 635px */
         flex: 0 0 25%!important;
         max-width: 25%!important;
     }
+}
+
+#fitem_id_disableforwardseek > div:last-of-type {
+    display: flex;
+    align-items: center!important;
 }
