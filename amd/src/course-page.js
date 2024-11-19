@@ -106,6 +106,7 @@ export const init = () => {
                         firstLoad = 0;
                         pageFunctions.removeLoadingClasses(modalRootInner);
                     });
+                    modalRootInner.closest('.modal').classList.add('clearlesson-player');
                 }
 
                 if (modalType === 'menu') {
@@ -184,7 +185,9 @@ async function reRenderCoursePlayerModal(position, url) {
     const bodyContent = theModal.getBody(serialFormParams);
     await theModal.modal.setBodyContent(bodyContent);
     await pageFunctions.setWindowWatched();
-    document.querySelector('.incourse-player').scrollIntoView({behavior: 'smooth'});
+    if (window.innerWidth < 577) {
+        document.querySelector('.incourse-player').scrollIntoView({behavior: 'smooth'});
+    }
     pageFunctions.removeLoadingClasses(theModal.modal.getRoot()[0].children[0]);
 }
 

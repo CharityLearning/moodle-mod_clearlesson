@@ -127,7 +127,9 @@ async function reRenderPlayer(position, url) {
     await Templates.runTemplateJS(js);
     progressTracker.init();
     await pageFunctions.setWindowWatched();
-    document.querySelector('.incourse-player').scrollIntoView({behavior: 'smooth'});
+    if (window.innerWidth < 577) {
+        document.querySelector('.incourse-player').scrollIntoView({behavior: 'smooth'});
+    }
     pageFunctions.removeLoadingClasses(pageContainer);
 }
 
@@ -168,7 +170,9 @@ async function reRenderModulePlayerModal(position, url) {
     const bodyContent = playerModalFromMenu.getBody(serialFormParams);
     await playerModalFromMenu.modal.setBodyContent(bodyContent);
     await pageFunctions.setWindowWatched();
-    document.querySelector('.incourse-player').scrollIntoView({behavior: 'smooth'});
+    if (window.innerWidth < 577) {
+        document.querySelector('.incourse-player').scrollIntoView({behavior: 'smooth'});
+    }
     pageFunctions.removeLoadingClasses(playerModalFromMenu.modal.getRoot()[0]);
 }
 

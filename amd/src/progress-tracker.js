@@ -27,118 +27,272 @@ import Ajax from 'core/ajax';
 import * as Utils from './utils';
 
 var beforeUnloadEventSet = false;
+var iframeHidden = false;
 var loopCount = 0;
+var dontPause = false;
+var reset = false;
 
 export const init = async() => {
+    if (typeof window.players === 'undefined' || !window.playNext) {
+        window.players = [];
+        window.iFrames = [];
+    }
+
+    var iframe;
+    window.currentTime = 0;
+
+    // Convert return key press to a click events.
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.activeElement.click();
+        }
+    });
+
+    if (typeof window.closeModalEventset === 'undefined') {
+        window.closeModalEventset = true;
+        document.addEventListener('click', function(e) {
+            if (e.target.innerHTML.trim() === '×'
+                || e.target.getAttribute('data-action') === 'cancel') {
+                const playerModalOpen = document.querySelector('.modal.clearlesson-player.show');
+                if (window.updateProgress && playerModalOpen) {
+                    updateProgressAndActivity();
+                }
+            }
+        }, true);
+
+        document.addEventListener('keydown', function(e) {
+            const playerModalOpen = document.querySelector('.modal.clearlesson-player.show');
+            if (e.key === 'Escape' && window.updateProgress && playerModalOpen) {
+                updateProgressAndActivity();
+            }
+        }, true);
+    }
+
+    const videoContainer = document.querySelector('.video-container');
+    window.extref = videoContainer.getAttribute('data-externalref');
+
     if (typeof window.VimeoPlayerConstructor === 'undefined') {
         setTimeout(init, 50);
         return;
     }
-    if (typeof window.player !== 'undefined') {
-        await window.player.destroy(); // We destroy the previous player before creating a new one.
-        delete window.player;
-    }
 
-    const iframe = document.querySelector('.video-container > iframe.videoframe');
-
-    window.player = new window.VimeoPlayerConstructor(iframe);
-
-    window.extref = await window.player.getVideoTitle().then(function(title) {
-        if (window.playNext) {
-            Utils.waitForElement('.watched-check', document, function() {
-                window.playNext = false;
-                window.player.play();
-            });
-        }
-        return title;
-    });
-
-    const container = iframe.closest('.incourse');
-    if (container?.getAttribute('data-watchedall') == '1') {
-        // If all videos in the resource have already been watched, we don't update the progress.
-        // If the resource has been watched but the completion status is incorrect,
-        // we'll update it in moodle via the page-functions method updateCompletionStatusIfIncorrect.
-        window.watchedAll = true;
-        window.updateProgress = false;
+    iframe = document.getElementsByClassName('videoframe')[0];
+    if (!window.playNext) {
+        let player = await new window.VimeoPlayerConstructor(iframe);
+        // activePlayer = player;
+        window.players.push(player);
+        window.iFrames.push(iframe);
     } else {
-        window.watchedAll = false;
-    }
-
-    window.viewedStatus =
-        container?.querySelector('.speakerinfo .watched-check')?.classList
-            .contains('notwatched') ? 'unwatched' : 'watched';
-
-    // When progress is updated, if the video has a higher status already, we don't update it.
-    window.player.on('play', function() {
-        if (window.viewedStatus === 'unwatched') {
-            window.viewedStatus = 'inprogress';
-        }
-    });
-
-    window.player.on('ended', async function() {
-        if (window.updateProgress) {
-            videoWatched();
-            updateProgressAndActivity();
-        }
-    });
-
-    window.currentTime = 0;
-    var timeWatched = 0;
-    const playerElement = document.querySelector('.incourse-player');
-    const lastProgress = playerElement.getAttribute('data-progress');
-    const disableForwardSeek = (playerElement.getAttribute('data-noseek') === '0') ? false : true;
-
-    if (lastProgress) {
-        window.currentTime = parseInt(lastProgress);
-        timeWatched = window.currentTime;
-        window.player.setCurrentTime(lastProgress);
-    }
-
-    window.player.on('timeupdate', function(data) {
-        // Disable seeking on the video player.
-        if (disableForwardSeek) {
-            if (data.seconds - 1 < timeWatched && data.seconds + 1 > timeWatched) {
-                timeWatched = data.seconds;
+        if (window.players.length > 0) {
+            for (let i = 0; i < (window.players.length - 1); i++) {
+                window.iFrames.shift();
+                let player = window.players.shift();
+                player.destroy();
             }
-        } else if (data.seconds > timeWatched) {
-            timeWatched = data.seconds;
         }
-        window.player.getDuration().then(async function(duration) {
-            const currentProgress = (timeWatched / duration);
-            const videoLink =
-            document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
-            if (videoLink) {
-                const progressBar = videoLink.closest('.video-card-side')?.querySelector('.progress-bar');
-                if (progressBar) {
-                    const existingProgress = parseFloat(progressBar.style.width.slice(0, -1));
-                    if ((currentProgress * 100) > existingProgress) {
-                        progressBar.setAttribute('style', 'width: ' + currentProgress * 100 + '%!important');
-                        progressBar.setAttribute('aria-valuenow', data.seconds);
-                    }
+        if (window.iFrames[0].parentElement) {
+            window.iFrames[0].parentElement.removeChild(nextIframe);
+        }
+        // activePlayer = window.players[0];
+    }
+
+    if (!window.playNext) {
+        setTimeout(async function() {
+            await window.players[0].play();
+            if (!dontPause) {
+                await window.players[0].pause();
+            }
+        });
+    }
+
+    var longIdString = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+    Utils.waitForElement('.speakerinfo .watched-check', document, async function() {
+        if (window.playNext) {
+            let currentiFrame = document.getElementsByClassName('videoframe')[0];
+            hideIframe(currentiFrame);
+            currentiFrame.replaceWith(window.iFrames[0]);
+        }
+
+        // Lets take the thumbnail and put it over the video container.
+        // This will hide the loading screen.
+        // const videoContainerWidth = videoContainer.offsetWidth;
+        const videoContainerHeight = videoContainer.offsetHeight;
+        const thumbImage = document.getElementById('loading-thumb');
+        thumbImage.style.height = videoContainerHeight + 'px';
+        // Now lets add a play icon on top of the thumbnail.
+        const playIconDiv = document.getElementById('play-icon-div');
+        playIconDiv.style.height = videoContainerHeight + 'px';
+        const playIcon = document.getElementById('play-video-button');
+
+        const nextIframe = document.getElementsByClassName('videoframe')[1];
+        if (nextIframe) {
+            nextIframe.parentElement.removeChild(nextIframe);
+            if (!nextIframe.hasAttribute('id')) {
+                nextIframe.setAttribute('id', 'videoframe_' + longIdString);
+            }
+            const nextPlayer = new window.VimeoPlayerConstructor(nextIframe);
+            // Get the progress for the next player
+            const nextVideoProgressBar = document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]')
+            .closest('.video-card-side').nextElementSibling.querySelector('.progress-bar');
+            let progressInt = parseInt(nextVideoProgressBar.getAttribute('aria-valuenow'));
+            const duration = parseInt(nextVideoProgressBar.getAttribute('aria-valuemax'));
+
+            if (progressInt !== 0) {
+                if (progressInt === duration) {
+                    progressInt = 0;
                 }
             }
-            // If 90% of the video has been watched, we update the status to 'watched'.
-            if (currentProgress >= 0.9) {
+
+            setTimeout(async function() {
+                if (progressInt !== 0) {
+                    await nextPlayer.setCurrentTime(progressInt);
+                }
+                await nextPlayer.play();
+                if ((typeof window.dontPlayNext === 'undefined' || !window.dontPlayNext)
+                && nextPlayer.id === 'videoframe_' + longIdString) {
+                    // await nextPlayer.setCurrentTime(progressInt);
+                    await nextPlayer.pause();
+                }
+            });
+
+            hideIframe(nextIframe);
+
+            // We should have 2 player instances now.
+            window.players.push(nextPlayer);
+            window.iFrames.push(nextIframe);
+        }
+
+        // If the there is a next video, we should now have 2 players and 2 iframes.
+        const container = document.querySelector('.incourse-player');
+        if (container.getAttribute('data-watchedall') == '1') {
+            // If all videos in the resource have already been watched, we don't update the progress.
+            // If the resource has been watched but the completion status is incorrect,
+            // we'll update it in moodle via the page-functions method updateCompletionStatusIfIncorrect.
+            window.watchedAll = true;
+            window.updateProgress = false;
+        } else {
+            window.watchedAll = false;
+        }
+
+        window.viewedStatus =
+        container.querySelector('.speakerinfo .watched-check').classList
+            .contains('notwatched') ? 'unwatched' : 'watched';
+
+        const playerElement = document.querySelector('.incourse-player');
+        const lastProgress = playerElement.getAttribute('data-progress');
+        const disableForwardSeek = (playerElement.getAttribute('data-noseek') === '0') ? false : true;
+        var timeWatched = 0;
+        if (window.viewedStatus === 'watched') {
+            timewatched = await window.players[0].getDuration().then(async function(duration) {
+                return parseInt(duration);
+            });
+        } else if (lastProgress && lastProgress !== '0') {
+            window.currentTime = parseInt(lastProgress);
+            timeWatched = window.currentTime;
+            if (!window.playNext) {
+                await window.players[0].setCurrentTime(window.currentTime);
+            }
+        } else {
+            window.currentTime = 0;
+            timeWatched = 0;
+        }
+
+        playIcon.classList.remove('not-opaque');
+        playIconDiv.classList.add('clickable');
+
+        playIconDiv.addEventListener('click', async function() {
+            window.iFrames[0].style.visibility = 'visible';
+            dontPause = true;
+            thumbImage.remove();
+            playIconDiv.remove();
+            setTimeout(async function() {
+                await window.players[0].play();
+                dontPause = false;
+            });
+        });
+
+        if (window.playNext) {
+            window.playNext = false;
+            playIconDiv.remove();
+            setTimeout(async function() {
+                showIframe(window.iFrames[0]);
+                await window.players[0].play();
+                thumbImage.remove();
+            }, 50);
+        }
+
+        // When progress is updated, if the video has a higher status already, we don't update it.
+        window.players[0].on('play', function() {
+            if (window.viewedStatus === 'unwatched') {
+                window.viewedStatus = 'inprogress';
+            }
+            if (iframeHidden) {
+                thumbImage.remove();
+                iframeHidden = false;
+            }
+        });
+
+            window.players[0].on('ended', function() {
                 if (window.updateProgress) {
                     videoWatched();
                     updateProgressAndActivity();
                 }
-            }
-            return true;
-        });
-        // Round off and provide as integer.
-        window.currentTime = Math.round(data.seconds);
-    });
+                window.players[0].pause();
+            });
 
-    if (disableForwardSeek &&
-    (window.window.viewedStatus !== 'watched') &&
-    !window.watchedAll) {
-        window.player.on('seeking', function(data) {
-            if (timeWatched < data.seconds) {
-                window.player.setCurrentTime(timeWatched);
-            }
+            window.players[0].on('timeupdate', function(data) {
+                // Disable seeking on the video player.
+                if (disableForwardSeek) {
+                    if (timeWatched === 0
+                    || (data.seconds - 1 < timeWatched && data.seconds + 1 > timeWatched)) {
+                        timeWatched = data.seconds;
+                    }
+                } else if (data.seconds > timeWatched) {
+                    timeWatched = data.seconds;
+                }
+                window.players[0].getDuration().then(function(duration) {
+
+                    let currentProgress = (timeWatched / duration);
+                    const videoLink =
+                    document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
+                    if (videoLink) {
+                        const progressBar = videoLink.closest('.video-card-side')?.querySelector('.progress-bar');
+                        if (progressBar) {
+                            const existingProgress = parseFloat(progressBar.style.width.slice(0, -1));
+                            if ((currentProgress * 100) > existingProgress) {
+                                progressBar.setAttribute('style', 'width: ' + currentProgress * 100 + '%!important');
+                                progressBar.setAttribute('aria-valuenow', data.seconds);
+                            }
+                        }
+                    }
+                    // If 90% of the video has been watched, we update the status to 'watched'.
+                    if (currentProgress >= 0.9) {
+                        if (window.updateProgress) {
+                            videoWatched();
+                            updateProgressAndActivity();
+                        }
+                    }
+                    return true;
+                });
+            // Round off and provide as integer.
+            window.currentTime = Math.round(data.seconds);
         });
-    }
+
+        if (disableForwardSeek &&
+        window.window.viewedStatus !== 'watched' &&
+        !window.watchedAll && !reset) {
+            window.players[0].on('seeking', async function(data) {
+                dontPause = true;
+                if (timeWatched < data.seconds) {
+                    await window.players[0].setCurrentTime(timeWatched);
+                }
+                await window.players[0].play();
+                dontPause = false;
+            });
+        }
+    });
 
     if (!beforeUnloadEventSet) {
         window.addEventListener('beforeunload', async function() {
@@ -179,7 +333,6 @@ const updateProgress = async() => {
         || typeof window.pageType === 'undefined' || typeof window.watchedAll === 'undefined') {
         return false;
     }
-
 
     loopCount = 0;
 
@@ -343,4 +496,24 @@ export async function updateProgressAndActivityPromise() {
             }, 50);
         }
     });
+}
+
+/**
+ * Show the iframe.
+ * @param {HTMLelement} iframe
+ */
+function showIframe(iframe) {
+    iframe.classList.remove('d-none');
+    iframe.style.visibility = 'visible';
+    iframe.setAttribute('aria-hidden', 'false');
+}
+
+/**
+ * Hide the iframe
+ * @param {HTMLelement} iframe
+ */
+function hideIframe(iframe) {
+    iframe.classList.add('d-none');
+    iframe.style.visibility = 'hidden';
+    iframe.setAttribute('aria-hidden', 'true');
 }
