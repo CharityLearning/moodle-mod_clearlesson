@@ -175,6 +175,7 @@ export async function openPlayerFromMenu(e, url, firstLoad, backString) {
         });
         setModalButtons(modalRootInner, backString);
         removeLoadingClasses(modalRootInner);
+        modalRootInner.closest('.modal').classList.add('clearlesson-player');
     });
 
     playerModalFromMenu.show();
@@ -250,6 +251,7 @@ window.playNextItem = function() {
         .closest('.video-card-side').nextElementSibling;
     if (nextVideo) {
         window.playNext = true;
+        window.dontPauseNext = true;
         nextVideo.querySelector('span').click();
     }
 };

@@ -1809,8 +1809,7 @@ At this stage the width of the  player row is 1153px and the height is 635px */
         max-height: 100px!important;
     }
     .modal .mod-clearlesson .player-row.video {
-        max-height: 950px!important;
-        height: calc(94vh - 240px)!important;
+        height: 500px!important;
     }
 
     .modal .mod-clearlesson .player-row.video > .video-list-column,
@@ -2039,4 +2038,32 @@ At this stage the width of the  player row is 1153px and the height is 635px */
 #fitem_id_disableforwardseek > div:last-of-type {
     display: flex;
     align-items: center!important;
+}
+
+/* div[class^="ControlBar_module_controlBarWrapper"] {
+    bottom: 0px!important;
+} */
+
+#play-video-button {
+    opacity: 0.5;
+    transition: opacity 0.5s ease-in-out, font-size 0.5s ease-in-out;
+    font-size: 72px;
+    border-radius: 50%;
+}
+
+#play-video-button::before {
+    color: white;
+}
+
+#play-icon-div:hover #play-video-button {
+    opacity: 0.8;
+    font-size: 82px;
+}
+
+#play-video-button.not-opaque {
+    opacity: 0!important;
+}
+
+#play-icon-div.clickable {
+    cursor: pointer;
 }

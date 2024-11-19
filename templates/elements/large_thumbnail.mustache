@@ -15,18 +15,10 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_clearlesson/play_next_button
+    @template mod_clearlesson/elements/menu_item
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-{{^isvideo}}
-    <div id="play-next-containter" class="w-100" style="position: relative; z-index: 102;">
-        {{^islast}}
-            <button id="play-next-button" class="btn-primary loading {{^watched}} notwatched{{/watched}}"
-            title="{{playnextstring}}" alt="{{playnextstring}}"  onclick="event.preventDefault();window.playNextItem()"
-            {{^watched}}aria-hidden="true"{{/watched}}{{#watched}}aria-hidden="false"{{/watched}}>
-                &nbsp&nbsp<i class="fas fa-play"></i>&nbsp&nbsp{{playnextstring}}&nbsp&nbsp&nbsp&nbsp
-            </button>
-        {{/islast}}
-    </div>
-{{/isvideo}}
+<div id="loading-thumb"
+style="background-image: url({{largethumbnail}});background-size: cover; background-position: center; width: 100%; position: absolute; z-index: 100;">
+</div>

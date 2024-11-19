@@ -83,6 +83,7 @@ class get_player_renderable extends \core_external\external_api {
                                                                         response: [],
                                                                         firstload: 0,
                                                                         instance: $clearlesson->id);
+                                                                        
             return $renderable;
         }
 
@@ -104,6 +105,7 @@ class get_player_renderable extends \core_external\external_api {
                             'externalref' => new external_value(PARAM_TEXT, 'The external reference of the video', VALUE_OPTIONAL),
                             'src' => new external_value(PARAM_RAW, 'The source of the video'),
                             'thumbnail' => new external_value(PARAM_RAW, 'The thumbnail of the video', VALUE_OPTIONAL),
+                            'largethumbnail' => new external_value(PARAM_RAW, 'The large thumbnail of the video', VALUE_OPTIONAL),
                             'panelshtml' => new external_value(PARAM_RAW, 'The panels html of the video', VALUE_OPTIONAL),
                             'description' => new external_value(PARAM_RAW, 'The description of the video', VALUE_OPTIONAL),
                             'topics' => new external_multiple_structure(
@@ -162,6 +164,25 @@ class get_player_renderable extends \core_external\external_api {
                             'islast' => new external_value(PARAM_BOOL, 'Is this the last video in the resource', VALUE_OPTIONAL),
                             'progess' => new external_value(PARAM_INT, 'The progress of the video in seconds', VALUE_OPTIONAL),
                             'disableforwardseek' => new external_value(PARAM_INT, 'Is seeking disabled', VALUE_OPTIONAL),
+                            'nextvideos' => new external_multiple_structure(
+                                new external_single_structure(
+                                    array('id' => new external_value(PARAM_INT, 'The id of the video', VALUE_OPTIONAL),
+                                        'name' => new external_value(PARAM_TEXT, 'The name of the video', VALUE_OPTIONAL),
+                                        'vimeoref' => new external_value(PARAM_TEXT, 'The vimeoref of the video', VALUE_OPTIONAL),
+                                        'src' => new external_value(PARAM_TEXT, 'The source of the video', VALUE_OPTIONAL),
+                                        'smallthumbnail' => new external_value(PARAM_RAW, 'The small thumbnail of the video', VALUE_OPTIONAL),
+                                        'largethumbnail' => new external_value(PARAM_RAW, 'The large thumbnail of the video', VALUE_OPTIONAL),
+                                        'description' => new external_value(PARAM_RAW, 'The description of the video', VALUE_OPTIONAL),
+                                        'duration' => new external_value(PARAM_TEXT, 'The duration of the video in s', VALUE_OPTIONAL),
+                                        'active' => new external_value(PARAM_BOOL, 'Is the video active?', VALUE_OPTIONAL),
+                                        'position' => new external_value(PARAM_INT, 'The position of the video in the resource', VALUE_OPTIONAL),
+                                        'convertedduration' => new external_value(PARAM_TEXT, 'The converted duration of the video', VALUE_OPTIONAL),
+                                        'progress' => new external_value(PARAM_INT, 'The progress of the video in seconds', VALUE_OPTIONAL),
+                                        'progresspercent' => new external_value(PARAM_INT, 'The progress of the video in percent', VALUE_OPTIONAL),
+                                        'watched' => new external_value(PARAM_INT, 'Has the user watched this video', VALUE_OPTIONAL),
+                                    )
+                                )
+                            ),
                         )
                     ),
                 )

@@ -68,7 +68,8 @@ async function openVideoPlayer(externalref, name, src) {
         externalref: externalref,
         src: src,
         name: name,
-        editform: true
+        editform: true,
+        resourceplayer: true
     });
 
     const videoPlayer = await ModalSaveCancel.create({
