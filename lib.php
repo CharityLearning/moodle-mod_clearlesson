@@ -440,9 +440,9 @@ function clearlesson_set_body($pluginconfig, $url) {
     $userinfofields = array();
     $userinfofields['referrer'] = str_replace('https://', '', $CFG->wwwroot);
     foreach ($USER as $key => $value) {
-        if (!empty($value)) {
-            if (substr($key, 0, 14) == 'profile_field_') {
-                $userinfofields[$key] = $value;
+        if ($key === 'profile') {
+            foreach ($value as $profilekey => $profilevalue) {
+                $userinfofields[$profilekey] = trim($profilevalue);
             }
         }
     }
