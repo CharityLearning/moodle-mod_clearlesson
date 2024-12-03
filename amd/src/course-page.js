@@ -92,6 +92,10 @@ export const init = () => {
                     pageFunctions.setModalFullscreen(modalRootInner, false, true);
                 }
 
+                if (type === 'play' && modalType === 'player') {
+                    pageFunctions.adjustModalWidthForLowHeights(modalRootInner);
+                }
+
                 if (modalType === 'player') {
                     if (window.innerWidth < 577) { // Video modals should fit the video player.
                         modalRootInner.setAttribute('style', 'height: unset!important;');

@@ -116,11 +116,19 @@ class incourse_player implements \renderable, \templatable {
                                                                         $this->position,
                                                                         $resetdate);
         }
-        if (isset($this->response['othervideos'])
-        && count($this->response['othervideos']) === $this->position) {
-            $this->response['islast'] = true;
-        } else {
-            $this->response['islast'] = false;
+    
+        if (isset($this->response['othervideos'])) {
+            $othervideocount = count($this->response['othervideos']);
+            if ($this->type === 'speakers' || $this->type === 'topics') {
+                // For speakers and topics, we need to add the primary video to the count.
+                // Because it does not get included in the list.
+                $othervideocount++;
+            }
+            if ($othervideocount === $this->position) {
+                $this->response['islast'] = true;
+            } else {
+                $this->response['islast'] = false;
+            }
         }
 
         $defaultdisableseek = get_config('clearlesson', 'defaultnoseek');

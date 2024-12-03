@@ -114,6 +114,7 @@ $string['speakers'] = 'speakers';
 $string['speakermenu'] = 'Speaker videos';
 $string['speakervideos'] = 'Speaker videos';
 $string['relatedvideoscap'] = 'Related videos';
+$string['returntocourse'] = 'Return to course';
 $string['collection'] = 'collection';
 $string['collections'] = 'collections';
 $string['collectionmenu'] = 'collection series';

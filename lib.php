@@ -216,12 +216,12 @@ function clearlesson_get_coursemodule_info($coursemodule) {
 
     switch ($clearlessonref->display) {
         case RESOURCELIB_DISPLAY_NEW:
-            $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;redirect=1";
+            $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id";
             $info->onclick = "window.open('$fullurl'); return false;";
             break;
         case RESOURCELIB_DISPLAY_OPEN:
-            $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id";
-            $info->onclick = "";
+            $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&amp;returnbutton=1";
+            $info->onclick = "window.location='$fullurl'; return false;";
             break;
         case RESOURCELIB_DISPLAY_POPUP:
             $fullurl = "$CFG->wwwroot/mod/clearlesson/view.php?id=$coursemodule->id&popup=1#topofscroll";
