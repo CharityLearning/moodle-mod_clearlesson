@@ -43,12 +43,13 @@ export const init = async() => {
 
     // Convert return key press to a click events.
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && document.activeElement.id.substring(0, 15) !== 'id_inplacevalue') {
             e.preventDefault();
             document.activeElement.click();
         }
     });
 
+    // Record progress on modal close if required
     if (typeof window.closeModalEventset === 'undefined') {
         window.closeModalEventset = true;
         document.addEventListener('click', function(e) {
@@ -77,13 +78,14 @@ export const init = async() => {
         return;
     }
 
+    // Set up our iframe and player.
     iframe = document.getElementsByClassName('videoframe')[0];
     if (!window.playNext) {
         let player = await new window.VimeoPlayerConstructor(iframe);
-        // activePlayer = player;
         window.players.push(player);
         window.iFrames.push(iframe);
     } else {
+        // Remove unused iframs and players.
         if (window.players.length > 0) {
             for (let i = 0; i < (window.players.length - 1); i++) {
                 window.iFrames.shift();
@@ -91,10 +93,6 @@ export const init = async() => {
                 player.destroy();
             }
         }
-        if (window.iFrames[0].parentElement) {
-            window.iFrames[0].parentElement.removeChild(nextIframe);
-        }
-        // activePlayer = window.players[0];
     }
 
     if (!window.playNext) {
@@ -108,6 +106,7 @@ export const init = async() => {
 
     var longIdString = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
+    // Wait for the player to render before we continue.
     Utils.waitForElement('.speakerinfo .watched-check', document, async function() {
         if (window.playNext) {
             let currentiFrame = document.getElementsByClassName('videoframe')[0];
@@ -117,7 +116,6 @@ export const init = async() => {
 
         // Lets take the thumbnail and put it over the video container.
         // This will hide the loading screen.
-        // const videoContainerWidth = videoContainer.offsetWidth;
         const videoContainerHeight = videoContainer.offsetHeight;
         const thumbImage = document.getElementById('loading-thumb');
         thumbImage.style.height = videoContainerHeight + 'px';
@@ -126,16 +124,28 @@ export const init = async() => {
         playIconDiv.style.height = videoContainerHeight + 'px';
         const playIcon = document.getElementById('play-video-button');
 
-        const nextIframe = document.getElementsByClassName('videoframe')[1];
+        /* Preload the 'nextvideo'  player */
+        let nextIframe = document.getElementsByClassName('videoframe')[1];
         if (nextIframe) {
             nextIframe.parentElement.removeChild(nextIframe);
             if (!nextIframe.hasAttribute('id')) {
                 nextIframe.setAttribute('id', 'videoframe_' + longIdString);
             }
             const nextPlayer = new window.VimeoPlayerConstructor(nextIframe);
+
+            let nextVideoProgressBar;
+            const currentVideoSpan = document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
+            if (currentVideoSpan) {
+                nextVideoProgressBar = currentVideoSpan.closest('.video-card-side')
+                                        .nextElementSibling.querySelector('.progress-bar');
+            } else {
+                // This is a speaker or a topic list. The current video is not in the list.
+                let nextVideoPosition = getNextVideoPosition();
+                nextVideoProgressBar = document.querySelector('.video-card-side[data-position="' + nextVideoPosition + '"]')
+                                        .querySelector('.progress-bar');
+            }
+
             // Get the progress for the next player
-            const nextVideoProgressBar = document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]')
-            .closest('.video-card-side').nextElementSibling.querySelector('.progress-bar');
             let progressInt = parseInt(nextVideoProgressBar.getAttribute('aria-valuenow'));
             const duration = parseInt(nextVideoProgressBar.getAttribute('aria-valuemax'));
 
@@ -152,7 +162,6 @@ export const init = async() => {
                 await nextPlayer.play();
                 if ((typeof window.dontPlayNext === 'undefined' || !window.dontPlayNext)
                 && nextPlayer.id === 'videoframe_' + longIdString) {
-                    // await nextPlayer.setCurrentTime(progressInt);
                     await nextPlayer.pause();
                 }
             });
@@ -180,14 +189,16 @@ export const init = async() => {
         container.querySelector('.speakerinfo .watched-check').classList
             .contains('notwatched') ? 'unwatched' : 'watched';
 
+        // Set the timeWatched var. This is the time the user has watched up to.
+        // If a user skipps back this will not change.
+        // If disable forward seek is set, we will not allow the user to skip forward past this point.
         const playerElement = document.querySelector('.incourse-player');
         const lastProgress = playerElement.getAttribute('data-progress');
         const disableForwardSeek = (playerElement.getAttribute('data-noseek') === '0') ? false : true;
+        const videoDuration = window.iFrames[0].getAttribute('data-duration');
         var timeWatched = 0;
         if (window.viewedStatus === 'watched') {
-            timewatched = await window.players[0].getDuration().then(async function(duration) {
-                return parseInt(duration);
-            });
+            timeWatched = parseInt(videoDuration);
         } else if (lastProgress && lastProgress !== '0') {
             window.currentTime = parseInt(lastProgress);
             timeWatched = window.currentTime;
@@ -198,7 +209,7 @@ export const init = async() => {
             window.currentTime = 0;
             timeWatched = 0;
         }
-
+        // Setup the play icon div.
         playIcon.classList.remove('not-opaque');
         playIconDiv.classList.add('clickable');
 
@@ -234,48 +245,47 @@ export const init = async() => {
             }
         });
 
-            window.players[0].on('ended', function() {
-                if (window.updateProgress) {
-                    videoWatched();
-                    updateProgressAndActivity();
-                }
-                window.players[0].pause();
-            });
+        window.players[0].on('ended', function() {
+            if (window.updateProgress) {
+                videoWatched();
+                updateProgressAndActivity();
+            }
+            window.players[0].pause();
+        });
 
-            window.players[0].on('timeupdate', function(data) {
-                // Disable seeking on the video player.
-                if (disableForwardSeek) {
-                    if (timeWatched === 0
-                    || (data.seconds - 1 < timeWatched && data.seconds + 1 > timeWatched)) {
-                        timeWatched = data.seconds;
-                    }
-                } else if (data.seconds > timeWatched) {
+        window.players[0].on('timeupdate', function(data) {
+            // Disable seeking on the video player.
+            if (disableForwardSeek) {
+                if (timeWatched === 0
+                || (data.seconds - 1 < timeWatched && data.seconds + 1 > timeWatched)) {
                     timeWatched = data.seconds;
                 }
-                window.players[0].getDuration().then(function(duration) {
-
-                    let currentProgress = (timeWatched / duration);
-                    const videoLink =
-                    document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
-                    if (videoLink) {
-                        const progressBar = videoLink.closest('.video-card-side')?.querySelector('.progress-bar');
-                        if (progressBar) {
-                            const existingProgress = parseFloat(progressBar.style.width.slice(0, -1));
-                            if ((currentProgress * 100) > existingProgress) {
-                                progressBar.setAttribute('style', 'width: ' + currentProgress * 100 + '%!important');
-                                progressBar.setAttribute('aria-valuenow', data.seconds);
-                            }
+            } else if (data.seconds > timeWatched) {
+                timeWatched = data.seconds;
+            }
+            window.players[0].getDuration().then(function(duration) {
+                let currentProgress = (timeWatched / duration);
+                const videoLink =
+                document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
+                if (videoLink) {
+                    const progressBar = videoLink.closest('.video-card-side')?.querySelector('.progress-bar');
+                    if (progressBar) {
+                        const existingProgress = parseFloat(progressBar.style.width.slice(0, -1));
+                        if ((currentProgress * 100) > existingProgress) {
+                            progressBar.setAttribute('style', 'width: ' + currentProgress * 100 + '%!important');
+                            progressBar.setAttribute('aria-valuenow', data.seconds);
                         }
                     }
-                    // If 90% of the video has been watched, we update the status to 'watched'.
-                    if (currentProgress >= 0.9) {
-                        if (window.updateProgress) {
-                            videoWatched();
-                            updateProgressAndActivity();
-                        }
+                }
+                // If 90% of the video has been watched, we update the status to 'watched'.
+                if (currentProgress >= 0.9) {
+                    if (window.updateProgress) {
+                        videoWatched();
+                        updateProgressAndActivity();
                     }
-                    return true;
-                });
+                }
+                return true;
+            });
             // Round off and provide as integer.
             window.currentTime = Math.round(data.seconds);
         });
@@ -293,7 +303,7 @@ export const init = async() => {
             });
         }
     });
-
+    // Save progress if required when the user leaves the page.
     if (!beforeUnloadEventSet) {
         window.addEventListener('beforeunload', async function() {
             if (window.updateProgress) {
@@ -516,4 +526,26 @@ function hideIframe(iframe) {
     iframe.classList.add('d-none');
     iframe.style.visibility = 'hidden';
     iframe.setAttribute('aria-hidden', 'true');
+}
+
+/**
+ * Get the current video position.
+ * @returns {number} The current video position.
+ */
+export function getNextVideoPosition() {
+    const videoCardSides = document.querySelectorAll('.video-card-side');
+    let positionArray = [];
+    videoCardSides.forEach(function(videoCardSide) {
+        positionArray.push(parseInt(videoCardSide.getAttribute('data-position')));
+    });
+    let currentVideoPosition = 1;
+    // In speakerlists and topic lists the current video is not in the list, hence the +1;
+    const videoListLength = videoCardSides.length + 1;
+    for (let i = 1; i < videoListLength; i++) {
+        if (!positionArray.includes(i)) {
+            currentVideoPosition = i;
+            break;
+        }
+    }
+    return ++currentVideoPosition;
 }

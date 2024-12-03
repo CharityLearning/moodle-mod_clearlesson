@@ -20,14 +20,14 @@
     Moodle template for the list of valid options in an autocomplate form element.
 }}
 <div class="mod-clearlesson">
-    <div class="d-flex flex-nowrap {{#collection}}flex-column {{/collection}}{{#small}}my-1{{/small}}" style='max-width:600px;'>
+    <div class="d-flex flex-nowrap {{#collection}}flex-column {{/collection}}{{#small}}my-1{{/small}}" style='max-width:500px;'>
         {{#thumbnail}}<div class='autocomplete-thumbnail'>
             <img src="{{thumbnail}}" class="thumb" height="50px" width="88.58px"/>
         </div>{{/thumbnail}}
         {{{panelshtml}}}
         <div class="d-flex flex-column pl-2">
-            {{#name}}<span class="resource-option-{{id}}" style="font-size: 14px">{{name}}</span>{{/name}}
-            {{#description}}<div class="resource-description" style="max-width:500px; height: 24px; font-size: 11px;line-height: 1; oveflow: hidden">{{{description}}}</div>{{/description}}
+            {{#name}}<span class="resource-option-{{id}}" style="font-size: 14px; line-height: 1">{{name}}</span>{{/name}}
+            {{#description}}<div class="resource-description" style="max-width:400px; height: 24px; font-size: 11px;line-height: 0.95; oveflow: hidden">{{{description}}}</div>{{/description}}
         </div>
     </div>
 </div>

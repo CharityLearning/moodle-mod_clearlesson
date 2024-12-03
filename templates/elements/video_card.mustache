@@ -20,8 +20,8 @@
     Moodle template for the list of valid options in an autocomplate form element.
 }}
 <div class="col-xxl-3 col-lg-4 col-sm-6 mb-3 video-card-wrapper {{#hidden}}d-none{{/hidden}}" id="resource-{{id}}" 
-data-speakers="{{speakers}}" data-topics="{{topics}}" data-animation="{{animation}}"
-data-hiddenby="{{hiddenby}}" data-playlists="{{playlists}}" data-series="{{series}}" 
+data-speakers="{{speakers}}" data-topics="{{topics}}" data-hiddenby="{{hiddenby}}"
+data-playlists="{{playlists}}" data-series="{{series}}" 
 data-collections="{{collections}}" {{#hidden}}aria-hidden="true"{{/hidden}}>
     <div class="video-card">
         <div class="video-card-image">
@@ -37,7 +37,7 @@ data-collections="{{collections}}" {{#hidden}}aria-hidden="true"{{/hidden}}>
             <div class="video-title">
                 <div class="video-details d-flex">
                     <span class="video-details-view"></span>
-                    <span class="video-details-time ml-auto" ><i class="far fa-clock"></i>{{duration}}</span>
+                    <span class="video-details-time ml-auto" ><i class="far fa-clock"></i>{{convertedduration}}</span>
                 </div>
                 <a class="searchable mr-1 card-title video-card-title" href="javascript:void(0)"
                 data-externalref="{{externalref}}" data-src="{{src}}" data-name="{{name}}"

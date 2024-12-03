@@ -78,7 +78,11 @@ class incourse_menu implements \renderable, \templatable {
      *
      * @return void
      */
-    public function __construct(string $type, string $externalref, array $response = [], int $instance = 0) {
+    public function __construct(string $type,
+                                string $externalref,
+                                array $response = [],
+                                int $instance = 0,
+                                int $inpage = 0) {
         global $USER, $DB;
         $this->type = $type;
         switch ($this->type) {
@@ -113,6 +117,7 @@ class incourse_menu implements \renderable, \templatable {
                 }
             }
             $this->response = \mod_clearlesson\call::get_menuform_data($this->type, $this->externalref, $resetdate);
+            $this->response['inpage'] = $inpage;
         }
     }
 
@@ -149,6 +154,7 @@ class incourse_menu implements \renderable, \templatable {
         if ($this->modal) {
             $this->response['modal'] = true;
         }
+
         return $this->response;
     }
 

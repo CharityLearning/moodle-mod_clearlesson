@@ -1440,8 +1440,8 @@ select.decorated option:hover {
         visibility: visible!important;
     }
     .mod-clearlesson .search-parent,
-    .mod-clearlesson .filter-parent,
-    .mod-clearlesson .sidebar-element {
+    .mod-clearlesson .filter-parent /*,
+    .mod-clearlesson .sidebar-element*/ {
         margin-left: -0.25em;
     }
 }
@@ -1761,26 +1761,26 @@ At this stage the width of the  player row is 1153px and the height is 635px */
     }
 }
 
-.modal .mod-clearlesson .container-fluid {
+/* .modal .mod-clearlesson .container-fluid {
     padding-right: 15px!important;
-}
+} */
 @media screen and (max-width: 1915px) {
-    .modal .mod-clearlesson .player-row {
+    .modal .mod-clearlesson .player-row:not(.reduced-width, .video) {
         max-height: unset!important;
         height: var(--modalPlayerHeightSmaller)!important;
     }
 
-    .modal .mod-clearlesson .player-row > * {
+    .modal .mod-clearlesson .player-row:not(.reduced-width, .video) > * {
         max-height: unset!important;
         height: var(--modalPlayerHeightSmaller)!important;
         min-height: 335px!important; 
     }
 
-    .modal .mod-clearlesson .player-row .player-column {
+    .modal .mod-clearlesson .player-row:not(.reduced-width, .video) .player-column {
         height: var(--modalPlayerHeightSmaller)!important;
     }
 
-    .modal .mod-clearlesson .player-row .video-list-column {
+    .modal .mod-clearlesson .player-row:not(.reduced-width) .video-list-column {
         height: calc(var(--modalPlayerHeightSmaller) - 1px)!important;
     }
 
@@ -1793,19 +1793,19 @@ At this stage the width of the  player row is 1153px and the height is 635px */
 }
 
 @media screen and (min-width: 1916px) { 
-    .modal .mod-clearlesson .player-row,
-    .modal .mod-clearlesson .player-row > .video-list-column,
-    .modal .mod-clearlesson .player-row > .player-column  {
+    .modal .mod-clearlesson .player-row:not(.reduced-width, .video),
+    .modal .mod-clearlesson .player-row:not(.reduced-width) > .video-list-column,
+    .modal .mod-clearlesson .player-row:not(.reduced-width, .video) > .player-column  {
         max-height: 950px!important;
         height: calc(94vh - 240px)!important;
     }
 
-    .modal .mod-clearlesson .player-row > .video-list-column {
+    .modal .mod-clearlesson .player-row:not(.reduced-width) > .video-list-column {
         max-height: 948px!important;
         height: calc(94vh - 242px)!important;
     }
 
-    .modal .mod-clearlesson .player-row > .player-column {
+    .modal .mod-clearlesson .player-row:not(.reduced-width, .video) > .player-column {
         max-height: 100px!important;
     }
     .modal .mod-clearlesson .player-row.video {
@@ -1819,13 +1819,15 @@ At this stage the width of the  player row is 1153px and the height is 635px */
 }
 
 @media screen and (max-height: 575px) {
-    .modal .mod-clearlesson .player-row {
+    .modal .mod-clearlesson .player-row,
+    .modal .mod-clearlesson .player-row:not(.reduced-width) {
         max-height: calc(100vh - 180px)!important;
         overflow-y: scroll;
         padding-bottom: 0px;
+        height: 100%!important;
     }
     
-    .modal .mod-clearlesson .player-row > * {
+    .modal .mod-clearlesson .player-row:not(.reduced-width) > * {
         max-height: calc(100vh - 190px)!important;
     }
 }
@@ -1985,17 +1987,32 @@ At this stage the width of the  player row is 1153px and the height is 635px */
         height: unset!important;
     }
 
-    .modal .mod-clearlesson .player-row {
+    .modal .mod-clearlesson .player-row
+    .modal .mod-clearlesson .player-row:not(.reduced-width) {
         max-height: unset!important;
         height: 100%!important;
         flex-wrap: nowrap!important;
     }
-    .modal .mod-clearlesson .player-row > * {
+
+    .modal .mod-clearlesson .player-row,
+    .modal .mod-clearlesson .player-row:not(.reduced-width) {
+        max-height: unset!important;
+        height: 100%!important;
+        flex-wrap: nowrap!important;
+    }
+
+    .modal .mod-clearlesson .player-row > .player-column,
+    .modal .mod-clearlesson .player-row:not(.reduced-width) > .player-column,
+    .modal .mod-clearlesson .player-row > .video-list-column,
+    .modal .mod-clearlesson .player-row:not(.reduced-width) > .video-list-column {
         max-height: unset!important;
         height: unset!important;
+        min-height: unset!important;
     }
     .modal .mod-clearlesson .player-column,
-    .modal .mod-clearlesson .player-column > .box {
+    .modal .mod-clearlesson .player-column:not(.reduced-width),
+    .modal .mod-clearlesson .player-column > .box,
+    .modal .mod-clearlesson .player-column:not(.reduced-width) > .box {
         border-bottom: 1px solid var(--clearlessons-gray)!important;
     }
     .mod-clearlesson .video-list-column {
@@ -2067,3 +2084,14 @@ At this stage the width of the  player row is 1153px and the height is 635px */
 #play-icon-div.clickable {
     cursor: pointer;
 }
+
+/* correct the alignment of autocomplete selections */
+#page-mod-clearlesson-mod .form-autocomplete-selection > span {
+    display: flex!important;
+    flex-direction: row!important;
+    flex-wrap: nowrap!important;
+}
+#page-mod-clearlesson-mod .form-autocomplete-selection > span > span {
+    margin-right: 0.25em;
+}
+

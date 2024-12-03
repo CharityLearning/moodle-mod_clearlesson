@@ -30,7 +30,6 @@ import * as Utils from './utils';
 var newResourceSelected = false;
 var orderedResources = false;
 var filterValues = {
-    animation: '',
     speakers: '',
     topics: '',
     playlists: '',
@@ -297,7 +296,6 @@ async function viewResourceType(type, cmid, courseid, url, browserForm, external
     scrollToTop();
     // Reset the filter values.
     filterValues = {
-        animation: '',
         speakers: '',
         topics: '',
         playlists: '',

@@ -30,7 +30,7 @@ $pluginconfig = get_config("clearlesson");
 $id = optional_param('id', 0, PARAM_INT);        // Course module ID.
 $u = optional_param('u', 0, PARAM_INT);         // URL instance id.
 $popup = optional_param('popup', 0, PARAM_INT);
-$redirect = optional_param('redirect', 0, PARAM_BOOL);
+$returnbutton = optional_param('returnbutton', 0, PARAM_BOOL);
 if ($u) {  // Two ways to specify the module.
     $clearlesson = $DB->get_record('clearlesson', array('id' => $u), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('clearlesson', $clearlesson->id, $clearlesson->course, false, MUST_EXIST);
@@ -53,6 +53,12 @@ if ($popup) {
 }
 if ($clearlesson->type == 'play') {
     $PAGE->add_body_class('is-video');
+}
+if ($returnbutton) {
+    $array = array('href' => new moodle_url('/course/view.php', ['id' => $course->id]),
+                'class' => 'btn btn-secondary', 'role' => 'button', 'tabindex' => '0');
+                $button = \html_writer::tag("div", get_string('returntocourse', 'clearlesson'), $array);
+                $PAGE->set_button($button);
 }
 clearlesson_print_header($clearlesson, $cm, $course);
 clearlesson_print_intro($clearlesson, $cm, $course);
@@ -94,8 +100,9 @@ if ($displaytype == 'menu') {
     $renderable = new \mod_clearlesson\output\incourse_menu(type: $clearlesson->type,
                                                             externalref: $clearlesson->externalref,
                                                             response: [],
-                                                            instance: $clearlesson->id);
-    $renderable->inpage = 1;
+                                                            instance: $clearlesson->id,
+                                                            inpage: 1
+                                                        );
     $output = $PAGE->get_renderer('mod_clearlesson');
     echo $output->render_incourse_menu($renderable);
 }

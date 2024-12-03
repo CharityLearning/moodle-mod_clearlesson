@@ -96,26 +96,41 @@ export function setModalButtons(modalRootInner, backString) {
  * @param {Boolean} player Is the modal for a player?
  */
 export function setModalFullscreen(modalRootInner, popup = false, player = false) {
-    var modalHeight, modalWidth, style;
+    var idealModalHeight, modalWidth, style, smallHeight;
     if (popup) {
-        let rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-        modalHeight = Math.ceil(window.innerHeight - rem);
-        modalWidth = Math.ceil(window.innerWidth - rem);
+        let oneRem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        idealModalHeight = Math.ceil(window.innerHeight - oneRem);
+        modalWidth = Math.ceil(window.innerWidth - oneRem);
     } else {
-        modalHeight = Math.ceil(window.innerHeight * 0.94);
+        idealModalHeight = Math.ceil(window.innerHeight * 0.94);
         modalWidth = Math.ceil(window.innerWidth * 0.94);
     }
+
     const playerRatio = 1481 / 833;
-    const extraWidth = 329;
     const extraHeight = 278;
     modalWidth = modalWidth > 1800 ? 1800 : modalWidth;
     // We adjust the modal width for small height windows.
-    if (player && modalWidth === 1800) {
-        const playerWidth = modalWidth - extraWidth;
+    if (player && window.innerHeight < 915) {
+        const playerWidth = Math.floor(((modalWidth - 96) / 7) * 6);
         const playerHeight = playerWidth / playerRatio;
-        if ((playerHeight + extraHeight) > modalHeight) {
+        let actualModalHeight = playerHeight + extraHeight;
+        let titleBarHeight = 100;
+        if (actualModalHeight > idealModalHeight) {
+            smallHeight = true;
             // Adust the modalWidth to fit the player.
-            modalWidth = (modalHeight - extraHeight) * playerRatio + 32;
+            let actualPlayerWidth = (idealModalHeight - extraHeight) * playerRatio;
+            let actualPlayerHeight = (idealModalHeight + titleBarHeight) - extraHeight;
+            modalWidth = Math.floor(((actualPlayerWidth / 6) * 7));
+            Utils.waitForElement('.player-row', modalRootInner, function() {
+                modalRootInner.querySelector('.modal-body')
+                .setAttribute('style', 'padding-top:0rem!important;padding-bottom:0!important;display:flex;align-items:center;');
+                const playerRow = modalRootInner.querySelector('.player-row');
+                playerRow.classList.add('reduced-width');
+                playerRow.setAttribute('style', 'height: ' + actualPlayerHeight + 'px!important;');
+                playerRow.children.forEach(function(element) {
+                    element.setAttribute('style', 'height: ' + (actualPlayerHeight - 2) + 'px!important;');
+                });
+            });
         }
     }
 
@@ -125,13 +140,47 @@ export function setModalFullscreen(modalRootInner, popup = false, player = false
                 'px;max-width: ' + modalWidth + 'px;';
     }
     if (!player) {
-        style += 'height: ' + modalHeight +
-                'px;max-height: ' + modalHeight + 'px;';
+        style += 'height: ' + idealModalHeight +
+                'px;max-height: ' + idealModalHeight + 'px;';
     }
-    if (player) {
+    if (player && !smallHeight) {
         style += 'height: auto';
     }
+    if (player && smallHeight) {
+        style += 'height: ' + idealModalHeight + 'px!important;';
+    }
     modalRootInner.setAttribute('style', style);
+}
+
+/**
+ * Adjust the modal width for low height windows. (When compared to the width).
+ * @param {HTMLElement} modalRootInner
+ */
+export function adjustModalWidthForLowHeights(modalRootInner) {
+    var style, adjusteModaldWidth;
+    if (window.innerWidth < 992) {
+        return;
+    }
+    const modalHeight = Math.floor(window.innerHeight - 56);
+
+    const playerRatio = 1481 / 833;
+    const extraHeight = 250;
+    if (window.innerHeight < 700) {
+        // Adust the modalWidth.
+        let playerHeight = modalHeight - extraHeight;
+        adjusteModaldWidth = playerHeight * playerRatio;
+        Utils.waitForElement('.player-row', modalRootInner, function() {
+            let styleInner = '';
+            styleInner += 'padding-top:0.5rem!important;padding-bottom:0.5rem!important;display:flex;align-items:center;';
+            styleInner += 'justify-content: center;';
+            modalRootInner.querySelector('.modal-body')
+            .setAttribute('style', styleInner);
+        });
+    }
+
+    style = 'width: ' + adjusteModaldWidth + 'px;max-width: ' + adjusteModaldWidth + 'px;';
+    modalRootInner.setAttribute('style', style);
+
 }
 
 /**
@@ -246,9 +295,19 @@ export function setModalBodyGrey(modalRootInner) {
     modalRootInner.querySelector('.modal-body').classList.add('mod-clearlesson-backgrounddgrey');
 }
 
+/**
+ * This function is called inline by the play next button.
+ */
 window.playNextItem = function() {
-    const nextVideo = document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]')
-        .closest('.video-card-side').nextElementSibling;
+    var nextVideo;
+    const currentVideoSpan = document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
+    if (currentVideoSpan) {
+        nextVideo = currentVideoSpan.closest('.video-card-side').nextElementSibling;
+    } else {
+        // This is a speaker or a topic list. The current video is not in the list.
+        let nextVideoPosition = progressTracker.getNextVideoPosition();
+        nextVideo = document.querySelector('.video-card-side[data-position="' + nextVideoPosition + '"]');
+    }
     if (nextVideo) {
         window.playNext = true;
         window.dontPauseNext = true;
