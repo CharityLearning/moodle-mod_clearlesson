@@ -52,7 +52,7 @@ function xmldb_clearlesson_upgrade($oldversion) {
         exit(1);
     }
 
-    if ($oldverion < 2023091315) {
+    if ($oldverion < 2023091316) {
         require_once("$CFG->libdir/resourcelib.php");
         require_once("$CFG->dirroot/mod/clearlesson/lib.php");
 
@@ -179,7 +179,7 @@ function xmldb_clearlesson_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_plugin_savepoint(true, 2023091315, 'mod', 'clearlesson');
+        upgrade_plugin_savepoint(true, 2023091316, 'mod', 'clearlesson');
     }
     return true;
 }

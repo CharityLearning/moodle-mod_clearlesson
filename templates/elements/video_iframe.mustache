@@ -34,7 +34,7 @@
         {{/nextvideos}}
         {{^inpage}}
             <script>
-                require([{{#firstload}}'../../../mod/clearlesson/vimeo/vimeo-sdk', {{/firstload}}'mod_clearlesson/progress-tracker'],
+                require([{{#firstload}}'mod_clearlesson/vimeo-sdk', {{/firstload}}'mod_clearlesson/progress-tracker'],
                 function({{#firstload}}VimeoPlayerConstructor, {{/firstload}}progressTracker) {
                     {{#firstload}}
                         window.VimeoPlayerConstructor = VimeoPlayerConstructor;
