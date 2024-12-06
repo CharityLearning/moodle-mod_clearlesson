@@ -35,7 +35,7 @@ var url, backString, outputType, playerModalFromMenu, newMenuModal;
 var firstLoad = 1;
 window.playNext = false;
 
-require(['../../../mod/clearlesson/vimeo/vimeo-sdk'], function(VimeoPlayerConstructor) {
+require(['mod_clearlesson/vimeo-sdk'], function(VimeoPlayerConstructor) {
     window.VimeoPlayerConstructor = VimeoPlayerConstructor;
 });
 
