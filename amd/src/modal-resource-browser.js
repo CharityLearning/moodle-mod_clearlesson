@@ -51,7 +51,8 @@ export const init = () => {
             const externalref = element.getAttribute('data-externalref');
             selectResource(externalref, e.target.getAttribute('data-type'));
         }
-        if (element.classList?.contains('close')
+        if (element.classList?.contains('btn-close')
+            || element.parentElement.classList?.contains('btn-close')
             || element.getAttribute('data-action') === 'cancel'
             || element.getAttribute('data-action') === 'hide'
             || element.parentElement.getAttribute('data-action') === 'hide') {
