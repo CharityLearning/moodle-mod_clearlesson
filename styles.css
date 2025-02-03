@@ -1271,7 +1271,7 @@
     -webkit-appearance: none;
     cursor: pointer!important;
     border-color: var(--info);
-    width: 290px;
+    width: 290px!important;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -2094,4 +2094,5 @@ At this stage the width of the  player row is 1153px and the height is 635px */
 #page-mod-clearlesson-mod .form-autocomplete-selection > span > span {
     margin-right: 0.25em;
 }
+
 
