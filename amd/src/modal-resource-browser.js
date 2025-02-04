@@ -235,7 +235,7 @@ export function selectResource(externalref, resourceType) {
             // Once the option is loaded, click on it to select the resource.
             document.querySelector('li[data-value="' + externalref + '"]').click();
             // We can close the modals now.
-            document.querySelectorAll('.modal-header button.close').forEach(function(button) {
+            document.querySelectorAll('.modal-header button.btn-close').forEach(function(button) {
                 button.click();
             });
         });
