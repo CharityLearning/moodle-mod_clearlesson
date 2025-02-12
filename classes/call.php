@@ -85,7 +85,7 @@ class call {
      * @param string $query The search query.
      */
     public static function get_potential_resources(string $type, string $query = '', $exactref = false): array {
-        $response = self::initate_call('/api/v1/get_potential_resources.php', ['type' => $type,
+        $response = self::initate_call('/api/v2/get_potential_resources.php', ['type' => $type,
                                                                     'query' => $query,
                                                                     'exactref' => $exactref,
                                                                     'small' => true]);
@@ -99,7 +99,7 @@ class call {
      * @param string $type The type of resource.
      */
     public static function get_browserform_data(string $type): array {
-        $response = self::initate_call('/api/v1/get_browserform_data.php', ['type' => $type]);
+        $response = self::initate_call('/api/v2/get_browserform_data.php', ['type' => $type]);
         $decodedresponse = json_decode($response, true);
         $decodedresponse['records'][$type] = true;
         if ($type == 'series') {
@@ -117,7 +117,7 @@ class call {
      * @param int $resetdate The resetdate of the activity if any.
      */
     public static function get_playerform_data(string $type, string $externalref, int $position = 1, int $resetdate = 0): array {
-        $response = self::initate_call('/api/v1/get_playerform_data.php', ['type' => $type,
+        $response = self::initate_call('/api/v2/get_playerform_data.php', ['type' => $type,
                                                                     'externalref' => $externalref,
                                                                     'position' => $position,
                                                                     'resetdate' => $resetdate]);
@@ -134,7 +134,7 @@ class call {
      * @param int $resetdate The resetdate of the activity if any.
      */
     public static function get_menuform_data(string $type, string $externalref, int $resetdate = 0): array {
-        $response = self::initate_call('/api/v1/get_menuform_data.php', ['type' => $type,
+        $response = self::initate_call('/api/v2/get_menuform_data.php', ['type' => $type,
                                                                     'externalref' => $externalref,
                                                                     'resetdate' => $resetdate]);
         $decodedresponse = json_decode($response, true);
@@ -158,7 +158,7 @@ class call {
                                             string $type,
                                             string $resetdate): array {
 
-        $response = self::initate_call('/api/v1/update_progress.php', ['externalref' => $externalref,
+        $response = self::initate_call('/api/v2/update_progress.php', ['externalref' => $externalref,
                                                                     'duration' => $duration,
                                                                     'status' => $status,
                                                                     'resourceref' => $resourceref,
@@ -176,7 +176,7 @@ class call {
      * @param int $resetdate The resetdate of the activity if any.
      */
     public static function get_video_count(string $externalref, string $type, int $resetdate = 0): int {
-        $response = self::initate_call('/api/v1/get_video_count.php', ['externalref' => $externalref,
+        $response = self::initate_call('/api/v2/get_video_count.php', ['externalref' => $externalref,
                                                                     'type' => $type,
                                                                     'resetdate' => $resetdate]);
         $decodedresponse = json_decode($response, true);
