@@ -51,7 +51,8 @@ export const init = () => {
             const externalref = element.getAttribute('data-externalref');
             selectResource(externalref, e.target.getAttribute('data-type'));
         }
-        if (element.classList?.contains('close')
+        if (element.classList?.contains('btn-close')
+            || element.parentElement.classList?.contains('btn-close')
             || element.getAttribute('data-action') === 'cancel'
             || element.getAttribute('data-action') === 'hide'
             || element.parentElement.getAttribute('data-action') === 'hide') {
@@ -234,7 +235,7 @@ export function selectResource(externalref, resourceType) {
             // Once the option is loaded, click on it to select the resource.
             document.querySelector('li[data-value="' + externalref + '"]').click();
             // We can close the modals now.
-            document.querySelectorAll('.modal-header button.close').forEach(function(button) {
+            document.querySelectorAll('.modal-header button.btn-close').forEach(function(button) {
                 button.click();
             });
         });

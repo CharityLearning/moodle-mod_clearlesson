@@ -402,7 +402,7 @@ function clearlesson_redirect_post($data, array $headers = null) {
             $curl->setHeader("$key:$header");
         }
     }
-    $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v1/userlogin.php');
+    $endpoint = new \moodle_url($pluginconfig->clearlessonurl.'/api/v2/userlogin.php');
     $response = json_decode($curl->post($endpoint, $data));
     if (isset($response->success)) {
         $url = new \moodle_url($response->authUrl);
