@@ -29,7 +29,7 @@
         <iframe class="videoframe" src="{{src}}&muted=1" title="{{name}}" frameborder="1" allowfullscreen data-duration="{{duration}}"
         allow="autoplay" {{^resourceplayer}}style="visibility:hidden"{{/resourceplayer}} aria-hidden="false"></iframe>
         {{#nextvideos}}
-            <iframe aria-hidden="true" class="videoframe d-none" src="{{src}}&muted=1" title="{{name}}"
+            <iframe style="visibility: hidden" aria-hidden="true" class="videoframe" src="{{src}}&muted=1" title="{{name}}"
             data-duration="{{duration}}" frameborder="1" allowfullscreen allow="autoplay"></iframe>
         {{/nextvideos}}
         {{^inpage}}

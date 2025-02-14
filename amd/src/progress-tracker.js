@@ -31,6 +31,7 @@ var iframeHidden = false;
 var loopCount = 0;
 var dontPause = false;
 var reset = false;
+var volume = 1;
 
 export const init = async() => {
     if (typeof window.players === 'undefined' || !window.playNext) {
@@ -90,17 +91,21 @@ export const init = async() => {
             for (let i = 0; i < (window.players.length - 1); i++) {
                 window.iFrames.shift();
                 let player = window.players.shift();
-                player.destroy();
+                await player.destroy();
             }
         }
+        let currentiFrame = document.getElementsByClassName('videoframe')[0];
+        hideIframe(currentiFrame);
+        currentiFrame.replaceWith(window.iFrames[0]);
+        currentiFrame.remove();
     }
 
     if (!window.playNext) {
-        setTimeout(async function() {
-            await window.players[0].play();
+        window.players[0].play().then(function() {
             if (!dontPause) {
-                await window.players[0].pause();
+                window.players[0].pause();
             }
+            return true;
         });
     }
 
@@ -108,12 +113,6 @@ export const init = async() => {
 
     // Wait for the player to render before we continue.
     Utils.waitForElement('.speakerinfo .watched-check', document, async function() {
-        if (window.playNext) {
-            let currentiFrame = document.getElementsByClassName('videoframe')[0];
-            hideIframe(currentiFrame);
-            currentiFrame.replaceWith(window.iFrames[0]);
-        }
-
         // Lets take the thumbnail and put it over the video container.
         // This will hide the loading screen.
         const videoContainerHeight = videoContainer.offsetHeight;
@@ -123,57 +122,11 @@ export const init = async() => {
         const playIconDiv = document.getElementById('play-icon-div');
         playIconDiv.style.height = videoContainerHeight + 'px';
         const playIcon = document.getElementById('play-video-button');
+        // Setup the play icon div.
+        playIcon.classList.remove('not-opaque');
+        playIconDiv.classList.add('clickable');
 
-        /* Preload the 'nextvideo'  player */
-        let nextIframe = document.getElementsByClassName('videoframe')[1];
-        if (nextIframe) {
-            nextIframe.parentElement.removeChild(nextIframe);
-            if (!nextIframe.hasAttribute('id')) {
-                nextIframe.setAttribute('id', 'videoframe_' + longIdString);
-            }
-            const nextPlayer = new window.VimeoPlayerConstructor(nextIframe);
 
-            let nextVideoProgressBar;
-            const currentVideoSpan = document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
-            if (currentVideoSpan) {
-                nextVideoProgressBar = currentVideoSpan.closest('.video-card-side')
-                                        .nextElementSibling.querySelector('.progress-bar');
-            } else {
-                // This is a speaker or a topic list. The current video is not in the list.
-                let nextVideoPosition = getNextVideoPosition();
-                nextVideoProgressBar = document.querySelector('.video-card-side[data-position="' + nextVideoPosition + '"]')
-                                        .querySelector('.progress-bar');
-            }
-
-            // Get the progress for the next player
-            let progressInt = parseInt(nextVideoProgressBar.getAttribute('aria-valuenow'));
-            const duration = parseInt(nextVideoProgressBar.getAttribute('aria-valuemax'));
-
-            if (progressInt !== 0) {
-                if (progressInt === duration) {
-                    progressInt = 0;
-                }
-            }
-
-            setTimeout(async function() {
-                if (progressInt !== 0) {
-                    await nextPlayer.setCurrentTime(progressInt);
-                }
-                await nextPlayer.play();
-                if ((typeof window.dontPlayNext === 'undefined' || !window.dontPlayNext)
-                && nextPlayer.id === 'videoframe_' + longIdString) {
-                    await nextPlayer.pause();
-                }
-            });
-
-            hideIframe(nextIframe);
-
-            // We should have 2 player instances now.
-            window.players.push(nextPlayer);
-            window.iFrames.push(nextIframe);
-        }
-
-        // If the there is a next video, we should now have 2 players and 2 iframes.
         const container = document.querySelector('.incourse-player');
         if (container.getAttribute('data-watchedall') == '1') {
             // If all videos in the resource have already been watched, we don't update the progress.
@@ -203,104 +156,189 @@ export const init = async() => {
             window.currentTime = parseInt(lastProgress);
             timeWatched = window.currentTime;
             if (!window.playNext) {
-                await window.players[0].setCurrentTime(window.currentTime);
+                window.players[0].setCurrentTime(window.currentTime);
             }
         } else {
             window.currentTime = 0;
             timeWatched = 0;
         }
-        // Setup the play icon div.
-        playIcon.classList.remove('not-opaque');
-        playIconDiv.classList.add('clickable');
+
+        const setEventListeners = async function(activePlayer) {
+            await activePlayer.getPaused(); // If the player is ready it will stop here.
+            // Good the events wont work until the player is ready and we dont want duplicate events.
+            if (typeof activePlayer.eventsSet === 'undefined') {
+                // When progress is updated, if the video has a higher status already, we don't update it.
+                activePlayer.on('play', function() {
+                    if (window.viewedStatus === 'unwatched') {
+                        window.viewedStatus = 'inprogress';
+                    }
+                    if (iframeHidden) {
+                        thumbImage.remove();
+                        iframeHidden = false;
+                    }
+                });
+
+                activePlayer.on('ended', function() {
+                    if (window.updateProgress) {
+                        videoWatched();
+                        updateProgressAndActivity();
+                    }
+                    if (!dontPause) {
+                        activePlayer.pause();
+                    }
+                });
+
+                activePlayer.on('volumechange', function(data) {
+                    volume = data.volume;
+                });
+
+                activePlayer.on('timeupdate', function(data) {
+                    // Disable seeking on the video player.
+                    if (disableForwardSeek) {
+                        if (timeWatched === 0
+                        || (data.seconds - 1 < timeWatched && data.seconds + 1 > timeWatched)) {
+                            timeWatched = data.seconds;
+                        }
+                    } else if (data.seconds > timeWatched) {
+                        timeWatched = data.seconds;
+                    }
+                    activePlayer.getDuration().then(function(duration) {
+                        let currentProgress = (timeWatched / duration);
+                        const videoLink =
+                        document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
+                        if (videoLink) {
+                            // Move the progress bar in video list along.
+                            const progressBar = videoLink.closest('.video-card-side')?.querySelector('.progress-bar');
+                            if (progressBar) {
+                                const existingProgress = parseFloat(progressBar.style.width.slice(0, -1));
+                                if ((currentProgress * 100) > existingProgress) {
+                                    progressBar.setAttribute('style', 'width: ' + currentProgress * 100 + '%!important');
+                                    progressBar.setAttribute('aria-valuenow', data.seconds);
+                                }
+                            }
+                        }
+                        // If 90% of the video has been watched, we update the status to 'watched'.
+                        if (currentProgress >= 0.9) {
+                            if (window.updateProgress) {
+                                videoWatched();
+                                updateProgressAndActivity();
+                            }
+                        }
+                        return true;
+                    });
+                    // Round off and provide as integer.
+                    window.currentTime = Math.round(data.seconds);
+                });
+
+                if (disableForwardSeek &&
+                window.window.viewedStatus !== 'watched' &&
+                !window.watchedAll && !reset) {
+                    activePlayer.on('seeking', async function(data) {
+                        dontPause = true;
+                        if (timeWatched < data.seconds) {
+                            activePlayer.setCurrentTime(timeWatched);
+                        }
+                        await activePlayer.play();
+                        dontPause = false;
+                    });
+                }
+            }
+            activePlayer.eventsSet = true;
+        };
+
+        if (window.playNext) {
+            window.playNext = false;
+            playIconDiv.remove();
+            showIframe(window.iFrames[0]);
+            thumbImage.remove();
+            let playIfPausedInterval = setInterval(function() {
+                window.players[0].getPaused().then(function(paused) {
+                    if (paused) {
+                        setEventListeners(window.players[0]);
+                        // Since we are autoplaying the video,
+                        // many browsers now mute it by default. How wude.
+                        window.players[0].setVolume(volume);
+                        window.players[0].play();
+                        clearInterval(playIfPausedInterval);
+                    }
+                    return paused;
+                });
+            }, 50);
+        }
 
         playIconDiv.addEventListener('click', async function() {
             window.iFrames[0].style.visibility = 'visible';
             dontPause = true;
             thumbImage.remove();
             playIconDiv.remove();
+            // Since we are autoplaying the video,
+            // many browsers now mute it by default. How wude.
+            window.players[0].setVolume(volume);
+            setEventListeners(window.players[0]);
+            await window.players[0].play();
+            dontPause = false;
+        });
+
+        /* Preload the 'nextvideo'  player */
+        let nextIframe = document.getElementsByClassName('videoframe')[1];
+        if (nextIframe) {
             setTimeout(async function() {
-                await window.players[0].play();
-                dontPause = false;
-            });
-        });
-
-        if (window.playNext) {
-            window.playNext = false;
-            playIconDiv.remove();
-            setTimeout(async function() {
-                showIframe(window.iFrames[0]);
-                await window.players[0].play();
-                thumbImage.remove();
-            }, 50);
-        }
-
-        // When progress is updated, if the video has a higher status already, we don't update it.
-        window.players[0].on('play', function() {
-            if (window.viewedStatus === 'unwatched') {
-                window.viewedStatus = 'inprogress';
-            }
-            if (iframeHidden) {
-                thumbImage.remove();
-                iframeHidden = false;
-            }
-        });
-
-        window.players[0].on('ended', function() {
-            if (window.updateProgress) {
-                videoWatched();
-                updateProgressAndActivity();
-            }
-            window.players[0].pause();
-        });
-
-        window.players[0].on('timeupdate', function(data) {
-            // Disable seeking on the video player.
-            if (disableForwardSeek) {
-                if (timeWatched === 0
-                || (data.seconds - 1 < timeWatched && data.seconds + 1 > timeWatched)) {
-                    timeWatched = data.seconds;
+                if (!nextIframe.hasAttribute('id')) {
+                    nextIframe.setAttribute('id', 'videoframe_' + longIdString);
                 }
-            } else if (data.seconds > timeWatched) {
-                timeWatched = data.seconds;
-            }
-            window.players[0].getDuration().then(function(duration) {
-                let currentProgress = (timeWatched / duration);
-                const videoLink =
-                document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
-                if (videoLink) {
-                    const progressBar = videoLink.closest('.video-card-side')?.querySelector('.progress-bar');
-                    if (progressBar) {
-                        const existingProgress = parseFloat(progressBar.style.width.slice(0, -1));
-                        if ((currentProgress * 100) > existingProgress) {
-                            progressBar.setAttribute('style', 'width: ' + currentProgress * 100 + '%!important');
-                            progressBar.setAttribute('aria-valuenow', data.seconds);
+
+                const nextPlayer = await new window.VimeoPlayerConstructor(nextIframe);
+
+                let nextVideoProgressBar;
+                const currentVideoSpan = document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
+                if (currentVideoSpan) {
+                    nextVideoProgressBar = currentVideoSpan.closest('.video-card-side')
+                                            .nextElementSibling.querySelector('.progress-bar');
+                } else {
+                    // This is a speaker or a topic list. The current video is not in the list.
+                    let nextVideoPosition = getNextVideoPosition();
+                    nextVideoProgressBar = document.querySelector('.video-card-side[data-position="' + nextVideoPosition + '"]')
+                                            .querySelector('.progress-bar');
+                }
+
+                // Get the progress for the next player
+                let progressInt = parseInt(nextVideoProgressBar.getAttribute('aria-valuenow'));
+                const duration = parseInt(nextVideoProgressBar.getAttribute('aria-valuemax'));
+
+                if (progressInt !== 0) {
+                    if (progressInt === duration) {
+                        progressInt = 0;
+                    }
+                }
+
+                if (progressInt !== 0) {
+                    nextPlayer.setCurrentTime(progressInt).then(playNext);
+                } else {
+                    playNext();
+                }
+                /**
+                 * Play the next video, then pause it if required.
+                 * Used for prebuffering while the current video is playing.
+                 */
+                function playNext() {
+                    nextPlayer.play().then(function() {
+                        if ((typeof window.dontPlayNext === 'undefined' || !window.dontPlayNext)
+                        && nextPlayer.id === 'videoframe_' + longIdString) {
+                            if (!dontPause) {
+                                nextPlayer.pause();
+                            }
                         }
-                    }
+                        return true;
+                    });
                 }
-                // If 90% of the video has been watched, we update the status to 'watched'.
-                if (currentProgress >= 0.9) {
-                    if (window.updateProgress) {
-                        videoWatched();
-                        updateProgressAndActivity();
-                    }
-                }
-                return true;
-            });
-            // Round off and provide as integer.
-            window.currentTime = Math.round(data.seconds);
-        });
 
-        if (disableForwardSeek &&
-        window.window.viewedStatus !== 'watched' &&
-        !window.watchedAll && !reset) {
-            window.players[0].on('seeking', async function(data) {
-                dontPause = true;
-                if (timeWatched < data.seconds) {
-                    await window.players[0].setCurrentTime(timeWatched);
-                }
-                await window.players[0].play();
-                dontPause = false;
+                hideIframe(nextIframe);
+
+                // We should have 2 player instances now.
+                window.players.push(nextPlayer);
+                window.iFrames.push(nextIframe);
             });
+            // If the there is a next video, we should now have 2 players and 2 iframes.
         }
     });
     // Save progress if required when the user leaves the page.
