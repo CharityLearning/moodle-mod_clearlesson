@@ -104,6 +104,11 @@ export const init = async(type) => {
             } else {
                 reRenderPlayer(position);
             }
+        } else if (element.classList?.contains('returntocourse')) {
+            // Get the href
+            const href = element.getAttribute('href');
+            // Redirect to the course page.
+            window.location.assign(href);
         }
     });
 };
