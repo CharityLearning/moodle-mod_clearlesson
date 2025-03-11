@@ -56,8 +56,8 @@ if ($clearlesson->type == 'play') {
 }
 if ($returnbutton) {
     $array = array('href' => new moodle_url('/course/view.php', ['id' => $course->id]),
-                'class' => 'btn btn-secondary', 'role' => 'button', 'tabindex' => '0');
-                $button = \html_writer::tag("div", get_string('returntocourse', 'clearlesson'), $array);
+                'class' => 'btn btn-secondary returntocourse', 'role' => 'link', 'tabindex' => '0');
+                $button = \html_writer::tag("button", get_string('returntocourse', 'clearlesson'), $array);
                 $PAGE->set_button($button);
 }
 clearlesson_print_header($clearlesson, $cm, $course);
