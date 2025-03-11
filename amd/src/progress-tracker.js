@@ -37,6 +37,8 @@ export const init = async() => {
     if (typeof window.players === 'undefined' || !window.playNext) {
         window.players = [];
         window.iFrames = [];
+        window.continue = true;
+        window.autoPlay = false;
     }
 
     var iframe;
@@ -101,11 +103,20 @@ export const init = async() => {
     }
 
     if (!window.playNext) {
-        window.players[0].play().then(function() {
-            if (!dontPause) {
-                window.players[0].pause();
-            }
-            return true;
+        window.players[0].play();
+        setTimeout(function() {
+            let currentBufferInterval = setInterval(async function() {
+                const paused = await window.players[0].getPaused();
+                if (!paused) {
+                    window.players[0].play().then(function() {
+                        clearInterval(currentBufferInterval);
+                        if (!dontPause) {
+                            window.players[0].pause();
+                        }
+                        return true;
+                    });
+                }
+            }, 50);
         });
     }
 
@@ -242,28 +253,50 @@ export const init = async() => {
                         dontPause = false;
                     });
                 }
+                return true;
             }
             activePlayer.eventsSet = true;
+            return false;
         };
 
         if (window.playNext) {
             window.playNext = false;
-            playIconDiv.remove();
             showIframe(window.iFrames[0]);
-            thumbImage.remove();
+            if (window.autoPlay) {
+                playIconDiv.remove();
+                thumbImage.remove();
+            }
+
             let playIfPausedInterval = setInterval(function() {
-                window.players[0].getPaused().then(function(paused) {
-                    if (paused) {
-                        setEventListeners(window.players[0]);
-                        // Since we are autoplaying the video,
-                        // many browsers now mute it by default. How wude.
+                    setTimeout(async function() {
+                        await setEventListeners(window.players[0]);
+                        // Since we are autoplaying the video, many browsers now mute it by default. How wude.
                         window.players[0].setVolume(volume);
-                        window.players[0].play();
-                        clearInterval(playIfPausedInterval);
-                    }
-                    return paused;
-                });
-            }, 50);
+                        // Get the progress of the next video and set the current time.
+                        const progressBar = document.querySelector('span.v[data-externalref="' + window.extref + '"]')
+                                                            .closest('.video-card-side').querySelector('.progress-bar');
+                        const duration = parseInt(progressBar.getAttribute('aria-valuemax'));
+                        var startTime = parseInt(progressBar.getAttribute('aria-valuenow'));
+                        if (startTime === duration) {
+                            startTime = 0;
+                        }
+                        window.players[0].setCurrentTime(startTime);
+
+                        if (window.autoPlay) {
+                            playIconDiv.remove();
+                            thumbImage.remove();
+                            dontPause = true;
+                            window.players[0].play().then(function() {
+                                dontPause = false;
+                                return true;
+                            });
+                            window.autoPlay = false;
+                        }
+                        if (typeof playIfPausedInterval !== 'undefined') {
+                            clearInterval(playIfPausedInterval);
+                        }
+                    });
+            }, 200);
         }
 
         playIconDiv.addEventListener('click', async function() {
@@ -271,8 +304,7 @@ export const init = async() => {
             dontPause = true;
             thumbImage.remove();
             playIconDiv.remove();
-            // Since we are autoplaying the video,
-            // many browsers now mute it by default. How wude.
+            // Since we are autoplaying the video, many browsers now mute it by default. How wude.
             window.players[0].setVolume(volume);
             setEventListeners(window.players[0]);
             await window.players[0].play();
@@ -289,50 +321,43 @@ export const init = async() => {
 
                 const nextPlayer = await new window.VimeoPlayerConstructor(nextIframe);
 
-                let nextVideoProgressBar;
-                const currentVideoSpan = document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
-                if (currentVideoSpan) {
-                    nextVideoProgressBar = currentVideoSpan.closest('.video-card-side')
-                                            .nextElementSibling.querySelector('.progress-bar');
-                } else {
-                    // This is a speaker or a topic list. The current video is not in the list.
-                    let nextVideoPosition = getNextVideoPosition();
-                    nextVideoProgressBar = document.querySelector('.video-card-side[data-position="' + nextVideoPosition + '"]')
-                                            .querySelector('.progress-bar');
-                }
+                setTimeout(function() {
+                    let bufferPlayer = setInterval(async function() {
+                        await nextPlayer.getPaused();
+                        clearInterval(bufferPlayer);
+                        let nextVideoProgressBar;
+                        const currentVideoSpan =
+                            document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
+                        if (currentVideoSpan) {
+                            nextVideoProgressBar = currentVideoSpan.closest('.video-card-side')
+                                                    .nextElementSibling.querySelector('.progress-bar');
+                        } else {
+                            // This is a speaker or a topic list. The current video is not in the list.
+                            let nextVideoPosition = getNextVideoPosition();
+                            nextVideoProgressBar = document
+                                                    .querySelector('.video-card-side[data-position="' + nextVideoPosition + '"]')
+                                                    .querySelector('.progress-bar');
+                        }
 
-                // Get the progress for the next player
-                let progressInt = parseInt(nextVideoProgressBar.getAttribute('aria-valuenow'));
-                const duration = parseInt(nextVideoProgressBar.getAttribute('aria-valuemax'));
+                        // Get the progress for the next player
+                        let progressInt = parseInt(nextVideoProgressBar.getAttribute('aria-valuenow'));
+                        const duration = parseInt(nextVideoProgressBar.getAttribute('aria-valuemax'));
 
-                if (progressInt !== 0) {
-                    if (progressInt === duration) {
-                        progressInt = 0;
-                    }
-                }
-
-                if (progressInt !== 0) {
-                    nextPlayer.setCurrentTime(progressInt).then(playNext);
-                } else {
-                    playNext();
-                }
-                /**
-                 * Play the next video, then pause it if required.
-                 * Used for prebuffering while the current video is playing.
-                 */
-                function playNext() {
-                    nextPlayer.play().then(function() {
-                        if ((typeof window.dontPlayNext === 'undefined' || !window.dontPlayNext)
-                        && nextPlayer.id === 'videoframe_' + longIdString) {
-                            if (!dontPause) {
-                                nextPlayer.pause();
+                        if (progressInt !== 0) {
+                            if (progressInt === duration) {
+                                progressInt = 0;
                             }
                         }
-                        return true;
-                    });
-                }
 
-                hideIframe(nextIframe);
+                        if (progressInt !== 0) {
+                            nextPlayer.setCurrentTime(progressInt).then(nextPlayer.play());
+                        } else {
+                            nextPlayer.play();
+                        }
+
+                        hideIframe(nextIframe);
+                    }, 100);
+                });
 
                 // We should have 2 player instances now.
                 window.players.push(nextPlayer);

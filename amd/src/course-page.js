@@ -159,7 +159,7 @@ export const init = () => {
         || element.parentElement?.classList?.contains('othervideo-title')
         || element.classList?.contains('video-player-link')
         || element.parentElement?.classList?.contains('video-player-link')) {
-            e.preventDefault();
+            window.playNext = window.isNextVideo(e);
             position = parseInt(element.closest('.has-position').getAttribute('data-position'));
             reRenderCoursePlayerModal(position, url);
         }

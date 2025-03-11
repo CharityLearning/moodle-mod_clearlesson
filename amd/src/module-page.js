@@ -98,12 +98,18 @@ export const init = async(type) => {
         || element.parentElement?.classList?.contains('othervideo-title')
         || element.classList?.contains('video-player-link')
         || element.parentElement?.classList?.contains('video-player-link')) {
+            window.playNext = window.isNextVideo(e);
             position = parseInt(element.closest('.has-position').getAttribute('data-position'));
             if (element.closest('.modal-body')) {
                 reRenderModulePlayerModal(position, url);
             } else {
                 reRenderPlayer(position);
             }
+        } else if (element.classList?.contains('returntocourse')) {
+            // Get the href
+            const href = element.getAttribute('href');
+            // Redirect to the course page.
+            window.location.assign(href);
         }
     });
 };

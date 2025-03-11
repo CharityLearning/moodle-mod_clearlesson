@@ -309,10 +309,43 @@ window.playNextItem = function() {
         nextVideo = document.querySelector('.video-card-side[data-position="' + nextVideoPosition + '"]');
     }
     if (nextVideo) {
-        window.playNext = true;
-        window.dontPauseNext = true;
+        window.autoPlay = true;
         nextVideo.querySelector('span').click();
     }
+};
+
+/**
+ * Works out if the video clicked it the next video in the list.
+ *
+ * @param {Event} e The event object.
+ */
+window.isNextVideo = (e) => {
+    var nextVideoCard, videoCard;
+    if (e.target.id === 'play-next-button' || e.target.closest('#play-next-button')) {
+        return true;
+    }
+    const currentVideoSpan = document.querySelector('.video-card-side span[data-externalref="' + window.extref + '"]');
+    if (currentVideoSpan) {
+        nextVideoCard = currentVideoSpan.closest('.video-card-side').nextElementSibling;
+    } else {
+        // This is a speaker or a topic list. The current video is not in the list.
+        let nextVideoPosition = progressTracker.getNextVideoPosition();
+        nextVideoCard = document.querySelector('.video-card-side[data-position="' + nextVideoPosition + '"]');
+    }
+    if (!nextVideoCard) {
+        return false;
+    }
+    if (e.target.classList?.contains('video-card-side')) {
+        videoCard = e.target;
+    } else {
+        videoCard = e.target.closest('.video-card-side');
+    }
+    if (!videoCard) {
+        return false;
+    }
+    const nextVideoExternalRef = nextVideoCard.querySelector('.video-player-link').getAttribute('data-externalref');
+    const externalRef = videoCard.querySelector('.video-player-link').getAttribute('data-externalref');
+    return nextVideoExternalRef === externalRef;
 };
 
 /**
