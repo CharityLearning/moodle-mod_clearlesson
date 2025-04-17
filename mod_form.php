@@ -76,6 +76,7 @@ class mod_clearlesson_mod_form extends moodleform_mod {
 
         $options = [0 => get_string('no'), 1 => get_string('yes')];
         $mform->addElement('select', 'disableforwardseek', get_string('disableforwardseek', 'clearlesson'), $options);
+        $mform->addHelpButton('disableforwardseek',  'disableforwardseek',  'clearlesson');
         if (isset($config->defaultnoseek) && $config->defaultnoseek) {
             $defaultsetting = 1;
         } else {
