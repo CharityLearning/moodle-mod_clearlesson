@@ -76,6 +76,7 @@ class mod_clearlesson_mod_form extends moodleform_mod {
 
         $options = [0 => get_string('no'), 1 => get_string('yes')];
         $mform->addElement('select', 'disableforwardseek', get_string('disableforwardseek', 'clearlesson'), $options);
+        $mform->addHelpButton('disableforwardseek',  'disableforwardseek',  'clearlesson');
         if (isset($config->defaultnoseek) && $config->defaultnoseek) {
             $defaultsetting = 1;
         } else {
@@ -97,9 +98,9 @@ class mod_clearlesson_mod_form extends moodleform_mod {
             reset($options);
             $mform->setDefault('display', key($options));
         } else {
-            $mform->addElement('select', 'display', get_string('displayselect', 'url'), $options);
+            $mform->addElement('select', 'display', get_string('displayselect', 'mod_clearlesson'), $options);
             $mform->setDefault('display', $config->display);
-            $mform->addHelpButton('display', 'displayselect', 'url');
+            $mform->addHelpButton('display', 'displayselect', 'mod_clearlesson');
         }
 
         if (array_key_exists(RESOURCELIB_DISPLAY_POPUP, $options)) {

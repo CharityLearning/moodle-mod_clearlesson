@@ -52,7 +52,7 @@ function xmldb_clearlesson_upgrade($oldversion) {
         exit(1);
     }
 
-    if ($oldverion < 2023091316) {
+    if ($oldversion < 2023091316) {
         require_once("$CFG->libdir/resourcelib.php");
         require_once("$CFG->dirroot/mod/clearlesson/lib.php");
 
