@@ -39,14 +39,12 @@ $string['contentheader'] = 'Content';
 $string['createurl'] = 'Create a URL';
 $string['displayoptions'] = 'Available display options';
 $string['displayselect'] = 'Display';
-$string['displayselect_help'] = 'This setting, together with the URL file type and whether the browser allows embedding, determines how the URL is displayed. Options may include:
+$string['displayselect_help'] = 'Determines how the resource is displayed when clicked from the course page, the options may include:
 
-* Automatic - The best display option for the URL is selected automatically
-* Embed - The URL is displayed within the page below the navigation bar together with the URL description and any blocks
-* Open - Only the URL is displayed in the browser window
-* In pop-up - The URL is displayed in a new browser window without menus or an address bar
-* In frame - The URL is displayed within a frame below the navigation bar and URL description
-* New window - The URL is displayed in a new browser window with menus and an address bar';
+* New window - The link opens in a new browser window.
+* Open - The link opens in the same window.
+* In pop-up - The link opens in a new pop-up window.
+* Modal - The link opens a modal window on the same page.';
 $string['displayselectexplain'] = 'Choose display type, unfortunately not all types are suitable for all URLs.';
 $string['externalurl'] = 'External URL';
 $string['framesize'] = 'Frame height';
@@ -91,6 +89,7 @@ $string['clearsearch'] = 'Clear search';
 $string['defaultnoseek'] = 'Disable forward skipping by default';
 $string['defaultnoseekexplain'] = 'This setting can be edited per activity module';
 $string['disableforwardseek'] = 'Disable skipping forward in the video player';
+$string['disableforwardseek_help'] = 'If a video is already marked as \'watched\', playback will start from the beginning and the user can skip around freely even if this feature is enabled.';
 $string['resetclearwatched'] = 'Recompletion reset and video watched history';
 $string['resetclearwatchedinfo'] = 'Enabling will reset the watched history of any videos in the activity during a reset. No prior watched history data will be deleted, just ignored.';
 $string['displaytypemodal'] = 'Modal';
