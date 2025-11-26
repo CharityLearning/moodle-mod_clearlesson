@@ -19,7 +19,8 @@
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="mod-clearlesson mod-clearlesson-backgrounddgrey browser" style="margin-top: -2em; position: relative">
+<div class="mod-clearlesson mod-clearlesson-backgrounddgrey browser"
+style="margin-top: -2em; position: relative; min-height: 520px!important;">
     <div style="position: relative"></div>
     <div id="open-filters-parent" class="d-block d-xl-none">
         <button class="btn btn-outline-info" id="open-filters-button">
@@ -33,8 +34,8 @@
     </div>
     <div class="d-flex" style="position: relative">
         {{> mod_clearlesson/elements/browser_sidebar}}
-        <div class="row w-100 ml-1" id="resource-container">
-            <div class="type-buttons w-100 pt-4 pb-1 pl-2 mod-clearlesson-backgrounddgrey"
+        <div class="row w-100 ms-1" id="resource-container">
+            <div class="type-buttons w-100 pt-4 pb-1 ps-2 mod-clearlesson-backgrounddgrey"
             style="position:sticky;z-index:2; top: -2em!important;">
                 {{#types}}
                     <button href="javascript:void(0)" data-type="{{key}}" class="type-button btn btn-{{^disabled}}outline-{{/disabled}}info

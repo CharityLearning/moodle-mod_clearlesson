@@ -373,7 +373,10 @@ function updateWaitingDivs(modalElement, waiting, selector) {
             }
         }
     } else {
-        modalElement.querySelector('.modal-header > button > span').style.cursor = 'pointer';
+        const buttonSpan = modalElement.querySelector('.modal-header > button > span');
+        if (buttonSpan) {
+            buttonSpan.style.cursor = 'pointer';
+        }
         for (const node of resources) {
             if (!node.classList.contains('d-none')) {
                 let cursor = (node.tagName === 'BUTTON'

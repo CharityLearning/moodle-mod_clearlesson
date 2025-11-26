@@ -22,7 +22,7 @@
 {{^isvideo}}
     <div id="play-next-containter" class="w-100" style="position: relative; z-index: 102;">
         {{^islast}}
-            <button id="play-next-button" class="btn-primary loading {{^watched}} notwatched{{/watched}}"
+            <button id="play-next-button" class="btn btn-primary loading {{^watched}} notwatched{{/watched}}"
             title="{{playnextstring}}" alt="{{playnextstring}}"  onclick="event.preventDefault();window.playNextItem()"
             {{^watched}}aria-hidden="true"{{/watched}}{{#watched}}aria-hidden="false"{{/watched}}>
                 &nbsp&nbsp<i class="fas fa-play"></i>&nbsp&nbsp{{playnextstring}}&nbsp&nbsp&nbsp&nbsp
