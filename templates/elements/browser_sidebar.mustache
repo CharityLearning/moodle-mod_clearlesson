@@ -21,7 +21,7 @@
 }}
 <div class="browser-sidebar d-flex flex-column justify-content-between align-content-start align-items-start"
 style="z-index:3;">
-    <div id="sibebar-parent">
+    <div id="sidebar-parent">
         <div class="browser-filters inwisible-small flex-column" aria-expanded="false" style="position: fixed;">
             {{> mod_clearlesson/elements/searchbar}}
             <br>
@@ -30,7 +30,7 @@ style="z-index:3;">
             {{/filters}}
             {{#filtersexist}}
                 <div class="w-100 d-flex flex-nowrap px-1 sidebar-element">
-                    <button class="btn btn-outline-info mr-3 mb-2 flex-grow-1" id="clear-filters"
+                    <button class="btn btn-outline-info me-3 mb-2 flex-grow-1" id="clear-filters"
                     style="height: 36.5px; width:calc(50% - 0.25em)">{{#str}} clearfilters, mod_clearlesson {{/str}}</button>
                     <button class="btn btn-outline-info mb-2 flex-grow-1" id="clear-search"
                     style="height: 36.5px; width:calc(50% - 0.25em)">{{#str}} clearsearch, mod_clearlesson {{/str}}</button>

@@ -20,15 +20,15 @@
     Moodle template for the list of valid options in an autocomplate form element.
 }}
 <div class="mod-clearlesson">
-    <div class="page-content-wrapper incourse incourse-player" data-resourceref="{{resourceref}}"
+    <div class="page-content-wrapper incourse incourse-player px-4" data-resourceref="{{resourceref}}"
     data-type={{type}} data-watchedall="{{watchedall}}" data-noseek="{{disableforwardseek}}" data-progress="{{progress}}">
         <div class="container-fluid">
-            <div class="row player-row{{#isvideo}} justify-content-center video{{/isvideo}} col-container">
+            <div class="d-flex player-row{{#isvideo}} justify-content-center video{{/isvideo}} flex-wrap">
                 {{^isvideo}}
-                    <div class="col-sm-2 video-list-column"{{#playlistref}} data-playlist="{{playlistref}}"{{/playlistref}}
-                    {{#speakeref}} data-speaker="{{speakeref}}"{{/speakeref}}>
-                        <div class="col-md-12 box pr-0">
-                            <h6 class="card-subtitle mb-2 text-muted mt-2">
+                    <div class="video-list-column flex-shrink-0"{{#playlistref}} data-playlist="{{playlistref}}"{{/playlistref}}
+                    {{#speakeref}} data-speaker="{{speakeref}}"{{/speakeref}} style="width: 16.666667%;">
+                        <div class="box pe-0">
+                            <h6 class="card-subtitle ps-2 mb-2 text-muted mt-2">
                                 {{#topicref}}
                                     {{#str}} topicvideos, mod_clearlesson {{/str}}
                                 {{/topicref}}
@@ -46,16 +46,16 @@
                         </div>
                     </div>
                 {{/isvideo}}
-                <div class="col-sm-10 player-column w-100" data-thumb="{{largethumbnail}}">
+                <div class="player-column flex-grow-1" data-thumb="{{largethumbnail}}">
                     <div class="box p-0 d-flex flex-column justify-content-between w-100">
                         {{> mod_clearlesson/elements/video_iframe}}
                         <div class="p-2 speakerinfo d-flex bd-highlight mb-1 w-100">
-                            <div class="mr-auto bd-highlight d-flex justify-content-start">
+                            <div class="me-auto bd-highlight d-flex justify-content-start">
                                 <div class="d-flex bd-highlight">
-                                    <div class="mr-auto bd-highlight">
+                                    <div class="me-auto bd-highlight">
                                         <img class="speaker-img" alt="speaker" src="{{speakerimgsrc}}">
                                     </div>
-                                    <div class="mr-auto p-2 bd-highlight">
+                                    <div class="me-auto p-2 bd-highlight">
                                         <span href="javascript:void(0)" class="speaker-link text-muted" data-speakers="{{speakeref}}">{{speakername}}</span>
                                     </div>
                                 </div>

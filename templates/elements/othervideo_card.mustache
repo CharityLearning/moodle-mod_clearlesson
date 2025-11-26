@@ -19,7 +19,7 @@
 
     Moodle template for the list of valid options in an autocomplate form element.
 }}
-<div class="video-card-side video-card-list has-position d-block d-sm-flex d-lg-block flex-wrap"
+<div class="video-card-side video-card-list has-position d-block d-sm-flex d-lg-block flex-wrap ps-2"
 data-position="{{position}}" data-type="{{type}}">
     {{#playlistref}}
         <div class="playlist-play-content-video-number d-none d-lg-flex justify-content-center {{#active}}active{{/active}}">
@@ -27,8 +27,8 @@ data-position="{{position}}" data-type="{{type}}">
             {{^active}}{{position}}{{/active}}
         </div>
     {{/playlistref}}
-    <div class="video-card-body pr-2 w-100">
-        <div class="play-{{#playlists}}playlist-{{/playlists}}video-card-body pr-2" style="position: relative;">
+    <div class="video-card-body pe-2 w-100">
+        <div class="play-{{#playlists}}playlist-{{/playlists}}video-card-body pe-2" style="position: relative;">
             <div class="video-title othervideo-title loading">
                 <span href="javascript:void(0)" class="v video-player-link" data-externalref="{{vimeoref}}">{{name}}</span>
             </div>
