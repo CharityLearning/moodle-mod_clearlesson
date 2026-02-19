@@ -34,7 +34,6 @@ class clearlesson_task extends \core\task\scheduled_task {
         $this->sync();
     }
     public function sync() {
-        require_once(dirname(__FILE__) . '../../../../../config.php');
         require_once(dirname(__FILE__) . '../../../lib/php-jws/Exception/JWSException.php');
         require_once(dirname(__FILE__) . '../../../lib/php-jws/Util/Base64Url.php');
         require_once(dirname(__FILE__) . '../../../lib/php-jws/Util/Json.php');
